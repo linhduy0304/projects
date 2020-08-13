@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/24x24_perfume_o</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M16,6.525 C20.653,7.765 24,11.091 24,15 C24,19.962 18.617,24 12,24 C5.383,24 0,19.962 0,15 C0,11.091 3.347,7.765 8,6.525 L8,1 C8,0.448 8.448,0 9,0 L15,0 C15.552,0 16,0.448 16,1 L16,6.525 Z M12,22 C17.514,22 22,18.86 22,15 C22,11.14 17.514,8 12,8 C6.486,8 2,11.14 2,15 C2,18.86 6.486,22 12,22 Z M10,6 L14,6 L14,2 L10,2 L10,6 Z M15,18 C15.552,18 16,18.448 16,19 C16,19.552 15.552,20 15,20 L8,20 C7.448,20 7,19.552 7,19 C7,18.448 7.448,18 8,18 L15,18 Z M19,14.875 C19.552,14.875 20,15.323 20,15.875 C20,16.427 19.552,16.875 19,16.875 L5,16.875 C4.448,16.875 4,16.427 4,15.875 C4,15.323 4.448,14.875 5,14.875 L19,14.875 Z M19,5 C18.448,5 18,4.552 18,4 C18,3.448 18.448,3 19,3 C19.552,3 20,3.448 20,4 C20,4.552 19.552,5 19,5 Z M22,3 C21.448,3 21,2.552 21,2 C21,1.448 21.448,1 22,1 C22.552,1 23,1.448 23,2 C23,2.552 22.552,3 22,3 Z M22,7 C21.448,7 21,6.552 21,6 C21,5.448 21.448,5 22,5 C22.552,5 23,5.448 23,6 C23,6.552 22.552,7 22,7 Z" id="path-1"></path>
+    </defs>
+    <g id="icon/24x24_perfume_o" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <use id="Mask" fill="#231F20" xlink:href="#path-1"></use>
+        <g id="COLOR/JJ_4.black" mask="url(#mask-2)" fill="#0F0A0A">
+            <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        </g>
+    </g>
+</svg>

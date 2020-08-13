@@ -1,0 +1,15 @@
+
+
+const {Record} = require('immutable');
+const {
+  PROFILE
+} = require('../../config/actionTypes');
+
+var InitialState = Record({
+  state: PROFILE,
+  loading: null,
+  currentUser: null
+});
+
+export default InitialState;
+

@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Happy Skin V3</string>
+    <string name="fb_app_id">784718758280423</string>
+    <string name="fb_login_protocol_scheme">fb784718758280423</string>
+</resources>

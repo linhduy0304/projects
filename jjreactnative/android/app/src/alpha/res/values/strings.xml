@@ -1,0 +1,10 @@
+<resources>
+    <!--pro: 437382966424613 -->
+    <!--dev: 1628889640660321-->
+    <string name="facebook_app_id">1628889640660321</string>
+    <string name="app_name">JAMJA_DEBUG</string>
+    <string name="google_project_number">1095577327775</string>
+    <string name="branch_io_key">key_test_dbpUG9a9yIHbIaFv73j6fbhkzEpqpLuu</string>
+    <string name="one_signal_app_id">79d889ff-f51c-447b-8d9c-ad61e21ad2bf</string>
+    <string name="ga_trackingId">UA-64551878-15</string>
+</resources>

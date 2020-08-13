@@ -1,0 +1,32 @@
+{
+  "name": "testApi",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@haskkor/react-native-pincode": "^1.6.3",
+    "axios": "^0.18.0",
+    "decode-html": "^2.0.0",
+    "html-entities": "^1.2.1",
+    "react": "16.5.0",
+    "react-native": "0.57.0",
+    "react-native-camera": "^1.2.0",
+    "react-native-masked-text": "^1.9.2",
+    "react-native-universal-pedometer": "^0.2.0",
+    "react-native-view-shot": "^2.4.0",
+    "react-navigation": "^2.18.2",
+    "rn-fetch-blob": "^0.10.13"
+  },
+  "devDependencies": {
+    "babel-jest": "23.6.0",
+    "jest": "23.6.0",
+    "metro-react-native-babel-preset": "0.45.1",
+    "react-test-renderer": "16.5.0"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}

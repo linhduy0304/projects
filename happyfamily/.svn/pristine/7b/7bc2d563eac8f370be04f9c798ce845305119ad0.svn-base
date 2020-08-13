@@ -1,0 +1,100 @@
+
+
+import React from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image
+} from 'react-native';
+import Swipeout from 'react-native-swipeout';
+import TimeAgo from 'react-native-timeago'; 
+import {renderTime} from '../Functions'
+const swipeoutBtns = [
+  {
+    // text: 'Edit',
+    // backgroundColor: '#2ecc71',
+    component:  <View style={{backgroundColor: '#c6247d', flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                  <Image source={require('../../images/icons/ic_close.png')} />
+                </View>
+  },
+]
+
+const ListChat = ({
+  onPress,
+  data
+}) => (
+  <Swipeout 
+        right={swipeoutBtns}
+        buttonWidth={70}
+        backgroundColor={data.color}
+      >
+  <TouchableOpacity onPress={onPress} style={styles.ctItem}>
+    <Image style={styles.avatar} source={data.type === 'multiple' ? require('../../images/group_chat.png') : data.user.avatar ? {uri: data.user.avatar} : (require('../../images/avatar_default.png'))} />
+    <View style={styles.ctContent}>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={styles.txtName}>{data.type === 'multiple' ? data.name : data.user.full_name}</Text>
+        <Text style={styles.txtTime}>{renderTime(data.created_at)}</Text>
+      </View>
+      <View style={{flexDirection: 'row', marginTop: 5}}>
+        <Text numberOfLines={2} style={styles.txtContent}>{data.last_message_content}</Text>
+        {/* <View style={styles.ctCount}>
+          <Text style={styles.txtCount}>3</Text>
+        </View> */}
+      </View>
+    </View>
+  </TouchableOpacity>
+  </Swipeout>
+)
+
+const styles = StyleSheet.create({
+  txtCount: {
+    color: '#fff',
+    fontSize: 12
+  },
+  ctCount: {
+    backgroundColor: '#c6247d',
+    borderRadius: 4,
+    padding: 3,
+    paddingLeft: 5,
+    paddingRight: 5
+  },
+  ctDelete: {
+    alignItems: 'center'
+  },
+  txtTime: {
+    color: '#bcc0c8',
+    fontSize: 12
+  },
+  txtContent: {
+    color: '#606060',
+    fontSize: 13,
+    flex: 1,
+    alignItems: 'center',
+  },
+  ctContent: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  avatar: {
+    height: 60,
+    width: 60,
+    borderRadius: 30
+  },
+  txtName: {
+    color: '#000',
+    fontSize: 15,
+    flex: 1,
+  },
+  ctItem: {
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    padding: 15,
+    borderBottomColor: '#e5e9ea',
+    borderBottomWidth: 1
+  },
+})
+
+export default ListChat;
+  

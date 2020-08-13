@@ -1,0 +1,99 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "react-native-timeline-listview",
+        "scope": null,
+        "escapedName": "react-native-timeline-listview",
+        "name": "react-native-timeline-listview",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "/Users/tuonght93/Dev/reactnative/hs2/happyskin"
+    ]
+  ],
+  "_from": "react-native-timeline-listview@latest",
+  "_id": "react-native-timeline-listview@0.2.2",
+  "_inCache": true,
+  "_location": "/react-native-timeline-listview",
+  "_nodeVersion": "8.1.2",
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages",
+    "tmp": "tmp/react-native-timeline-listview-0.2.2.tgz_1499438143244_0.9063289707992226"
+  },
+  "_npmUser": {
+    "name": "thegamenicorus",
+    "email": "nicorus_1@hotmail.com"
+  },
+  "_npmVersion": "5.0.3",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "react-native-timeline-listview",
+    "scope": null,
+    "escapedName": "react-native-timeline-listview",
+    "name": "react-native-timeline-listview",
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/react-native-timeline-listview/-/react-native-timeline-listview-0.2.2.tgz",
+  "_shasum": "96b65797425525cf98d17e45044b7c154ea82421",
+  "_shrinkwrap": null,
+  "_spec": "react-native-timeline-listview",
+  "_where": "/Users/tuonght93/Dev/reactnative/hs2/happyskin",
+  "author": {
+    "name": "Watcharachai Kanjaikaew",
+    "url": "https://github.com/thegamenicorus"
+  },
+  "bugs": {
+    "url": "https://github.com/thegamenicorus/react-native-timeline-listview/issues"
+  },
+  "dependencies": {},
+  "description": "Timeline component for React Native",
+  "devDependencies": {},
+  "directories": {},
+  "dist": {
+    "integrity": "sha512-gzpBitOD6CqNfJT0HdppHxLtwV1z9QTTa+zUoaE5h9gX+eUZnYxQQwxV8B5apcibrpqusH5TcpLJMZ1ZJ3XkBQ==",
+    "shasum": "96b65797425525cf98d17e45044b7c154ea82421",
+    "tarball": "https://registry.npmjs.org/react-native-timeline-listview/-/react-native-timeline-listview-0.2.2.tgz"
+  },
+  "gitHead": "17cecb6ff8f5c7f519755bb5075169a89ef62caf",
+  "homepage": "https://github.com/thegamenicorus/react-native-timeline-listview",
+  "keywords": [
+    "react-native",
+    "timeline",
+    "listview",
+    "schedule",
+    "react native component",
+    "ios",
+    "android",
+    "component"
+  ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "maintainers": [
+    {
+      "name": "thegamenicorus",
+      "email": "nicorus_1@hotmail.com"
+    }
+  ],
+  "name": "react-native-timeline-listview",
+  "optionalDependencies": {},
+  "peerDependencies": {
+    "react-native": ">= 0.4"
+  },
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/thegamenicorus/react-native-timeline-listview.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "0.2.2"
+}

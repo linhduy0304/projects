@@ -1,0 +1,128 @@
+
+
+import {
+  StyleSheet,
+  Platform,
+  Dimensions,
+  StatusBar,
+} from "react-native";
+const window = Dimensions.get('window');
+var DeviceInfo = require('react-native-device-info');
+
+module.exports = StyleSheet.create({
+  container: {
+    flex: 1,
+		backgroundColor: '#fff',
+  },
+  statusBar: {
+		backgroundColor: '#fff',
+		height: Platform.Version < 21 ? 0 : StatusBar.currentHeight
+	},
+	navBarWhite: {
+		backgroundColor: '#fff',
+		padding: 0,
+    height: 44,
+    marginTop: 0,
+		// width: windowSize.width,
+		borderBottomColor: "transparent"
+	},
+	navBar2: {
+		backgroundColor: '#3f4553',
+		padding: 0,
+    height: 44,
+    marginTop: 0,
+		// width: windowSize.width,
+		// borderBottom
+		borderBottomColor: "transparent"
+	},
+	navBar: {
+		backgroundColor: '#C6247D',
+		padding: 0,
+    height: 44,
+    marginTop: 0,
+		// width: windowSize.width,
+		borderBottomColor: "transparent"
+	},
+	navTitle: {
+		maxWidth: window.width/2,
+	},
+	navBack: {
+		marginLeft: 0, 
+		padding: 15,
+		flexDirection: 'row',
+		alignItems: 'center'
+	},
+	txtBack: {
+		color: '#1A3045',
+		marginLeft: 10
+	},
+	txtTitle: {
+		fontSize: 17,
+    color: '#fff',
+    // color: 'rgb(0, 139, 125)',
+		// marginLeft: 15
+	},
+	navButtonRight: {
+		backgroundColor: 'red',
+		padding: 15,
+		marginRight: 0
+	},
+
+	ctModalSearch: {
+		backgroundColor: 'rgba(198, 36, 125, 0.6)',
+		marginTop: Platform.OS === 'ios' ? 0 : DeviceInfo.getSystemVersion().slice(0, 1) != 4 ? StatusBar.currentHeight : 0,
+	},
+	
+	ctSearch: {
+    height: 44,
+    backgroundColor: '#fff',
+    paddingLeft: 15,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+
+	txtError: {
+    color: 'red',
+    fontSize: 13
+  },
+	
+  mainSpin: {
+		width: window.width,
+		height: window.height,
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'rgba(0, 0, 0, 0.3)',
+		zIndex: 99
+	},
+	mainSpin1: {
+		width: window.width,
+		height: window.height,
+		position: 'absolute',
+		top: Platform.OS === 'ios' ? 44 : DeviceInfo.getSystemVersion().slice(0, 1) != 4 ? StatusBar.currentHeight+44 : 44,
+		left: 0,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: '#fff',
+		zIndex: 99
+  },
+	
+	ctNoti: {
+    marginTop: window.height/3,
+    alignItems: 'center',
+    justifyContent: 'center',
+	},
+	txtNoti: {
+		fontSize: 15,
+		color: '#e291be',
+		marginTop: 5
+	},
+
+
+	icLoading: {
+		width: 30, 
+		height: 30
+	},
+});

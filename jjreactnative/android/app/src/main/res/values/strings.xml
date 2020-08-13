@@ -1,0 +1,22 @@
+<resources>
+    <string moduleConfig="true" name="reactNativeCodePush_androidDeploymentKey"></string>
+    <string name="app_name">JAMJA_DEV</string>
+    <!-- Dev -->
+    <string name="facebook_app_id">1628889640660321</string>
+    <!-- Production -->
+    <!-- <string name="facebook_app_id">437382966424613</string> -->
+
+    <string name="insider_notification_icon">ic_notification_icon</string>
+    <string name="insider_notification_large_icon">ic_onesignal_large_icon_default</string>
+    <string name="insider_notification_circle_color">ColorJamja</string>
+
+    <string name="CodePushPublicKey">-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApag7xD3cfSG8Yph0rXCe
+fF6krrafJWCdXMY28uKn9Ke/8uR5G9L6n1pUS1B6XwoDge0oEabH+gGDaPKwpjDJ
+svdkSi/HDlC3gDavXooyX9W7mIHqJJz+5W5K1+YwDyCh26G9Dbtf0ksigkTcRhdh
+IKosNuOWIY2GAZcO+LM1RABu5lwy2RxQXrqgWg6XfNTY+g4C6GZna3iUp3R79FRc
+XBaheHOClhHCnBCsFfwqPb5GJc8KiGkgsyUlO5PYHhFowSPP53wTkHI5vryPjqNl
+wQ6r9LeoK0R5OH7CfRBOok0rFfXHckmveIInGSKOHrXZCyjAuAzpUXDY+V5A9Bsm
+5wIDAQAB
+-----END PUBLIC KEY-----</string>
+</resources>

@@ -1,0 +1,648 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ * @flow
+ */
+
+import React, { Component } from 'react';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+  TextInput,
+  Linking,
+  Clipboard,
+  InteractionManager,
+  Animated
+} from 'react-native';
+
+import NavBar, { NavButton, NavGroup, NavTitle } from 'react-native-nav';
+import { Actions } from "react-native-router-flux";
+import Button from "react-native-button";
+import Swiper from 'react-native-swiper';
+import Web from 'react-native-webview2';
+import dismissKeyboard from 'react-native/Libraries/Utilities/dismissKeyboard'
+import HTMLView from 'react-native-render-html';
+import Toast from 'react-native-simple-toast';
+import Share, {ShareSheet, Button as ButtonShare} from 'react-native-share';
+import NoInternet from '../components/NoInternet'
+//import RNFirebase from 'react-native-firebase';
+import RNFirebase from 'react-native-firebase';
+
+let deviceWidth = Dimensions.get('window').width;
+let css = require('../Css');
+let shareOptions = {
+  title: "React Native",
+  message: "Hola mundo",
+  url: "http://facebook.github.io/react-native/",
+  subject: "Share Link" //  for email
+};
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { Map } from 'immutable';
+import * as postActions from '../actions/postActions';
+import * as profileActions from '../actions/profileActions';
+
+const actions = [
+  postActions,
+  profileActions
+];
+function mapStateToProps(state) {
+  return {
+    post: state.post,
+    profile: state.profile
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class PostDetail extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollY: new Animated.Value(0),
+      load: true,
+      is_follow: null,
+      page: 1,
+      is_like: null,
+      visible: false,
+      comment: '',
+    }
+  }
+
+  componentWillMount() {
+    this.props.actions.postDetailRequest();
+    var firebase = RNFirebase.initializeApp({ debug: false });
+    firebase.analytics().logEvent('PostDetail_Screen',{'title': this.props.slug});
+  }
+
+  componentDidMount() {
+    
+    timeout = setTimeout( () => {
+    }, 1000);
+    InteractionManager.runAfterInteractions(()=> {
+      this.props.actions.postDetail(this.props.slug);
+    })
+   
+    
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.post.postDetail != this.props.post.postDetail && nextProps.post.postDetail) {
+      var url = 'http://ipick.vn/bai-viet/';
+      url = url+nextProps.post.postDetail.slug;
+      shareOptions.title = nextProps.post.postDetail.title;
+      shareOptions.message = nextProps.post.postDetail.title;
+      shareOptions.url = url;
+      shareOptions.subject = nextProps.post.postDetail.title;
+      // if(this.state.load) {
+      //   this.props.actions.loadComment(nextProps.post.postDetail.id);
+      // }
+      // this.setState({load: false})
+      this.setState({
+        is_like: nextProps.post.postDetail.is_like,
+        is_follow: nextProps.post.postDetail.user.is_follow_current_user,
+        load: false
+      })
+    }
+  }
+
+  loadMoreComment() {
+    this.props.actions.loadComment(this.props.post.postDetail.id, 'LM', this.state.page +1);
+    this.setState({page: this.state.page + 1})
+  }
+
+  follow(id) {
+    this.setState({is_follow: this.state.is_follow == 1 ? 0 : 1})
+    this.props.actions.follow(id)
+  }
+
+  like(is_like, id) {
+    this.setState({is_like: this.state.is_like == 1 ? 0 : 1});
+    this.props.actions.like(is_like, id)
+  }
+
+  link(url) {
+    Linking.openURL(url)
+  }
+
+  openShare(){
+    // if(shareOptions.url == 'http://facebook.github.io/react-native/'){
+    //   console.log('ooo')
+    //   return;
+    // }
+    var _this = this;
+    setTimeout(function(){
+      _this.setState({
+        visible: true
+      });
+    }, 200);
+  }
+
+  onCancel() {
+    this.setState({visible:false});
+  }
+
+  renderLoading() {
+    return (
+      <View style={{ alignItems: 'center', marginTop: 20}}>
+        <Text style={css.txtLoading}>Đang tải nội dung</Text>
+      </View>
+    )
+  }
+
+  onLoadStart() {
+    this.props.actions.loadComment(this.props.post.postDetail.id);
+  }
+
+  onLoadEnd() {
+    timeout = setTimeout( () => {
+      if(this.props.comment) {
+        this.refs.scroll.scrollToEnd({animated: true});
+        this.refs.input.focus();
+      }
+    }, 500);
+  }
+  _onNavigationStateChange(webViewState){
+      if(webViewState.url != ('https://mapi.ipick.vn/api/v1/webview?slug='+this.props.slug)) {
+        this.refs.web.stopLoading();
+        Linking.openURL(webViewState.url);
+      }
+     
+  }
+
+  comment() {
+    dismissKeyboard()
+    this.props.actions.comment(this.props.post.postDetail.id, this.state.comment)
+  }
+
+  render() {
+    const navTranslate = Animated.diffClamp(this.state.scrollY, 0, 75).interpolate({
+      inputRange: [0, 75],
+      outputRange: [0, -75],
+      extrapolate: 'clamp',
+    });
+    const navOpacity = Animated.diffClamp(this.state.scrollY, 0, 75).interpolate({
+      inputRange: [0, 25],
+      outputRange: [1, 0],
+      extrapolate: 'clamp',
+    });
+    return (
+      <View style={css.container}>
+      
+        {
+          this.props.post.postDetail ?
+          <View style={css.ctScrollContent}>
+            <ScrollView
+              ref="scroll"
+              onScroll={
+                Animated.event(
+                [{nativeEvent: {contentOffset: {y: this.state.scrollY}}}]
+              )}
+              bounces={false}
+              keyboardShouldPersistTaps={'always'}
+              style={{flex: 1, paddingTop: 45}}>
+              
+              <View style={styles.ctHeader}>
+              
+                <Image style={styles.avatar} source={{uri: this.props.post.postDetail.user.avatar +'_100x100.png'}} />
+                <View style={{flex: 1, marginLeft: 10}}>
+                  <Text style={styles.txtName}>{this.props.post.postDetail.user.full_name}</Text>
+                  <Text style={styles.txtJobs}>{this.props.post.postDetail.user.job}</Text>
+                </View>
+
+                {
+                  this.props.post.postDetail.user.id != this.props.profile.currentUser.id ?
+                    this.state.is_follow == 1 ?
+                      <TouchableOpacity onPress={() => this.follow(this.props.post.postDetail.user.id)} style={[css.ctFollow, {borderColor: 'rgb(176, 184, 198)', backgroundColor: '#fff'}]}>
+                        <Image style={css.ic_follow} source={require('../images/icons/ic_picked_plus.png')} />
+                        <Text style={{fontSize: 12, color: 'rgb(0, 139, 125)', fontWeight: 'bold'}}>Picked</Text>
+                      </TouchableOpacity>
+                    :
+                      <TouchableOpacity onPress={() => this.follow(this.props.post.postDetail.user.id)} style={[css.ctFollow, {borderColor: 'rgb(176, 184, 198)', backgroundColor: '#fff'}]}>
+                        <Image style={css.ic_follow} source={require('../images/icons/ic_pick_plus.png')} />
+                        <Text style={{fontSize: 12, color: 'rgb(0, 139, 125)', fontWeight: 'bold'}}>Pick</Text>
+                      </TouchableOpacity>
+                  : null
+                }
+              </View>
+
+              <Text style={styles.txtTitle}>{this.props.post.postDetail.title}</Text>
+
+              <View style={[styles.ctLink,{marginTop: 0}]}>
+                {/* <View style={styles.ctHeader1}>
+                  <View style={[styles.ctTxtLink, {borderBottomColor: 'rgb(74, 144, 226)'}]}>
+                    <Text style={styles.txtLink}>Ảnh</Text>
+                  </View>
+                </View> */}
+                <Image style={{width: deviceWidth - 30, height: (deviceWidth - 30)*400/600, marginTop: 25}} source={{uri: this.props.post.postDetail.image_thumb+ '_600x400.png'}} />
+                <Text style={{fontStyle: 'italic', fontSize: 13, marginTop: 3, marginRight: 15}}>{this.props.post.postDetail.photo_caption}</Text>
+                <View style={{paddingTop: 15, paddingRight: 15}}>
+                {
+                  this.props.post.postDetail ? 
+                  <Web
+                    ref='web'
+                    source={{uri: 'https://mapi.ipick.vn/api/v1/webview?slug=' +this.props.slug}}
+                    scrollEnabled={false}
+                    renderLoading={this.renderLoading}
+                    startInLoadingState
+                    onNavigationStateChange={this._onNavigationStateChange.bind(this)}
+                    onLoadStart={this.onLoadStart.bind(this)}
+                    onLoadEnd={this.onLoadEnd.bind(this)}
+                    // evalReturn={((r) => {eval(r)}).bind(this)}
+                    automaticallyAdjustContentInsets={true}
+                    // style={{width: windowSize.width }}
+                    scalesPageToFit={true}
+                    dataDetectorTypes="none"
+                    javaScriptEnabled={true}
+                  />
+                  : null
+                }
+                </View>
+                   
+              </View>
+
+              {
+                this.props.post.postDetail.contentByUrls ?
+                  <View style={[styles.ctLink,{marginTop: 0}]}>
+                    <View style={styles.ctHeader1}>
+                      <View style={[styles.ctTxtLink, {borderBottomColor: 'rgb(80, 227, 194)'}]}>
+                        <Text style={styles.txtLink}>Link</Text>
+                      </View>
+                    </View>
+                    <View style={{flexDirection: 'row', marginTop: 15}}>
+                      <TouchableOpacity onPress={() => this.link(this.props.post.postDetail.contentByUrls.full_url)}>
+                        <Image style={{height: 100, width: 100}} source={{uri: this.props.post.postDetail.contentByUrls.image}} />
+                      </TouchableOpacity>
+                      <View style={{flex: 1, marginLeft: 15, marginRight: 15}}>
+                        <Text onPress={() => this.link(this.props.post.postDetail.contentByUrls.full_url)} style={{fontSize: 16, color: 'rgb(51, 51, 51)'}}>{this.props.post.postDetail.contentByUrls.title}</Text>
+                        <View style={{flexDirection: 'row', marginTop: 10, alignItems: 'center'}}>
+                          <View style={{width: 24, height: 24, borderRadius: 12, backgroundColor: 'rgb(216, 216, 216)'}}/>
+                          <Text style={{fontSize: 12, color: 'rgb(155, 155, 155)', marginLeft: 5}}>{this.props.post.postDetail.contentByUrls.domain}</Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                : null
+              }
+                
+              {
+                this.props.post.postDetail.atributes.length != 0 ?
+                <View style={[styles.ctLink,{marginTop: 0}]}>
+                  <View style={styles.ctHeader1}>
+                    <View style={[styles.ctTxtLink, {borderBottomColor: 'rgb(74, 144, 226)'}]}>
+                      <Text style={styles.txtLink}>Ảnh</Text>
+                    </View>
+                  </View>
+                  <View style={{marginTop: 15}}>
+                    <Swiper 
+                      style={{height: 250, width: deviceWidth-30}}
+                      loop={true}
+                      paginationStyle={{height: 30, top: 0, right: 25, justifyContent: 'flex-end'}}
+                      dot={<View style={{backgroundColor:'rgba(255,255,255,0.5)', width: 8, height: 8,borderRadius: 4, marginLeft: 3, marginRight: 3, marginTop: 3, marginBottom: 3,}} />}
+                      activeDot={<View style={{backgroundColor: '#fff', width: 8, height: 8, borderRadius: 4, marginLeft: 3, marginRight: 3, marginTop: 3, marginBottom: 3,}} />}
+                      >
+                    {
+                      this.props.post.postDetail.atributes.map((item, index) => {
+                        return (
+                          <View style={{backgroundColor: '#000'}} key={index}>
+                            <Image  style={{height: (deviceWidth-30)*170/300, resizeMode: 'contain'}} source={{uri: item.image_thumb + '.png'}} />
+                            {
+                              item.name ?
+                              <View style={{backgroundColor: 'rgba(0, 0, 0, 0.5)', width: deviceWidth-30,alignItems: 'center', justifyContent: 'center', position: 'absolute', height: 50, bottom: 0}}>
+                                <Text numberOfLines={2} style={{color: '#fff', textAlign: 'center'}}>{item.name}</Text>
+                              </View>
+                              : null
+                            }
+                          </View>
+                        )
+                      })
+                    }
+                    </Swiper>
+                  </View>
+                  
+                </View>
+                : null
+              }
+
+              {/* //video */}
+             
+              {
+                this.props.post.postDetail.atribute_videos.length != 0 ?
+                  <View style={[styles.ctLink,{marginTop: 0}]}>
+                    <View style={styles.ctHeader1}>
+                      <View style={[styles.ctTxtLink, {borderBottomColor: 'rgb(144, 19, 154)'}]}>
+                        <Text style={styles.txtLink}>Video</Text>
+                      </View>
+                    </View>
+                    <View style={{marginTop: 15}}>
+                      {
+                        this.props.post.postDetail.atribute_videos.map((item, index) => {
+                          return (
+                            <TouchableOpacity key={index} style={{flexDirection: 'row', marginBottom: 7}} onPress={() => Actions.video({videoId: item.id})}>
+                              <View>
+                                <Image key={index} style={{height: (deviceWidth-70)*200/600, width: (deviceWidth-70)/2}} source={{uri: item.image_thumb}} />
+                                <View style={{height: (deviceWidth-70)*200/600, width: (deviceWidth-70)/2, backgroundColor: 'rgba(0, 0, 0, 0.5)',top: 0, position: 'absolute',alignItems: 'center', justifyContent: 'center'}}>
+                                  <Image source={require('../images/icons/ic_play_white.png')} />
+                                </View>
+                              </View>
+                              <Text numberOfLines={3} style={{flex: 1, marginRight: 15,fontSize: 15, marginLeft: 10, color: 'rgb(53, 69, 164)'}}>{item.title}</Text>
+                            </TouchableOpacity>
+                          )
+                        })
+                      }
+                    </View>
+                    
+                  </View>
+                : null
+              }
+
+              {/* audio */}
+              {
+                this.props.post.postDetail.atribute_radios.length != 0 ?
+                  <View style={[styles.ctLink,{marginTop: 0}]}>
+                    <View style={styles.ctHeader1}>
+                      <View style={[styles.ctTxtLink, {borderBottomColor: 'rgb(245, 166, 35)'}]}>
+                        <Text style={styles.txtLink}>Audio</Text>
+                      </View>
+                    </View>
+                    <View style={{marginTop: 15, marginRight: 15}}>
+                      {
+                        this.props.post.postDetail.atribute_radios.map((item, index) => {
+                          return (
+                            
+                            <View key={index} style={{marginBottom: 15}}>
+                            <HTMLView 
+                              imagesMaxWidth={deviceWidth-30}
+                              html={item}
+                            />
+                            </View>
+                          )
+                        })
+                      }  
+                    </View>
+                    
+                  </View>
+                : null
+              }
+
+              <View style={styles.ctComment}>
+                <Text style={styles.txtCount}>{this.props.post.postDetail ? this.props.post.postDetail.count_comment_post : ''} Bình luận</Text>
+                {
+                  this.props.post.loadComment ?
+                    <View style={{alignItems: 'center',paddingTop: 20}}>
+                      <Text style={{color: 'rgb(41, 163, 104)', fontSize: 12}}>Đang tải bình luận</Text>
+                    </View>
+                  : null
+                }
+                {
+                  this.props.post.comments ?
+                    this.props.post.comments.length != 0 ?
+                      this.props.post.comments.map((item, index) => {
+                        return (
+                          <View key={index} style={{flexDirection: 'row', marginTop: 15}}>
+                            <Image style={{height: 34, width: 34, borderRadius: 17}} source={item.user.avatar ? {uri: item.user.avatar + '_100x100.png'}: require('../images/avatar_default.png')} />
+                            <View style={{flex: 1}}>
+                              <View style={{flexDirection: 'row', marginLeft: 18, alignItems: 'center'}}>
+                                <Text style={{fontSize: 15, color: 'rgb(53, 69, 164)', fontWeight: 'bold'}}>{item.user.full_name}</Text>
+                                <Text style={{color: 'rgb(153, 163, 171)', marginLeft: 5}}>{item.user.username}</Text>
+                              </View>
+                              <View style={{backgroundColor: '#fff', marginTop: 5, borderRadius: 10, marginLeft: 5, padding: 13}}>
+                                <Text>{item.content}</Text>
+                              </View>
+                              <Text style={{fontSize: 12,margin: 5, color: 'rgb(153, 163, 171)'}}>{item.created_at}</Text>
+                            </View>
+                          </View>
+                        )
+                      })
+                    : 
+                    <View style={{alignItems: 'center', paddingTop: 15}}>
+                      <Text>Hiện tại chưa có bình luận nào</Text>
+                    </View>
+                  : null
+                }
+                {
+                  this.props.post.loadMoreComment ?
+                    <View style={{alignItems: 'center', marginTop: 15,}}>
+                      <Button 
+                        containerStyle={{backgroundColor: 'rgb(41, 163, 104)', borderRadius: 10, padding: 5, paddingLeft: 10, paddingRight: 10,}}
+                        style={{fontSize: 12, color: '#fff'}}
+                        onPress={() => this.loadMoreComment()}
+                      >
+                        Xem thêm bình luận
+                      </Button>
+                    </View>
+                  : null
+                }
+              </View>
+
+              {
+                this.props.post.sendComment ?
+                <View style={{alignItems: 'center', padding: 5}}>
+                  <Text style={{fontSize: 12, color: 'rgb(41, 163, 104)'}}>Đang gửi bình luận</Text>
+                </View>
+                : null
+              }
+
+              <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 105}}>
+                <TextInput
+                  style={{padding: 15, fontSize: 15, flex: 1, color: 'rgb(31, 42, 53)'}}
+                  placeholder="Nhập bình luận của bạn"
+                  ref='input'
+                  underlineColorAndroid="transparent"
+                  placeholderTextColor="rgb(194, 197, 208)"
+                  onChangeText={(comment) => this.setState({comment: comment})}
+                  value={this.state.comment}
+                  autoCapitalize="none"
+                />
+                <TouchableOpacity onPress={() => this.comment()} style={{padding: 5}}>
+                  <Image style={{ marginRight: 15}} source={require('../images/icons/ic_plus_2.png')} />
+                </TouchableOpacity>
+              </View>
+              
+            </ScrollView>
+           
+            <View style={{ position: 'absolute', bottom: 15, right: 15}}>
+              {
+                this.state.is_like != 1 ?
+                <TouchableOpacity onPress={() => this.like(this.state.is_like, this.props.post.postDetail.id)} style={{height: 40, width: 120,flexDirection: 'row', backgroundColor: 'rgb(41, 163, 104)', justifyContent: 'center', alignItems: 'center', borderRadius: 20}}>
+                  <Image style={{height: 21, width: 18}} source={require('../images/icons/ic_pick_white.png')} />
+                  <Text style={{marginLeft: 12, color: '#fff', fontWeight: 'bold', fontSize: 16}}>Pick</Text>
+                </TouchableOpacity>
+                :
+                <TouchableOpacity onPress={() => this.like(this.state.is_like, this.props.post.postDetail.id)} style={{height: 40,backgroundColor: '#fff', width: 40,justifyContent: 'center', alignItems: 'center', borderRadius: 19, borderColor: 'rgb(41, 163, 104)', borderWidth: 3}}>
+                  <Image source={require('../images/icons/ic_pick_brown.png')} />
+                </TouchableOpacity>
+              }
+            </View>
+            
+          </View>
+          : null
+        }
+        {
+          this.props.post.isFetching ? 
+            <View style={css.mainSpin1}>
+              <Image style={{width: 50, height: 50}} source={require('../images/loading.gif')} />
+            </View>
+          : null
+        }
+        
+        <Animated.View style={[styles.navScroll,{opacity: navOpacity, transform: [{translateY: navTranslate}]}]}>
+          <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'dark-content', backgroundColor: '#fff'}} >
+            <NavButton onPress={() => Actions.pop()} style={css.navBack}  >
+              <Image style={{height: 12, width: 13}} source={require('../images/icons/ic_back.png')} />
+            </NavButton>
+            <NavButton onPress={() => this.openShare()} style={css.navBack}>
+              <Text style={{fontSize: 15, color: '#000', marginRight: 7}}>Chia sẻ</Text>
+              <Image  source={require('../images/icons/ic_share_black.png')} />
+            </NavButton>
+          </NavBar>
+        </Animated.View>
+        
+        <ShareSheet visible={this.state.visible} onCancel={this.onCancel.bind(this)}>
+          <ButtonShare iconSrc={{ uri: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE8AAABPCAYAAACqNJiGAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAFLklEQVR42u2cT2wUVRzHP+/N7s6yuy0t2z/SRimiBQwRrAYSKxIvoiBGQxMtFxNNpBcSEr14UGM4cPSAh0JC4snlQDwQPWgM0YQajI22pvwJf4qUFrZ/tt1lu9v9O+NhC2lI053daR2meZ/z7OtvP3lvfm+++zqCeTq7e31AD9ANbANCKB4wCwwBEaC3L9KTAxAAnd29rcAPwA6nq3QBA8BbfZGeMTE/4/5AiauEQWCXBA6jxFXKduBjCRxyuhKXckgCHU5X4VJekIDP6Spcii6drsDNKHk28DhdwEpimmCaJoZpVvQ5j2ZtTq0qeUIIDMMgnsyQSGYwDBPd58HrkQghLI4B4boAmpRlpa8KeVIKCgWDO9E4AM9tamL/ns3s2NpC07ogtSE/UlqTl80V+OLEL0zPpAkGlu6lrpYnBGhSMnIvQTZX4M1X2+nau409OzeyRvdWPa5Xk+TyRYJlrnOtvNIyNLl0Y5ztW9bz6Ye7eWN3u+1x03N5DNO0NFNdKa90bzO5MjzBwde38c3nB9B9//9Xcak8uDI8wQfvdPD1Z/sdq8N1+zyPR3Lt3yn2dj7rqDhwmTwpBdGpWZrDIU4de9fpcty1bA3DZDqe5tvjXdQEdafLcc/MEwKik0k6Ozawb89mp8sBXCQPBDPJDO/te97pQh7iGnnJVJb2tjAHXtvidCkPcY28yekUr3S0EVyzsvGj1VAAXCQvXzDYtf3JFf87Pp9W2oRbSGJc0W3zBYOG+gBbnm60PdZvf97i6vAkI/fiJGezCCFYGLgUiyaZTN5SN3eFvFQ6x4aWOjZvbKh6jN//HuH4qV8ZuHyXuWwB3edBW+T5VUhBa3MtPq+GYayCSCqbLxCuC+D1aFV9/qcL1zn0yRl03Utbax2alJhllmU5ceASeYWCUXWjGI/NcuTYOcJ1QVqaaigUjbLirOKKhlE0DHS9ull3+mw/47HZh+KWE1fIwwRpMUZ/lIsDIzSHl18cuEVelUSnkkzEUoSCK7M3XNXyxsbvM5Ocw+etbsmXY1XLKxompmFS3YIvz6qWJ4VACMHy9NZFxnf6C7oZJc8Gjm2SH/zmevtunHQmv+S1E7djjFURCqQzea7dnKR+nfWnE92r0dZaD/D4nhgoGiapdJaPul6ipal2yWsTyQxbN1UeCjzzVJgTX76N3++1vE+cy+Y58+Mg2VyxbJcWnd29K3U/XZJ8wWBqJsWF7w6zvrHGiRIWJRZP8/L7vayt8ZeV59g9T4hS8Dg2ft+pEhbl/MWbJJIZS3tD1TAeYfBq1PKhICXvEYZHpwlYTHCUvAUkkhlGowlCASWvYoauj3MnmiDgt3Y8TclbwGg0wdxcXt3zqmHg6j2kZj1GUPIWcGt0hqDfevan5M0Ti6dLzaKC4FTJm+fS9QlGK2gW4KA804RC0aC1udb+YMtALJ4imcpa/pcDcDAY0DTB2pCf02f7LQcDlR7YvjuR5PufhywFA+cv3qS5obJnbOfkSUFtSOf02X5LkVTXwRcrlndjJMaRr85ZiqQa1wV5oiFELl98/OVVsmx1r1bV8g74vbRvaqR+7RpLp58qEQeqYdhCybOBkmcDJc8GSp4NlDwbKHk2UPJsoOTZQMmzgZJnAyXPBkqeDZQ8Gyh5NlDybKDk2UDJs4GSZwMlzwYSyDldhEuZlcBfTlfhUoYkpVd2KyonIoGTlN44rbDOP8BJ2RfpyQL7Kb3zXFGeQWBfX6QnKwH6Ij1jwC7gKNAPpJyu8DEjRcnLUWDnvC/+A7XomQQ1U+xDAAAAAElFTkSuQmCC' }}
+            onPress={()=>{
+            this.onCancel();
+            setTimeout(() => {
+              Share.shareSingle(Object.assign(shareOptions, {
+                "social": "facebook"
+              }));
+            },300);
+            }}>
+            <Text style={{fontWeight: '400'}}><Text >Chia sẻ lên</Text> <Text>Facebook</Text></Text>
+          </ButtonShare>
+            
+          <ButtonShare iconSrc={{ uri: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAMAAAANIilAAAABvFBMVEUAAAAA//8AnuwAnOsAneoAm+oAm+oAm+oAm+oAm+kAnuwAmf8An+0AqtUAku0AnesAm+oAm+oAnesAqv8An+oAnuoAneoAnOkAmOoAm+oAm+oAn98AnOoAm+oAm+oAmuoAm+oAmekAnOsAm+sAmeYAnusAm+oAnOoAme0AnOoAnesAp+0Av/8Am+oAm+sAmuoAn+oAm+oAnOoAgP8Am+sAm+oAmuoAm+oAmusAmucAnOwAm+oAmusAm+oAm+oAm+kAmusAougAnOsAmukAn+wAm+sAnesAmeoAnekAmewAm+oAnOkAl+cAm+oAm+oAmukAn+sAmukAn+0Am+oAmOoAmesAm+oAm+oAm+kAme4AmesAm+oAjuMAmusAmuwAm+kAm+oAmuoAsesAm+0Am+oAneoAm+wAmusAm+oAm+oAm+gAnewAm+oAle0Am+oAm+oAmeYAmeoAmukAoOcAmuoAm+oAm+wAmuoAneoAnOkAgP8Am+oAm+oAn+8An+wAmusAnuwAs+YAmegAm+oAm+oAm+oAmuwAm+oAm+kAnesAmuoAmukAm+sAnukAnusAm+oAmuoAnOsAmukAqv9m+G5fAAAAlHRSTlMAAUSj3/v625IuNwVVBg6Z//J1Axhft5ol9ZEIrP7P8eIjZJcKdOU+RoO0HQTjtblK3VUCM/dg/a8rXesm9vSkTAtnaJ/gom5GKGNdINz4U1hRRdc+gPDm+R5L0wnQnUXzVg04uoVSW6HuIZGFHd7WFDxHK7P8eIbFsQRhrhBQtJAKN0prnKLvjBowjn8igenQfkQGdD8A7wAAAXRJREFUSMdjYBgFo2AUDCXAyMTMwsrGzsEJ5nBx41HKw4smwMfPKgAGgkLCIqJi4nj0SkhKoRotLSMAA7Jy8gIKing0KwkIKKsgC6gKIAM1dREN3Jo1gSq0tBF8HV1kvax6+moG+DULGBoZw/gmAqjA1Ay/s4HA3MISyrdC1WtthC9ebGwhquzsHRxBfCdUzc74Y9UFrtDVzd3D0wtVszd+zT6+KKr9UDX749UbEBgULIAbhODVHCoQFo5bb0QkXs1RAvhAtDFezTGx+DTHEchD8Ql4NCcSyoGJYTj1siQRzL/JKeY4NKcSzvxp6RmSWPVmZhHWnI3L1TlEFDu5edj15hcQU2gVqmHTa1pEXJFXXFKKqbmM2ALTuLC8Ak1vZRXRxa1xtS6q3ppaYrXG1NWjai1taCRCG6dJU3NLqy+ak10DGImx07LNFCOk2js6iXVyVzcLai7s6SWlbnIs6rOIbi8ViOifIDNx0uTRynoUjIIRAgALIFStaR5YjgAAAABJRU5ErkJggg==' }}
+            onPress={()=>{
+            this.onCancel();
+            setTimeout(() => {
+              Share.shareSingle(Object.assign(shareOptions, {
+                "social": "twitter"
+              }));
+            },300);
+            }}>
+            <Text style={{fontWeight: '400'}}><Text >Chia sẻ lên</Text> <Text>Twitter</Text></Text>
+          </ButtonShare>
+
+          <ButtonShare
+            iconSrc={{ uri: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAMAAAANIilAAAAB5lBMVEUAAAA8PDw+Pj4/Pz8/Pz8/Pz8/Pz8+Pj47OzsAAAA5OTk+Pj4/Pz8/Pz8+Pj49PT0/Pz8/Pz85OTlAQEA/Pz87Ozs+Pj4+Pj4/Pz8/Pz8/Pz8zMzNBQUE/Pz8/Pz8/Pz9AQEA7Ozs9PT0/Pz9AQEA+Pj4/Pz8+Pj4AAABAQEA/Pz87OztBQUE/Pz8+Pj4zMzNDQ0M/Pz89PT03Nzc/Pz8/Pz8/Pz8/Pz88PDw8PDwAAABCQkI7Ozs9PT0/Pz9AQEA/Pz8uLi4rKytAQEA/Pz89PT0+Pj4/Pz8/Pz8/Pz9CQkJAQEA/Pz9CQkI/Pz8/Pz8/Pz8+Pj49PT0/Pz8yMjI/Pz88PDw/Pz9BQUE8PDw/Pz9AQEA/Pz8/Pz8/Pz89PT0/Pz9CQkI9PT1EREQ9PT08PDw4ODg+Pj6AgIA/Pz8/Pz82NjZVVVU7Ozs/Pz81NTVAQEA/Pz8+Pj49PT1BQUE/Pz8/Pz8/Pz8vLy8/Pz87OztAQEA3Nzc9PT0+Pj4/Pz89PT0/Pz8/Pz89PT1AQEA9PT04ODgzMzM/Pz8/Pz9AQEA/Pz9AQEA/Pz83Nzc9PT0/Pz9AQEA/Pz8+Pj4+Pj5AQEA/Pz89PT1FRUU5OTk/Pz8/Pz8+Pj47Ozs/Pz89PT08PDw+Pj6z1Mg0AAAAonRSTlMAEXTG8/7pslICKMn//J0u2LcSLNu9Y0523KoKL9b7hggauZsEOuJ/ARS7VifkiwUX0bEq1f1p6KGQAz4NpnpY8AsGtMIyb46NbSOMcRuh+fGTFc0z1yKFKy/dpKff1CqKMoYPp+lAgAKd6kIDhdorJJExNjflktMr3nkQDoXbvaCe2d2EijIUn3JsbjDDF1jjOOdWvIDhmhoJfWrAK7bYnMgx8fGWAAACNUlEQVRIx+2W6V8SURSGBxEVeydMbVER1DCwRNTCEhMNsywqExXcUrNVU9NK2wy1fd9sMyvrP+1cmYH5eK5f5f3APef85hnuvfPeM6MoaaW1dWXKMGdasrJzrJtgc7dhQ+p2kzRry4OuHfmSbEEhUTt37d5TRGNxiRRrLwUczjKKyiuI3uuSYCv3ARa3ZyOu2k/xAT5b7aXra3xaVlsH1LPZg4cAvzM10wbgMBs+QqtsDKTyJroXGz7a7AgandECtPLXfKzFY8hCbcBxFudpP3Gy49RpQ8UXtgBnOOzZc53CU+e7Ism7uYnt5ji0p1e3pDmqzTnmAEr7GGz/AGEDg0MXaBgeERXrKIWFBQz2IvlYHbtEh/EycOUqVQLXVCDPxvGz+MPYdRGWjE/coGFyyg9M32SwM8PkydlQIim7JX6DxHpvM9g7c+SjoLESmqd9vjvDYO9NEzs1aahYY7SK+3Zm31Ddmp8jDx4qysIj2qt4O6dviH4xqvk5soj40vJjqjzh7HOf6BtPtb1SnulG6X3O6bHdqb5BejHbKtDOl+UcQ78iNuwzFKKvwx1v3npYJ+kd0BYynqz3Eu2OZvnB+IyCRVE+TD5qSmWBRuDjJzb8GWhIJq4xv36kWKoH6mr1vlFDnvRW86e9Qtd/qUrs1VeKv1VKbJjrOz3Wih8UrTpF37ArMlotFmfg58raLxrjvyXfifl/ku/TdZsiK9NfNcH+y93Ed4A1JzvLkmnOMClppbV19R+iQFSQ2tNASwAAAABJRU5ErkJggg==' }}
+            onPress={()=>{
+              this.onCancel();
+              setTimeout(() => {
+                if(typeof shareOptions["url"] !== undefined) {
+                  Clipboard.setString(shareOptions["url"]);
+                  Toast.show('Nội dung đã được copy');
+                }
+              },300);
+            }}>
+            <Text style={{fontWeight: '400'}}><Text >Copy Link</Text> <Text>Url</Text></Text>
+          </ButtonShare>
+        </ShareSheet>
+
+      </View>
+    )
+  }
+}
+
+const styles= StyleSheet.create({
+  navScroll: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+  },
+  
+  ctComment: {
+    backgroundColor: 'rgb(237, 239, 241)',
+    padding: 15
+  },
+  txtCount: {
+    fontSize: 15,
+    color: 'rgb(27, 48, 70)'
+  },
+
+  txtContent: {
+    fontSize: 16,
+    color: 'rgb(51, 51, 51)',
+    marginRight: 15,
+    marginTop: 15,
+  },
+  ctHeader1: {
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgb(236, 238, 240)'
+  },
+  ctYourPick: {
+    borderRadius: 20,
+    borderColor: 'rgb(211, 214, 218)',
+    borderWidth: 1,
+    padding: 10,
+    paddingLeft: 20, 
+    paddingRight: 20,
+    maxWidth: deviceWidth -100
+  },
+  txtYourPick: {
+    color: 'rgb(51, 51, 51)',
+    fontSize: 16,
+  },
+  txtLink: {
+    color: 'rgb(51, 51, 51)',
+    fontWeight: 'bold'
+  },
+  ctTxtLink: {
+    borderBottomColor: 'rgb(80, 227, 194)',
+    borderBottomWidth: 2,
+    paddingTop: 9,
+    paddingBottom: 7
+  },
+  ctLink: {
+    marginTop: 50,
+    paddingLeft: 15,
+    paddingBottom: 20
+  },
+  txtTitle: {
+    color: 'rgb(27, 48, 70)',
+    fontSize: 32,
+    marginLeft: 15,
+    marginRight: 15
+  },
+  txtName: {
+    fontSize: 16,
+    color: '#000',
+    fontWeight: 'bold'
+  },
+  txtJobs: {
+    color: 'rgb(155, 155, 155)'
+  },
+  avatar: {
+    height: 50,
+    width: 50,
+    borderRadius: 2
+  },
+  ctHeader: {
+    flexDirection: 'row',
+    margin: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgb(242, 245, 248)',
+    paddingBottom: 15
+  },
+});
+export default connect(mapStateToProps, mapDispatchToProps)(PostDetail);
+
+

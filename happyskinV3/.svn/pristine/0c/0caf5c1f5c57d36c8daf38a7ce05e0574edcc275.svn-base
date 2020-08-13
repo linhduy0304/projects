@@ -1,0 +1,182 @@
+'use strict';
+const {
+    HOME_REQUEST,
+    HOME_SUCCESS,
+    HOME_FAIL,
+    HOT_DEAL_REQUEST,
+    HOT_DEAL_SUCCESS,
+    HOT_DEAL_FAIL,
+    BOOKING_REQUEST,
+    BOOKING_SUCCESS,
+    BOOKING_FAIL,
+    SPA_HISTORY_SUCCESS
+  } = require('../libs/actionTypes');
+
+import Constant from '../services/Constant';
+const StoreService = require('../services/StoreService').default;
+
+const Home = require('../services/Home');
+import Toast from 'react-native-simple-toast';
+
+import {Actions} from 'react-native-router-flux';
+
+//spa histoory
+export function spaHistoryRequest() {
+  return {
+    type: BOOKING_REQUEST
+  };
+}
+
+export function spaHistorySuccess(data) {
+  return {
+    type: SPA_HISTORY_SUCCESS,
+    data
+  };
+}
+export function spaHistoryFail() {
+  return {
+    type: BOOKING_FAIL,
+  };
+}
+
+export function spaHistory() {
+  return dispatch => {
+    dispatch(spaHistoryRequest())
+    return Home.spaHistory().then((res) => {
+      console.log(res)
+      switch(res.status) {
+        case 500:
+          Actions.login({type: 'reset'});
+          return;
+        case 200:
+          dispatch(spaHistorySuccess(res.data));
+          return;
+        default: 
+          dispatch(spaHistoryFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(spaHistoryFail())
+    })
+  }
+}
+
+//
+export function bookingRequest() {
+  return {
+    type: BOOKING_REQUEST
+  };
+}
+
+export function bookingSuccess() {
+  return {
+    type: BOOKING_SUCCESS,
+  };
+}
+export function bookingFail() {
+  return {
+    type: BOOKING_FAIL,
+  };
+}
+
+export function booking(data) {
+  return dispatch => {
+    dispatch(bookingRequest())
+    return Home.booking(data).then((res) => {
+      switch(res.status) {
+        case 500:
+          Actions.login({type: 'reset'});
+          return;
+        case 200:
+          dispatch(bookingSuccess());
+          Toast.show('Đặt lịch thành công');
+          Actions.pop();
+          return;
+        default: 
+          dispatch(bookingFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(bookingFail())
+    })
+  }
+}
+
+//hot deal
+export function hotDealRequest() {
+  return {
+    type: HOT_DEAL_REQUEST
+  };
+}
+
+export function hotDealSuccess(data) {
+  return {
+    type: HOT_DEAL_SUCCESS,
+    data: data,
+  };
+}
+export function hotDealFail() {
+  return {
+    type: HOT_DEAL_FAIL,
+  };
+}
+
+export function hotDeal() {
+  return dispatch => {
+    return Home.hotDeal().then((res) => {
+      switch(res.status) {
+        case 500:
+          Actions.login({type: 'reset'});
+          return;
+        case 200:
+          dispatch(hotDealSuccess(res.data))
+          return;
+        default: 
+          dispatch(hotDealFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(hotDealFail())
+    })
+  }
+}
+
+export function homeRequest() {
+  return {
+    type: HOME_REQUEST
+  };
+}
+
+export function homeSuccess(data) {
+  return {
+    type: HOME_SUCCESS,
+    data: data,
+  };
+}
+export function homeFail() {
+  return {
+    type: HOME_FAIL,
+  };
+}
+
+export function home() {
+  return dispatch => {
+    return Home.home().then((res) => {
+      switch(res.status) {
+        case 500:
+          Actions.login({type: 'reset'});
+          return;
+        case 200:
+          dispatch(homeSuccess(res.data))
+          return;
+        default: 
+          dispatch(homeFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(homeFail())
+    })
+  }
+}
+
+

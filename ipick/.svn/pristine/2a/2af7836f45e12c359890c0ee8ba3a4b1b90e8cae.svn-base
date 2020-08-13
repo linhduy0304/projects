@@ -1,0 +1,455 @@
+'use strict';
+const {
+  POST_DETAIL_REQUEST,
+  POST_DETAIL_SUCCESS,
+  POST_DETAIL_FAIL,
+  LOAD_COMMENT_REQUEST,
+  LOAD_COMMENT_SUCCESS,
+  LOAD_COMMENT_FAIL,
+  COMMENT_REQUEST,
+  COMMENT_SUCCESS,
+  COMMENT_FAIL,
+  LIKE_REQUEST,
+  LIKE_SUCCESS,
+  LIKE_FAIL,
+  GET_LINK_REQUEST,
+  GET_LINK_SUCCESS,
+  GET_LINK_FAIL,
+  POST_IMAGE_REQUEST,
+  POST_IMAGE_SUCCESS,
+  POST_IMAGE_FAIL,
+  POST_LINK_REQUEST,
+  POST_LINK_SUCCESS,
+  POST_LINK_FAIL,
+  EDIT_CONTENT,
+  UPDATE_POST_PROFILE,
+  UPDATE_POST_POPULAR
+  } = require('../libs/actionTypes');
+
+import Constant from '../services/Constant';
+import Toast from 'react-native-simple-toast';
+import {
+  Alert,
+} from 'react-native';
+const StoreService = require('../services/StoreService').default;
+
+const Post = require('../services/Post');
+
+import {Actions} from 'react-native-router-flux';
+
+
+export function updatePostProfile(data) {
+  return {
+    type: UPDATE_POST_PROFILE,
+    data: data,
+  };
+}
+
+export function updatePostPopular(data) {
+  return {
+    type: UPDATE_POST_POPULAR,
+    data: data,
+  };
+}
+
+export function edit(title, content) {
+  return {
+    type: EDIT_CONTENT,
+    title: title,
+    content: content
+  };
+}
+
+export function saveContent(title, content) {
+  return dispatch => {
+    Actions.pop()
+    dispatch(edit(title, content))
+  }
+}
+//edit post
+export function editArticle(data, action, slug) {
+  return dispatch => {
+    dispatch(postLinkRequest())
+    Post.editArticle(data, action, slug).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(postLinkFail());
+          return;
+        case 200:
+          dispatch(updatePostPopular(res.data))
+          dispatch(updatePostProfile(res.data))
+          dispatch(postLinkSuccess())
+          Toast.show('Sửa bài thành công!');
+          Actions.pop()
+          return;
+        default: 
+          Toast.show(res.errors);
+          dispatch(postLinkFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(postLinkFail())
+    })
+  }
+}
+
+//post link
+export function postLinkRequest() {
+  return {
+    type: POST_LINK_REQUEST
+  };
+}
+
+export function postLinkSuccess() {
+  return {
+    type: POST_LINK_SUCCESS,
+  };
+}
+export function postLinkFail() {
+  return {
+    type: POST_LINK_FAIL,
+  };
+}
+
+export function postLink(data, action) {
+  return dispatch => {
+    dispatch(postLinkRequest())
+    Post.postLink(data, action).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(postLinkFail());
+          return;
+        case 200:
+          dispatch(updatePostPopular(res.data))
+          dispatch(updatePostProfile(res.data))
+          dispatch(postLinkSuccess())
+          Toast.show('Đăng bài thành công!');
+          Actions.pop()
+          return;
+        default: 
+          Toast.show(res.errors);
+          dispatch(postLinkFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(postLinkFail())
+    })
+  }
+}
+
+//get link
+export function getLinkRequest() {
+  return {
+    type: GET_LINK_REQUEST
+  };
+}
+
+export function getLinkSuccess(data) {
+  return {
+    type: GET_LINK_SUCCESS,
+    data: data,
+  };
+}
+export function getLinkFail() {
+  return {
+    type: GET_LINK_FAIL,
+  };
+}
+
+export function getLink(link) {
+  return dispatch => {
+    dispatch(getLinkRequest())
+    Post.getLink(link).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(getLinkFail());
+          return;
+        case 200:
+          dispatch(getLinkSuccess(res))
+          return;
+        default: 
+          dispatch(getLinkFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(getLinkFail())
+    })
+  }
+}
+
+//post image
+export function postImageRequest() {
+  return {
+    type: POST_IMAGE_REQUEST,
+  };
+}
+
+export function postImageSuccess() {
+  return {
+    type: POST_IMAGE_SUCCESS,
+  };
+}
+export function postImageFail() {
+  return {
+    type: POST_IMAGE_FAIL,
+  };
+}
+
+export function postImage(title, content, category_ids, atribute_image, tags) {
+  return dispatch => {
+    dispatch(postImageRequest())
+    Post.postImage(title, content, category_ids, atribute_image, tags).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(postImageFail());
+          return;
+        case 200:
+          dispatch(updatePostPopular(res.data))
+          dispatch(updatePostProfile(res.data))
+          dispatch(postImageSuccess())
+          // Actions.pop();
+          Toast.show('Đăng bài thành công!')
+          Actions.pop()
+          return;
+        default: 
+          Toast.show(res.errors)
+          dispatch(postImageFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(postImageFail())
+    })
+  }
+}
+
+//save
+
+export function save(is_save, id) {
+  return dispatch => {
+    dispatch(likeRequest())
+    Post.save(is_save, id).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(likeFail());
+          return;
+        case 200:
+          dispatch(likeSuccess())
+          return;
+        default: 
+          dispatch(likeFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(likeFail())
+    })
+  }
+}
+
+//like
+export function likeRequest() {
+  return {
+    type: LIKE_REQUEST
+  };
+}
+
+export function likeSuccess() {
+  return {
+    type: LIKE_SUCCESS,
+    data: data,
+  };
+}
+export function likeFail() {
+  return {
+    type: LIKE_FAIL,
+  };
+}
+
+export function like(is_like, id) {
+  return dispatch => {
+    dispatch(likeRequest())
+    Post.like(is_like, id).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(likeFail());
+          return;
+        case 200:
+          dispatch(likeSuccess())
+          return;
+        default: 
+          dispatch(likeFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(likeFail())
+    })
+  }
+}
+
+
+// comment
+export function commentRequest() {
+  return {
+    type: COMMENT_REQUEST
+  };
+}
+
+export function commentSuccess(data) {
+  return {
+    type: COMMENT_SUCCESS,
+    data: data,
+  };
+}
+export function commentFail() {
+  return {
+    type: COMMENT_FAIL,
+  };
+}
+
+export function comment(id, comment) {
+  return dispatch => {
+    dispatch(commentRequest())
+    Post.comment(id, comment).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(commentFail());
+          return;
+        case 200:
+          dispatch(commentSuccess(res.data))
+          return;
+        default: 
+          dispatch(commentFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(commentFail())
+    })
+  }
+}
+//load comment
+export function loadCommentRequest(action) {
+  return {
+    type: LOAD_COMMENT_REQUEST, 
+    action: action,
+  };
+}
+
+export function loadCommentSuccess(data, action) {
+  return {
+    type: LOAD_COMMENT_SUCCESS,
+    data: data,
+    action: action,
+  };
+}
+export function loadCommentFail() {
+  return {
+    type: LOAD_COMMENT_FAIL,
+  };
+}
+
+export function loadComment(id, action = 'L', page = 1) {
+  return dispatch => {
+    dispatch(loadCommentRequest(action))
+    Post.loadComment(id, page).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(loadCommentFail());
+          return;
+        case 200:
+            dispatch(loadCommentSuccess(res.data, action))
+          return;
+        default: 
+          dispatch(loadCommentFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(loadCommentFail())
+    })
+  }
+}
+
+//post detail
+export function postDetailRequest() {
+  return {
+    type: POST_DETAIL_REQUEST
+  };
+}
+
+export function postDetailSuccess(data) {
+  return {
+    type: POST_DETAIL_SUCCESS,
+    data: data,
+  };
+}
+export function postDetailFail() {
+  return {
+    type: POST_DETAIL_FAIL,
+  };
+}
+
+export function postDetail(slug) {
+  return dispatch => {
+    Post.postDetail(slug).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(postDetailFail());
+          return;
+        case 200:
+            dispatch(postDetailSuccess(res.post))
+          return;
+        default: 
+          dispatch(postDetailFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(postDetailFail())
+    })
+  }
+}
+
+
+

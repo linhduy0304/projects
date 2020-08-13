@@ -1,0 +1,92 @@
+
+
+import {
+  StyleSheet,
+  Platform,
+  Dimensions,
+  StatusBar,
+} from "react-native";
+const window = Dimensions.get('window');
+
+module.exports = StyleSheet.create({
+  container: {
+    flex: 1,
+		backgroundColor: '#fff',
+  },
+  statusBar: {
+		backgroundColor: '#fff',
+		height: Platform.Version < 21 ? 0 : StatusBar.currentHeight
+	},
+	navBarWhite: {
+		backgroundColor: '#fff',
+		padding: 0,
+    height: 44,
+    marginTop: 0,
+		// width: windowSize.width,
+		borderBottomColor: "transparent"
+	},
+	navBar: {
+		backgroundColor: '#297FCA',
+		padding: 0,
+    height: 44,
+    marginTop: 0,
+		// width: windowSize.width,
+		borderBottomColor: "transparent"
+	},
+	navTitle: {
+		maxWidth: window.width/2,
+	},
+	navBack: {
+		marginLeft: 0, 
+		padding: 15,
+		flexDirection: 'row',
+		alignItems: 'center'
+	},
+	txtBack: {
+		color: '#1A3045',
+		marginLeft: 10
+	},
+	txtTitle: {
+		fontSize: 17,
+    color: '#fff',
+    // color: 'rgb(0, 139, 125)',
+		// marginLeft: 15
+	},
+	navButtonRight: {
+		backgroundColor: 'red',
+		padding: 15,
+		marginRight: 0
+	},
+	
+  mainSpin: {
+		width: window.width,
+		height: window.height,
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'rgba(0, 0, 0, 0.3)',
+		zIndex: 99
+	},
+	
+	ctNoti: {
+    marginTop: window.height/3,
+    alignItems: 'center',
+    justifyContent: 'center',
+	},
+	txtNoti: {
+		fontSize: 15,
+		color: '#287FC9',
+		marginTop: 5
+	},
+
+	ctLoading: {
+    alignItems: 'center',
+    paddingTop: 15,
+  },
+  txtLoading: {
+    fontSize: 12,
+    color: '#287FC9'
+  },
+});

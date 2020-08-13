@@ -1,0 +1,117 @@
+
+'use strict';
+const InitialState = require('./postInitialState').default;
+
+const {
+  POST_DETAIL_REQUEST,
+  POST_DETAIL_SUCCESS,
+  POST_DETAIL_FAIL,
+  LOAD_COMMENT_REQUEST,
+  LOAD_COMMENT_SUCCESS,
+  LOAD_COMMENT_FAIL,
+  COMMENT_REQUEST,
+  COMMENT_SUCCESS,
+  COMMENT_FAIL,
+  LIKE_REQUEST,
+  LIKE_SUCCESS,
+  LIKE_FAIL,
+  GET_LINK_REQUEST,
+  GET_LINK_SUCCESS,
+  GET_LINK_FAIL,
+  POST_IMAGE_REQUEST,
+  POST_IMAGE_SUCCESS,
+  POST_IMAGE_FAIL,
+  POST_LINK_REQUEST,
+  POST_LINK_SUCCESS,
+  POST_LINK_FAIL,
+  EDIT_CONTENT,
+} = require('../../libs/actionTypes');
+
+const initialState = new InitialState;
+export default function postReducer(state = initialState, action) {
+  if (!(state instanceof InitialState)) return initialState.mergeDeep(state);
+  switch (action.type) {
+
+    case EDIT_CONTENT:
+      return state.setIn(['title'], action.title).setIn(['content'], action.content)
+    // /post link
+    case POST_LINK_REQUEST:
+      return state.setIn(['loadPost'], true);
+  
+    case POST_LINK_SUCCESS:
+      return state.setIn(['loadPost'], null).setIn(['title'], null).setIn(['content'], null);
+
+    case POST_LINK_FAIL: 
+      return state.setIn(['loadPost'], null).setIn(['title'], null).setIn(['content'], null);
+
+    //post image:
+    case POST_IMAGE_REQUEST:
+      return state.setIn(['loadPost'], true);
+  
+    case POST_IMAGE_SUCCESS:
+      return state.setIn(['loadPost'], null).setIn(['title'], null).setIn(['content'], null);
+
+    case POST_IMAGE_FAIL: 
+      return state.setIn(['loadPost'], null).setIn(['title'], null).setIn(['content'], null);
+
+    //get link
+    case GET_LINK_REQUEST:
+      return state.setIn(['loadLink'], true).setIn(['link'], null).setIn(['errorLink'], null);
+  
+    case GET_LINK_SUCCESS:
+      return state.setIn(['loadLink'], null).setIn(['link'], action.data).setIn(['errorLink'], null);
+
+    case GET_LINK_FAIL: 
+      return state.setIn(['loadLink'], null).setIn(['errorLink'], true)
+
+    //like
+    case LIKE_REQUEST:
+      return state
+    
+    case LIKE_SUCCESS:
+       return state
+
+    case LIKE_FAIL: 
+      return state
+
+    //comment
+    case COMMENT_REQUEST:
+      return state.setIn(['sendComment'], true);
+    
+    case COMMENT_SUCCESS:
+      var comments = state.getIn(['comments']);
+      comments.unshift(action.data);
+      return state.setIn(['sendComment'], null).removeIn(['comments']).setIn(['comments'], comments);
+
+    case COMMENT_FAIL: 
+      return state.setIn(['sendComment'], null)
+
+    //load comment
+    case LOAD_COMMENT_REQUEST:
+      if(action.action == 'LM') {
+        return state.setIn(['loadComment'], null);
+      } else return state.setIn(['loadComment'], true);
+   
+    case LOAD_COMMENT_SUCCESS:
+      if(action.action == 'LM') {
+        var comments = state.getIn(['comments']);
+        comments = comments.concat(action.data)
+        return state.setIn(['comments'], comments).setIn(['loadMoreComment'], action.data.length >=15 ? true : null)
+      }else return state.setIn(['loadComment'], null).setIn(['comments'], action.data).setIn(['loadMoreComment'], action.data.length >= 15 ? true : null);
+
+    case LOAD_COMMENT_FAIL: 
+      return state.setIn(['loadComment'], null)
+
+    //category
+    case POST_DETAIL_REQUEST:
+      return state.setIn(['isFetching'], true).setIn(['postDetail'], null).setIn(['relate'], null);
+    
+    case POST_DETAIL_SUCCESS:
+        return state.setIn(['isFetching'], null).setIn(['postDetail'], action.data).setIn(['relate'], action.relate);
+
+    case POST_DETAIL_FAIL: 
+      return state.setIn(['isFetching'], null)
+
+  }
+  return state;
+}

@@ -1,0 +1,667 @@
+
+'use strict';
+const {
+  EMPTY_DATA_USER,
+  PROFILE_MY_POST_REQUEST,
+  PROFILE_MY_POST_SUCCESS,
+  PROFILE_MY_POST_FAIL,
+  PROFILE_MY_PICK_REQUEST,
+  PROFILE_MY_PICK_SUCCESS,
+  PROFILE_MY_PICK_FAIL,
+  OTHER_PROFILE_REQUEST,
+  OTHER_PROFILE_SUCCESS,
+  OTHER_PROFILE_FAIL,
+  FOLLOWING_REQUEST,
+  FOLLOWING_SUCCESS,
+  FOLLOWING_FAIL,
+  FOLLOWER_REQUEST,
+  FOLLOWER_SUCCESS,
+  FOLLOWER_FAIL,
+  INVITE_REQUEST,
+  INVITE_SUCCESS,
+  INVITE_FAIL,
+  FOLLOW_REQUEST,
+  FOLLOW_SUCCESS,
+  FOLLOW_FAIL,
+  UPDATE_PROFILE_REQUEST,
+  UPDATE_PROFILE_SUCCESS,
+  UPDATE_PROFILE_FAIL,
+  CREATE_PASS_SUCCESS
+} = require('../libs/actionTypes');
+import {
+  Alert,
+} from 'react-native';
+
+import Constant from '../services/Constant';
+import Toast from 'react-native-simple-toast';
+const Profile = require('../services/Profile');
+const StoreService = require('../services/StoreService').default;
+import {Actions} from 'react-native-router-flux';
+
+// createPass
+export function createPassRequest() {
+  return {
+    type: INVITE_REQUEST
+  };
+}
+
+export function createPassSuccess(data) {
+  return {
+    type: CREATE_PASS_SUCCESS,
+    data: data
+  };
+}
+export function createPassFail() {
+  return {
+    type: INVITE_FAIL,
+  };
+}
+
+
+export function createPass(body) {
+  return dispatch => {
+    dispatch(createPassRequest());
+    Profile.createPass(body).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(createPassFail());
+          return;
+        case 200:
+            // Toast.show('Đổi mật khẩu thành công')
+            new StoreService().storeSession(Constant.IP_IS_PASS, true);
+            Actions.tab({type: 'reset'});
+            dispatch(createPassSuccess(res.data));
+          return;
+        default: 
+          Toast.show(res.errors,Toast.LONG)
+          dispatch(createPassFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(createPassFail())
+    })
+  }
+}
+
+//change pass
+
+export function changePassRequest() {
+  return {
+    type: INVITE_REQUEST
+  };
+}
+
+export function changePassSuccess() {
+  return {
+    type: INVITE_SUCCESS,
+  };
+}
+export function changePassFail() {
+  return {
+    type: INVITE_FAIL,
+  };
+}
+
+
+export function changePass(body) {
+  return dispatch => {
+    dispatch(changePassRequest());
+    Profile.changePass(body).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(changePassFail());
+          return;
+        case 200:
+            Toast.show('Đổi mật khẩu thành công')
+            Actions.pop()
+            dispatch(changePassSuccess());
+          return;
+        default: 
+          Toast.show(res.errors,Toast.LONG)
+          dispatch(changePassFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(changePassFail())
+    })
+  }
+}
+
+//update profile
+export function updateProfileRequest() {
+  return {
+    type: UPDATE_PROFILE_REQUEST
+  };
+}
+
+export function updateProfileSuccess(data) {
+  return {
+    type: UPDATE_PROFILE_SUCCESS,
+    data: data
+  };
+}
+export function updateProfileFail() {
+  return {
+    type: UPDATE_PROFILE_FAIL,
+  };
+}
+
+export function updateProfile(data) {
+  return dispatch => {
+    dispatch(updateProfileRequest())
+    Profile.updateProfile(data).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(updateProfileFail());
+          return;
+        case 200:
+          Toast.show('Thay đổi thành công');
+          Actions.pop()
+          dispatch(updateProfileSuccess(res.data))
+          return;
+        default: 
+          dispatch(updateProfileFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(updateProfileFail())
+    })
+  }
+}
+
+//update avatar
+// export function followRequest() {
+//   return {
+//     type: FOLLOW_REQUEST
+//   };
+// }
+
+// export function followSuccess() {
+//   return {
+//     type: FOLLOW_SUCCESS,
+//   };
+// }
+// export function followFail() {
+//   return {
+//     type: FOLLOW_FAIL,
+//   };
+// }
+
+export function updateAvatar(path) {
+  return dispatch => {
+    Profile.updateAvatar(path).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(followFail());
+          return;
+        case 200:
+          Toast.show('Thay đổi ảnh đại diện thành công')
+            dispatch(updateProfileSuccess(res.data))
+          return;
+        default: 
+          dispatch(followFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(followFail())
+    })
+  }
+}
+
+//follow
+export function followRequest() {
+  return {
+    type: FOLLOW_REQUEST
+  };
+}
+
+export function followSuccess() {
+  return {
+    type: FOLLOW_SUCCESS,
+  };
+}
+export function followFail() {
+  return {
+    type: FOLLOW_FAIL,
+  };
+}
+
+export function follow(id) {
+  return dispatch => {
+    dispatch(followRequest());
+    Profile.follow(id).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(followFail());
+          return;
+        case 200:
+            dispatch(followSuccess())
+          return;
+        default: 
+          dispatch(followFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(followFail())
+    })
+  }
+}
+
+
+//feedback
+export function feedBackRequest() {
+  return {
+    type: INVITE_REQUEST
+  };
+}
+
+export function feedBackSuccess() {
+  return {
+    type: INVITE_SUCCESS,
+  };
+}
+export function feedBackFail() {
+  return {
+    type: INVITE_FAIL,
+  };
+}
+
+export function feedBack(content) {
+  return dispatch => {
+    dispatch(feedBackRequest());
+    Profile.feedBack(content).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(feedBackFail());
+          return;
+        case 200:
+            Actions.pop()
+            dispatch(feedBackSuccess());
+          return;
+        default: 
+          dispatch(feedBackFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(inviteFail())
+    })
+  }
+}
+
+//my pick
+export function inviteRequest() {
+  return {
+    type: INVITE_REQUEST
+  };
+}
+
+export function inviteSuccess() {
+  return {
+    type: INVITE_SUCCESS,
+  };
+}
+export function inviteFail() {
+  return {
+    type: INVITE_FAIL,
+  };
+}
+
+export function invite(email, intro) {
+  return dispatch => {
+    dispatch(inviteRequest());
+    Profile.invite(email, intro).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(inviteFail());
+          return;
+        case 200:
+            Actions.pop()
+            dispatch(inviteSuccess());
+          return;
+        default: 
+          dispatch(inviteFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(inviteFail())
+    })
+  }
+}
+
+//load follower
+export function followerRequest(keyword= null) {
+  return {
+    type: FOLLOWER_REQUEST,
+    keyword: keyword
+  };
+}
+
+export function followerSuccess(data, action, keyword = null) {
+  return {
+    type: FOLLOWER_SUCCESS,
+    data: data,
+    action: action, 
+    keyword: keyword
+  };
+}
+export function followerFail() {
+  return {
+    type: FOLLOWER_FAIL,
+  };
+}
+
+export function follower(keyword= null, id, action, page = 1) {
+  if(keyword == null) {
+    return dispatch => {
+      Profile.follower(keyword, id, page).then((res) => {
+        switch(res.status) {
+          case 500:
+            Alert.alert(
+              'Thông báo!',
+              'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+              {text: 'Ok', style: 'cancel'},
+            );
+            dispatch(followerFail());
+            return;
+          case 200:
+              dispatch(followerSuccess(res.data, action))
+            return;
+          default: 
+            dispatch(followerFail());
+            return;
+        }
+      }).catch((err) => {
+        return dispatch(followerFail())
+      })
+    }
+  }else {
+    return dispatch => {
+      dispatch(followerRequest(keyword))
+      Profile.follower(keyword, id, page).then((res) => {
+        switch(res.status) {
+          case 500:
+            Alert.alert(
+              'Thông báo!',
+              'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+              {text: 'Ok', style: 'cancel'},
+            );
+            dispatch(followerFail());
+            return;
+          case 200:
+              dispatch(followerSuccess(res.data, action, keyword))
+            return;
+          default: 
+            dispatch(followerFail());
+            return;
+        }
+      }).catch((err) => {
+        return dispatch(followerFail())
+      })
+    }
+  }
+}
+
+//load follow
+export function followingRequest(keyword = null) {
+  return {
+    type: FOLLOWING_REQUEST,
+    keyword: keyword,
+  };
+}
+
+export function followingSuccess(data, action, keyword= null) {
+  return {
+    type: FOLLOWING_SUCCESS,
+    data: data,
+    action: action,
+    keyword: keyword,
+  };
+}
+export function followingFail() {
+  return {
+    type: FOLLOWING_FAIL,
+  };
+}
+
+export function following(keyword= null, id, action, page = 1) {
+  if(keyword == null) {
+    return dispatch => {
+      Profile.following(keyword, id, page).then((res) => {
+        switch(res.status) {
+          case 500:
+            Alert.alert(
+              'Thông báo!',
+              'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+              {text: 'Ok', style: 'cancel'},
+            );
+            dispatch(followingFail());
+            return;
+          case 200:
+              dispatch(followingSuccess(res.data, action))
+            return;
+          default: 
+            dispatch(followingFail());
+            return;
+        }
+      }).catch((err) => {
+        return dispatch(followingFail())
+      })
+    }
+  }else
+  return dispatch => {
+    dispatch(followingRequest(keyword))
+    Profile.following(keyword, id, page).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(followingFail());
+          return;
+        case 200:
+            dispatch(followingSuccess(res.data, action, keyword))
+          return;
+        default: 
+          dispatch(followingFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(followingFail())
+    })
+  }
+}
+
+//my pick
+export function myPickRequest() {
+  return {
+    type: PROFILE_MY_PICK_REQUEST
+  };
+}
+
+export function myPickSuccess(data, action, id) {
+  return {
+    type: PROFILE_MY_PICK_SUCCESS,
+    data: data,
+    action: action,
+    id: id
+  };
+}
+export function myPickFail() {
+  return {
+    type: PROFILE_MY_PICK_SUCCESS,
+  };
+}
+
+export function myPick(id = null, action, page = 1) {
+  return dispatch => {
+    Profile.myPick(id, page).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(myPickFail());
+          return;
+        case 200:
+            dispatch(myPickSuccess(res.data, action, id))
+          return;
+        default: 
+          dispatch(myPickFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(myPickFail())
+    })
+  }
+}
+
+//other profile
+export function otherProfileRequest() {
+  return {
+    type: OTHER_PROFILE_REQUEST
+  };
+}
+
+export function otherProfileSuccess(data) {
+  return {
+    type: OTHER_PROFILE_SUCCESS,
+    data: data,
+  };
+}
+export function otherProfileFail() {
+  return {
+    type: OTHER_PROFILE_FAIL,
+  };
+}
+
+export function otherProfile(id) {
+  return dispatch => {
+    Profile.otherProfile(id).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(otherProfileFail());
+          return;
+        case 200:
+            dispatch(otherProfileSuccess(res.data))
+          return;
+        default: 
+          dispatch(otherProfileFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(otherProfileFail())
+    })
+  }
+}
+
+
+//my post
+export function myPostRequest() {
+  return {
+    type: PROFILE_MY_POST_REQUEST
+  };
+}
+
+export function myPostSuccess(data, action, id) {
+  return {
+    type: PROFILE_MY_POST_SUCCESS,
+    data: data,
+    action: action,
+    id: id
+  };
+}
+export function myPostFail() {
+  return {
+    type: PROFILE_MY_POST_FAIL,
+  };
+}
+
+export function myPost(id = null, action, page = 1) {
+  return dispatch => {
+    Profile.myPost(id, page).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(myPostFail());
+          return;
+        case 200:
+            dispatch(myPostSuccess(res.data, action, id))
+          return;
+        default: 
+          dispatch(myPostFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(myPostFail())
+    })
+  }
+}
+
+
+export function emptyDataUser(){
+  return {
+    type: EMPTY_DATA_USER
+  }
+}
+
+export function logout() {
+  return dispatch => {
+    // Profile.updateStatus(notipush_key)
+    new StoreService().deleteSessionToken(Constant.IP_HEADER_REQUEST);
+    new StoreService().deleteSessionToken(Constant.IP_IS_LOGIN);
+    new StoreService().deleteSessionToken(Constant.IP_IS_PASS);
+    // emptyDataUser();
+    Actions.login({type: 'reset'});
+  };
+}
+
+
+

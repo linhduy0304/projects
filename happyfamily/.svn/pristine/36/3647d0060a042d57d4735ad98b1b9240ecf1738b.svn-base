@@ -1,0 +1,138 @@
+
+
+'use strict'
+import { Alert } from 'react-native';
+import {Actions} from 'react-native-router-flux'
+import SimpleToast from 'react-native-simple-toast';
+const {
+  FEED_BACK_REQUEST,
+  FEED_BACK_SUCCESS,
+  FEED_BACK_FAIL,
+  UPDATE_PROFILE_REQUEST,
+  UPDATE_PROFILE_SUCCESS,
+  UPDATE_PROFILE_FAIL,
+} = require('../config/actionTypes');
+const Profile = require('../services/Profile');
+
+//change pass
+export function changePass(body) {
+  return dispatch => {
+    dispatch(feedBackRequest());
+    Profile.changePass(body).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(feedBackFail());
+          return;
+        case 200:
+            Toast.show('Đổi mật khẩu thành công')
+            Actions.pop()
+            dispatch(feedBackSuccess());
+          return;
+        default: 
+          Toast.show(res.errors,Toast.LONG)
+          dispatch(feedBackFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(feedBackFail())
+    })
+  }
+}
+
+//update profile
+export function updateProfileRequest() {
+  return {
+    type: UPDATE_PROFILE_REQUEST
+  };
+}
+
+export function updateProfileSuccess(data) {
+  return {
+    type: UPDATE_PROFILE_SUCCESS,
+    data: data
+  };
+}
+export function updateProfileFail() {
+  return {
+    type: UPDATE_PROFILE_FAIL,
+  };
+}
+
+export function updateProfile(body) {
+  return dispatch => {
+    dispatch(updateProfileRequest())
+    Profile.updateProfile(body).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            [{text: 'Ok', style: 'cancel'}],
+          );
+          dispatch(updateProfileFail());
+          return;
+        case 200:
+          Toast.show('Thay đổi thành công');
+          Actions.pop()
+          dispatch(updateProfileSuccess(res.data))
+          return;
+        default: 
+          dispatch(updateProfileFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(updateProfileFail())
+    })
+  }
+}
+
+//feedback
+export function feedBackRequest() {
+  return {
+    type: FEED_BACK_REQUEST
+  };
+}
+
+export function feedBackSuccess() {
+  return {
+    type: FEED_BACK_SUCCESS,
+  };
+}
+export function feedBackFail() {
+  return {
+    type: FEED_BACK_FAIL,
+  };
+}
+
+export function feedBack(body) {
+  return dispatch => {
+    dispatch(feedBackRequest());
+    Profile.feedBack(body).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            [{text: 'Ok', style: 'cancel'}],
+          );
+          dispatch(feedBackFail());
+          return;
+        case 200:
+            Actions.pop()
+            SimpleToast.show(res.messages)
+            dispatch(feedBackSuccess());
+          return;
+        default: 
+          dispatch(feedBackFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(inviteFail())
+    })
+  }
+}

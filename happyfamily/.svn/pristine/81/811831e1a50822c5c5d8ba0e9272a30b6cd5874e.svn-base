@@ -1,0 +1,48 @@
+
+'use strict';
+
+const InitialState = require('./state').default;
+  
+const {
+    INDIVIDUAL_REQUEST,
+    INDIVIDUAL_SUCCESS,
+    INDIVIDUAL_FAIL,
+    ADD_INDIVIDUAL_REQUEST,
+    ADD_INDIVIDUAL_SUCCESS,
+    ADD_INDIVIDUAL_FAIL,
+    RELATIONSHIP_REQUEST,
+    RELATIONSHIP_SUCCESS,
+    RELATIONSHIP_FAIL
+} = require('../../config/actionTypes');
+
+const initialState = new InitialState;
+
+export default function reducer(state = initialState, action) {
+
+  switch (action.type) {
+    //individual
+    case INDIVIDUAL_REQUEST:
+      return state.setIn(['loading'], true);
+    case INDIVIDUAL_SUCCESS:
+      return state.setIn(['loading'], null).setIn(['individual'], action.data);
+    case INDIVIDUAL_FAIL:
+      return state.setIn(['loading'], null)
+
+      //add
+    case ADD_INDIVIDUAL_REQUEST:
+      return state.setIn(['loading'], true);
+    case ADD_INDIVIDUAL_SUCCESS:
+      return state.setIn(['loading'], null);
+    case ADD_INDIVIDUAL_FAIL:
+      return state.setIn(['loading'], null);
+
+    case RELATIONSHIP_REQUEST:
+      return state.setIn(['loadingRelationship'], true);
+    case RELATIONSHIP_SUCCESS:
+      return state.setIn(['loadingRelationship'], null).setIn(['relationships'], action.data);
+    case RELATIONSHIP_FAIL:
+      return state.setIn(['loadingRelationship'], null)
+  }
+ 
+  return state;
+}

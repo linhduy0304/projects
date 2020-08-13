@@ -1,0 +1,11 @@
+
+
+import React from 'react';
+
+let HTTP = require('./HTTP');
+let URL = require('./URL');
+
+//send
+export function event() {
+  return HTTP.get(`${URL.url}message`);
+}

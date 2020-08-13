@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>HiStaff</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>localhost</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>VAGRB.TTF</string>
+		<string>VALLERGO.TTF</string>
+		<string>VAPTIMB.TTF</string>
+		<string>VAPTIMBI.TTF</string>
+		<string>VAPTIMI.TTF</string>
+		<string>VAPTIMN.TTF</string>
+		<string>VARISON.TTF</string>
+		<string>VAUCHON.TTF</string>
+		<string>VAVOB.TTF</string>
+		<string>VAVOBI.TTF</string>
+		<string>VAVOI.TTF</string>
+		<string>VAVON.TTF</string>
+		<string>VAWCHON.TTF</string>
+		<string>VAZTEK.TTF</string>
+		<string>VBANDIT.TTF</string>
+		<string>VBODON.TTF</string>
+		<string>VBODONB.TTF</string>
+		<string>VBODONBI.TTF</string>
+		<string>VBODONII.TTF</string>
+		<string>VBODONP.TTF</string>
+		<string>VBOOKMB.TTF</string>
+		<string>VBOOKMBI.TTF</string>
+		<string>VBOOKMI.TTF</string>
+		<string>VBOOKMN.TTF</string>
+		<string>VBROADW.TTF</string>
+		<string>VBRUSH.TTF</string>
+		<string>VCENTB.TTF</string>
+		<string>VCENTBI.TTF</string>
+		<string>VCENTI.TTF</string>
+		<string>VCENTN.TTF</string>
+		<string>VCOMMERC.TTF</string>
+		<string>VCOOPERB.TTF</string>
+		<string>VCORONET.TTF</string>
+		<string>VCOURI.TTF</string>
+		<string>VCOURIB.TTF</string>
+		<string>VCOURIBI.TTF</string>
+		<string>VCOURII.TTF</string>
+		<string>VDOMCAS.TTF</string>
+		<string>VDUFFY.TTF</string>
+		<string>VDURHAM.TTF</string>
+		<string>VFATSO.TTF</string>
+		<string>VFRANKO.TTF</string>
+		<string>VFREE.TTF</string>
+		<string>VGARAMB.TTF</string>
+		<string>VGARAMBI.TTF</string>
+		<string>VGARAMI.TTF</string>
+		<string>VGARAMN.TTF</string>
+		<string>VGOUDYB.TTF</string>
+		<string>VGOUDYI.TTF</string>
+		<string>VGOUDYN.TTF</string>
+		<string>VHANTIQ.TTF</string>
+		<string>VHARABIA.TTF</string>
+		<string>VHARIABI.TTF</string>
+		<string>VHARIAL.TTF</string>
+		<string>VHARIALB.TTF</string>
+		<string>VHARIALI.TTF</string>
+		<string>VHARIALN.TTF</string>
+		<string>VHARIS.TTF</string>
+		<string>VHAVAN.TTF</string>
+		<string>VHAVANB.TTF</string>
+		<string>VHAVANBI.TTF</string>
+		<string>VHAVANI.TTF</string>
+		<string>VHBAHAB.TTF</string>
+		<string>VHBLACK.TTF</string>
+		<string>VHBODO.TTF</string>
+		<string>VHCENTB.TTF</string>
+		<string>VHCENTBI.TTF</string>
+		<string>VHCENTI.TTF</string>
+		<string>VHCENTN.TTF</string>
+		<string>VHCLARE.TTF</string>
+		<string>VHCOMSCI.TTF</string>
+		<string>VHCOOP.TTF</string>
+		<string>VHCORVI.TTF</string>
+		<string>VHCOUR.TTF</string>
+		<string>VHCOURB.TTF</string>
+		<string>VHELVCB.TTF</string>
+		<string>VHELVCBI.TTF</string>
+		<string>VHELVCI.TTF</string>
+		<string>VHELVCN.TTF</string>
+		<string>VHELVEB.TTF</string>
+		<string>VHELVEBI.TTF</string>
+		<string>VHELVEI.TTF</string>
+		<string>VHELVEN.TTF</string>
+		<string>VHEXOTIC.TTF</string>
+		<string>VHFREE.TTF</string>
+		<string>VHGOTH.TTF</string>
+		<string>VHHELS.TTF</string>
+		<string>VHKOALA.TTF</string>
+		<string>VHLINCOL.TTF</string>
+		<string>VHLINUS.TTF</string>
+		<string>VHMEMO.TTF</string>
+		<string>VHMUSTI.TTF</string>
+		<string>VHOBO.TTF</string>
+		<string>VHPARK.TTF</string>
+		<string>VHPRES.TTF</string>
+		<string>VHREVU.TTF</string>
+		<string>VHSOUTH.TTF</string>
+		<string>VHTEKN.TTF</string>
+		<string>VHTIFH.TTF</string>
+		<string>VHTIME.TTF</string>
+		<string>VHTIMEB.TTF</string>
+		<string>VHTIMEBI.TTF</string>
+		<string>VHTIMEI.TTF</string>
+		<string>VHUNIV.TTF</string>
+		<string>VHVOGU.TTF</string>
+		<string>VINHAN.TTF</string>
+		<string>VJAMAI.TTF</string>
+		<string>VJUNI.TTF</string>
+		<string>VKORIN.TTF</string>
+		<string>VKORINB.TTF</string>
+		<string>VKORINI.TTF</string>
+		<string>VKUNB.TTF</string>
+		<string>VKUNBI.TTF</string>
+		<string>VKUNM.TTF</string>
+		<string>VKUNN.TTF</string>
+		<string>VLINUSN.TTF</string>
+		<string>VLITHOS.TTF</string>
+		<string>VMARIAGE.TTF</string>
+		<string>VMELIB.TTF</string>
+		<string>VMELIBI.TTF</string>
+		<string>VMELII.TTF</string>
+		<string>VMELIN.TTF</string>
+		<string>VMURRAYB.TTF</string>
+		<string>VMURRAYN.TTF</string>
+		<string>VN3D.TTF</string>
+		<string>VNANTIQ.TTF</string>
+		<string>VNANTIQB.TTF</string>
+		<string>VNARABIA.TTF</string>
+		<string>VNARIABI.TTF</string>
+		<string>VNARIAL.TTF</string>
+		<string>VNARIALB.TTF</string>
+		<string>VNARIALI.TTF</string>
+		<string>VNARIALN.TTF</string>
+		<string>VNARIANB.TTF</string>
+		<string>VNARIANI.TTF</string>
+		<string>VNARIS.TTF</string>
+		<string>VNAVAN.TTF</string>
+		<string>VNAVANB.TTF</string>
+		<string>VNAVANBI.TTF</string>
+		<string>VNAVANI.TTF</string>
+		<string>VNBAHAB.TTF</string>
+		<string>VNBLACK.TTF</string>
+		<string>VNBODO.TTF</string>
+		<string>VNCENTB.TTF</string>
+		<string>VNCENTBI.TTF</string>
+		<string>VNCENTI.TTF</string>
+		<string>VNCENTN.TTF</string>
+		<string>VNCLARE.TTF</string>
+		<string>VNCOMSI.TTF</string>
+		<string>VNCOOP.TTF</string>
+		<string>VNCORSI.TTF</string>
+		<string>VNCOUR.TTF</string>
+		<string>VNCOUR2.TTF</string>
+		<string>VNCOURB.TTF</string>
+		<string>VNCOURBI.TTF</string>
+		<string>VNCOURI.TTF</string>
+		<string>VNEXOTIC.TTF</string>
+		<string>VNFREE.TTF</string>
+		<string>VNGOTHIC.TTF</string>
+		<string>VNHARR.TTF</string>
+		<string>VNHELVS.TTF</string>
+		<string>Vnhltfap.ttf</string>
+		<string>Vni 01 LinotypeZapfino one.ttf</string>
+		<string>Vni 02 LinotypeZapfino two.ttf</string>
+		<string>Vni 03 LinotypeZapfino Three.ttf</string>
+		<string>Vni 04 LinotypeZapfino four.ttf</string>
+		<string>Vni 05 SpringtimeFlourish.ttf</string>
+		<string>VNI 06 Springtime.ttf</string>
+		<string>Vni 07 WaterBrushROB.ttf</string>
+		<string>VNI 08 Springtime2.ttf</string>
+		<string>VNI 09 Baroque.ttf</string>
+		<string>Vni 10 Swan Song.ttf</string>
+		<string>Vni 11 Springtime2.ttf</string>
+		<string>Vni 12 Alex.ttf</string>
+		<string>Vni 13 Annabelle.ttf</string>
+		<string>Vni 14 AlexBrush.ttf</string>
+		<string>VNI 15 Chops Normal.ttf</string>
+		<string>Vni 16 Machina.ttf</string>
+		<string>VNI 17 Sandy.ttf</string>
+		<string>Vni 18 Mandalay.ttf</string>
+		<string>Vni 19 Walt Disney.ttf</string>
+		<string>Vni 20 University.ttf</string>
+		<string>Vni 21 Scrap Cursive.ttf</string>
+		<string>VNI 22 JackieO.ttf</string>
+		<string>Vni 23 Qwigley.ttf</string>
+		<string>VNI 24 Love.ttf</string>
+		<string>Vni 25 Ambiance BT Swash.ttf</string>
+		<string>VNI 26 Saliere.ttf</string>
+		<string>VNI 27 Bendigo.ttf</string>
+		<string>VNI 28 Zirkon.ttf</string>
+		<string>Vni 29 BrushMe.ttf</string>
+		<string>Vni 30 Shishoni Brush.ttf</string>
+		<string>VNI-Alex.ttf</string>
+		<string>VNI-AlexBrush.ttf</string>
+		<string>VNI-AmbianceBTSwash.ttf</string>
+		<string>VNI-Annabelle.ttf</string>
+		<string>VNI-Baybuom.ttf</string>
+		<string>VNI-Bendigo.ttf</string>
+		<string>VNI-Briquet.ttf</string>
+		<string>VNI-BrushMe.ttf</string>
+		<string>VNI-Butlong.ttf</string>
+		<string>VNI-Chops Normal.ttf</string>
+		<string>VNI-Disney.ttf</string>
+		<string>VNI-Diudang.ttf</string>
+		<string>VNI-HelveB.TTF</string>
+		<string>VNI-HelveBI.TTF</string>
+		<string>VNI-HelveI.TTF</string>
+		<string>VNI-Hobo.TTF</string>
+		<string>VNI-JackieO.ttf</string>
+		<string>VNI-Jamai.TTF</string>
+		<string>VNI-Korin.TTF</string>
+		<string>VNI-KorinB.TTF</string>
+		<string>VNI-Linus.TTF</string>
+		<string>VNI-Lithos.TTF</string>
+		<string>VNI-Love.ttf</string>
+		<string>VNI-Machina.ttf</string>
+		<string>VNI-Mandalay.ttf</string>
+		<string>VNI-Maria.TTF</string>
+		<string>VNI-Matisse.ttf</string>
+		<string>VNI-Netbut.ttf</string>
+		<string>VNI-Nhatban.ttf</string>
+		<string>VNI-OngdoHL.ttf</string>
+		<string>VNI-Qwigley.ttf</string>
+		<string>VNI-Saliere.ttf</string>
+		<string>VNI-Sandy.ttf</string>
+		<string>VNI-Scrap Cursive.ttf</string>
+		<string>VNI-Script.TTF</string>
+		<string>VNI-ShishoniBrush.ttf</string>
+		<string>VNI-Silver.TTF</string>
+		<string>VNI-Slogan.ttf</string>
+		<string>VNI-Souvir.TTF</string>
+		<string>VNI-Springtime.ttf</string>
+		<string>VNI-Thanhcao.TTF</string>
+		<string>VNI-Thufapfan.ttf</string>
+		<string>VNI-Thuphap.ttf</string>
+		<string>VNI-Thuphap1.ttf</string>
+		<string>VNI-Thuphap2.ttf</string>
+		<string>VNI-Thuphap3.ttf</string>
+		<string>VNI-Top.TTF</string>
+		<string>VNI-Truck.ttf</string>
+		<string>VNI-Trung Kien.TTF</string>
+		<string>VNI-Tubes.TTF</string>
+		<string>VNI-Univer.TTF</string>
+		<string>VNI-University.ttf</string>
+		<string>VNI-Viettay.ttf</string>
+		<string>VNI-Vivi.TTF</string>
+		<string>VNI-Walt Disney.ttf</string>
+		<string>VNI-Whimsy.ttf</string>
+		<string>VNI-Yahoo.ttf</string>
+		<string>VNI-Zap.TTF</string>
+		<string>VNI-Zirkon.ttf</string>
+		<string>VNICAMBO.TTF</string>
+		<string>VNIDOS.TTF</string>
+		<string>VNIGREEC.TTF</string>
+		<string>VNILAOS_.TTF</string>
+		<string>VNINET.TTF</string>
+		<string>VNIRUSSI.TTF</string>
+		<string>VNIWIN.TTF</string>
+		<string>VNKOALA.TTF</string>
+		<string>VNLINCOL.TTF</string>
+		<string>VNLINUS.TTF</string>
+		<string>VNLUCIDA.TTF</string>
+		<string>VNMEMO.TTF</string>
+		<string>VNMUSTI.TTF</string>
+		<string>VNPARK.TTF</string>
+		<string>VNPRES.TTF</string>
+		<string>VNREVU.TTF</string>
+		<string>VNSHELL.TTF</string>
+		<string>VNSOUTHB.TTF</string>
+		<string>VNSOUTHD.TTF</string>
+		<string>VNSOUTHI.TTF</string>
+		<string>VNSOUTHN.TTF</string>
+		<string>VNSTAMP.TTF</string>
+		<string>VNTEKN.TTF</string>
+		<string>Vntfap01.ttf</string>
+		<string>Vnthfap2.TTF</string>
+		<string>Vnthfap3.TTF</string>
+		<string>Vnthfapf.TTF</string>
+		<string>VNTIFH.TTF</string>
+		<string>VNTIME.TTF</string>
+		<string>VNTIMEB.TTF</string>
+		<string>VNTIMEBI.TTF</string>
+		<string>VNTIMEI.TTF</string>
+		<string>VNUNIV.TTF</string>
+		<string>VNVOGU.TTF</string>
+		<string>VPALABI.TTF</string>
+		<string>VPALATI.TTF</string>
+		<string>VPALATIB.TTF</string>
+		<string>VPALATIN.TTF</string>
+		<string>VPARK.TTF</string>
+		<string>VPRESENT.TTF</string>
+		<string>VREVUE.TTF</string>
+		<string>VSCRIPT.TTF</string>
+		<string>VSOUVB.TTF</string>
+		<string>VSOUVBI.TTF</string>
+		<string>VSWISC.TTF</string>
+		<string>VSWISEC.TTF</string>
+		<string>VTEKTI.TTF</string>
+		<string>VTEKTN.TTF</string>
+		<string>VTIMESB.TTF</string>
+		<string>VTIMESBI.TTF</string>
+		<string>VTIMESI.TTF</string>
+		<string>VTIMESN.TTF</string>
+		<string>VTOPHAT.TTF</string>
+		<string>VTUBE.TTF</string>
+		<string>VUNIVER.TTF</string>
+		<string>VVIVI.TTF</string>
+		<string>VZAP.TTF</string>
+	</array>
+</dict>
+</plist>

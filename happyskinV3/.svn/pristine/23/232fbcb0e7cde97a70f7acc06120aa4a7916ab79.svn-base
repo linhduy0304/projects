@@ -1,0 +1,316 @@
+import React from 'react';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  TouchableHighlight,
+  TouchableOpacity,
+  AlertIOS,
+  ScrollView,
+  Dimensions,
+  ListView,
+  RefreshControl,
+  InteractionManager,
+  Platform
+} from "react-native";
+
+import {Actions} from "react-native-router-flux";
+import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav';
+let ConstantSystem = require('../services/ConstantSystem');
+import ModalSkintestCategoryProduct from './ModalSkintestCategoryProduct';
+import ModalSkintestBrandProduct from './ModalSkintestBrandProduct';
+var Modal = require('react-native-modalbox');
+var Spinner = require('react-native-spinkit');
+
+import GoogleAnalytics from 'react-native-google-analytics-bridge';
+GoogleAnalytics.setTrackerId('UA-57146563-2');
+
+import SearchProductList from '../components/directives/SearchProductList';
+import GiftedSpinner from "../libs/react-native-gifted-spinner/GiftedSpinner";
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import {Map} from 'immutable';
+import * as skintestActions from '../actions/skintestActions';
+
+var windowSize = Dimensions.get('window');
+const actions = [
+  skintestActions
+];
+var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+function mapStateToProps(state) {
+  return {
+    ...state
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class PageSkinProduct extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoadingTail: false,
+      page: this.props.skintest.page,
+      dataSource: ds.cloneWithRows(this.props.skintest.products),
+      back: true,
+      loadMore: true
+    };
+  }
+
+  componentWillMount() {
+    this.props.actions.loading();
+  }
+
+  componentDidMount(){
+    InteractionManager.runAfterInteractions(() => {
+      this.props.actions.loadDataSkintestProduct(this.props.skintype, this.props.skintest.filterCategory, this.props.skintest.filterBrand);
+    });
+    GoogleAnalytics.trackScreenView('Page Skin Product: ');
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.skintest.products !== this.props.skintest.products) {
+      this.setState({
+        dataSource: ds.cloneWithRows(nextProps.skintest.products),
+        loadMore: nextProps.skintest.loadMore
+      });
+    }
+  }
+
+  _onRefresh() {
+    this.props.actions.refreshDataSkintestProduct(this.props.skintype, this.props.skintest.filterCategory, this.props.skintest.filterBrand);
+  }
+
+  _handleEndReached() {
+    if(this.state.loadMore){
+      if (this.state.isLoadingTail) {
+        return;
+      }
+      this.setState({
+        isLoadingTail: true
+      });
+      this.getDataSource(this.props.skintest.page + 1);
+    }
+  }
+
+  getDataSource(page) {
+    this.props.actions.skintestProductLoadMore(this.props.skintype, this.props.skintest.filterCategory, this.props.skintest.filterBrand, page);
+    this.setState({
+      isLoadingTail: false
+    });
+  }
+
+  _renderFooter() {
+    if (this.props.skintest.loadMore) {
+      return (
+        <View style={main.footer}>
+          <Text style={main.textFooter}>
+            Loading...
+          </Text>
+        </View>
+      );
+    }
+  }
+
+  showModalCategory() {
+    this.props.actions.openModalCategory();
+  }
+
+  showModalBrand() {
+    this.props.actions.openModalBrand();
+  }
+
+  closeModalCategory() {
+    this.props.actions.closeModalCategory();
+  }
+
+  closeModalBrand() {
+    this.props.actions.closeModalBrand();
+  }
+
+  back(){
+    if(this.state.back){
+      Actions.pop();
+      this.setState({
+        back: false
+      })
+      let _this = this;
+      setTimeout(function(){
+        _this.setState({
+          back: true
+        });
+      }, 2000);
+    }
+  }
+
+  render(){
+    return (
+      <View style={styles.content}>
+        <View style={{height: Platform.OS === 'ios' ? 20 : 0, backgroundColor: '#000'}}></View>
+        <NavBar style={{navBar: main.navBarBlack, statusBar: main.statusBar }} statusBar={{barStyle: 'light-content', backgroundColor: 'black'}}>
+          <NavButton>
+          </NavButton>
+          <NavTitle style={main.navTitle}>
+            <Text style={{color: '#fff'}}>
+            {'Sản phẩm phù hợp với bạn'}
+            </Text>
+          </NavTitle>
+          <NavButton>
+          </NavButton>
+          <TouchableOpacity onPress={() => Actions.pop()} style={{position: 'absolute', left: 0, padding: 15}}>
+            <Image style={{height: 17, width: 16}} source={require('../images/icons/ic_back_white.png')} />
+          </TouchableOpacity>
+        </NavBar>
+        <View style={[styles.container]}>
+          {/* <View style={styles.rowFilter}>
+            <View style={styles.mainFilter}>
+              <TouchableOpacity style={[styles.filter, styles.filterCategory]} onPress={ () => this.showModalCategory() }>
+                <Text 
+                numberOfLines = {1}
+                style={[styles.colorWhite, {flex: 1},this.props.skintest.showCategory ? styles.active : {} ]}>{this.props.skintest.nameCategory == '' ? 'Chọn loại sản phẩm' : this.props.skintest.nameCategory}</Text>
+                <Image source={require('../images/icons/ic_caret_down.png')} style={styles.icFilter}/>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.filter, styles.filterBrand]} onPress={ () => this.showModalBrand() }>
+                <Text 
+                numberOfLines = {1}
+                style={[styles.colorWhite, {flex:1}, this.props.skintest.showBrand ? styles.active : {} ]}>{this.props.skintest.nameBrand == '' ? 'Chọn thương hiệu' : this.props.skintest.nameBrand}</Text>
+                <Image source={require('../images/icons/ic_caret_down.png')} style={styles.icFilter}/>
+              </TouchableOpacity>
+            </View>
+          </View> */}
+          <View style={[styles.container]}>
+            {
+              (this.props.skintest.isFetching) ? 
+                <View style={{width: windowSize.width, height: windowSize.height}}>
+                  <GiftedSpinner/> 
+                </View>
+              : null
+            }
+            <View style={{flex: 1, opacity : (this.props.skintest.isFetching) ? 0 : 1}}>
+            {
+              this.props.skintest.products && this.props.skintest.products.length > 0 ?
+                <ListView
+                  ref='_listView'
+                  renderFooter={() => this._renderFooter()}
+                  dataSource={this.state.dataSource}
+                  onEndReached={() => this._handleEndReached()}
+                  refreshControl={
+                      <RefreshControl
+                        refreshing={this.props.skintest.isRefreshing}
+                        onRefresh={() => this._onRefresh()}
+                      />
+                    }
+                  renderRow={(product) => <SearchProductList key={product.id} product={product}/>}
+                  enableEmptySections={true}
+                  onEndReachedThreshold={ConstantSystem.PER_PAGE}
+                  />
+                  : <View style={styles.emptyData}><Text>Không có dữ liệu</Text></View>
+            }
+            </View>
+            <Modal style={styles.modal}
+               isOpen={this.props.skintest.showCategory}
+               ref={"top"}
+               swipeToClose={true}
+               position="top"
+               entry="bottom"
+               animationDuration={100}
+               backdropColor="white"
+               onClosed={()=> this.closeModalCategory()}>
+                  <ModalSkintestCategoryProduct skintype={this.props.skintype}>
+                  </ModalSkintestCategoryProduct>
+            </Modal>
+            <Modal style={styles.modal}
+               isOpen={this.props.skintest.showBrand}
+               ref={"top"}
+               swipeToClose={true}
+               position="top"
+               entry="bottom"
+               animationDuration={100}
+               backdropColor="white"
+               onClosed={()=> this.closeModalBrand()}>
+                  <ModalSkintestBrandProduct skintype={this.props.skintype}>
+                  </ModalSkintestBrandProduct>
+            </Modal>
+          </View>
+        </View>
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  content: {
+    flex: 1
+  },
+  container: {
+    flex: 1,
+  },
+  rowFilter: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    padding: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E4E3E4'
+  },
+  filter: {
+    padding: 5,
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderRadius: 20,
+    margin: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  filterCategory: {
+    backgroundColor: '#C5ACD3',
+    flex: 0.5,
+    justifyContent: 'space-between'
+  },
+  filterBrand:{
+    backgroundColor: '#f3aec1',
+    flex: 0.5,
+    justifyContent: 'space-between'
+  },
+  colorWhite: {
+    color: '#FFF'
+  },
+  active: {
+    color: 'red'
+  },
+  icFilter: {
+    width: 8,
+    height: 5,
+    resizeMode: 'cover',
+    marginLeft: 3
+  },
+  emptyData: {
+    padding: 30,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  mainFilter: {
+    flex: 1,
+    flexDirection: 'row'
+  },
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+});
+let main = require('../styles/Main');
+
+export default connect(mapStateToProps, mapDispatchToProps)(PageSkinProduct);
+
+
+

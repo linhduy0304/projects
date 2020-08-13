@@ -1,0 +1,61 @@
+
+
+import React from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image
+} from 'react-native';
+
+const ListChat = ({
+  onPress,
+  data
+}) => (
+  <TouchableOpacity onPress={onPress} style={styles.ctItem}>
+    <Image style={styles.avatar} source={data.type == 'group' ? require('../../images/group_chat.png') : {uri: data.avatar}} />
+    <View style={styles.ctContent}>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={styles.txtName}>{data.full_name}</Text>
+        <Text style={styles.txtTime}>{data.time}</Text>
+      </View>
+      <Text numberOfLines={2} style={styles.txtContent}>{data.content}</Text>
+    </View>
+  </TouchableOpacity>
+)
+
+const styles = StyleSheet.create({
+  txtTime: {
+    color: '#287FC9',
+    fontSize: 12
+  },
+  txtContent: {
+    color: '#287FC9',
+    fontSize: 15,
+  },
+  ctContent: {
+    flex: 1,
+    marginLeft: 10
+  },
+  avatar: {
+    height: 60,
+    width: 60,
+    borderRadius: 30
+  },
+  txtName: {
+    color: '#287FC9',
+    fontSize: 15,
+    flex: 1,
+  },
+  ctItem: {
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    padding: 15,
+    borderBottomColor: '#E3F1FD',
+    borderBottomWidth: 1
+  },
+})
+
+export default ListChat;
+  

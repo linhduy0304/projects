@@ -1,0 +1,16 @@
+
+
+const URL_PATH = "https://happyapi.techup.vn/api/v1/";
+
+
+module.exports = {
+  url: URL_PATH,
+  conversation: URL_PATH + 'conversation',
+  chats: URL_PATH + 'chatsList',
+  user: URL_PATH + 'user',
+  individual: URL_PATH + 'individuals',
+  relationships: URL_PATH + 'relationshipRoles',
+  comments: URL_PATH+'comments',
+  userSearch: URL_PATH + 'user/search',
+  requestRelationship: URL_PATH + 'individualRequest/postRequest',
+}

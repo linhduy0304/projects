@@ -1,0 +1,211 @@
+{
+    "bottom_tab": {
+        "tab_discovery": "Dạo xem",
+        "tab_booking": "Đặt chỗ",
+        "tab_nearby": "Quanh đây"
+    },
+    "bottom_tab_merchant": {
+        "tab_market": "Chợ",
+        "tab_request": "Yêu cầu",
+        "tab_more": "Thêm"
+    },
+    "deal": {
+        "bt_follow": "Theo dõi",
+        "remain_time": "Còn {{number_day}} ngày",
+        "near_you": "Ở gần bạn",
+        "bt_get_code": "LẤY MÃ",
+        "bt_detail": "CHI TIẾT",
+        "bt_booking": "ĐẶT CHỖ"
+    },
+    "login": {
+        "follow_brand": "THEO DÕI THƯƠNG HIỆU",
+        "follow_brand_description": "Nhận tin ưu đãi từ thương hiệu sớm nhất.",
+        "jamja_login_rule": "JAMJA không tự động đăng bài và lấy thông tin Facebook của bạn khi chưa được phép"
+    },
+    "deal_detail": {
+        "bt_share": "Chia sẻ",
+        "bt_share_messenger": "Messenger",
+        "bt_share_facebook": "Facebook",
+        "bt_share_copy_link": "Copy Link",
+        "bt_share_other": "Khác...",
+        "title_apply_condition": "Điều kiện áp dụng",
+        "bt_apply_at_store": "Áp dụng tại cửa hảng",
+        "bt_apply_online": "Áp dụng trực tuyến",
+        "tittle_about_store": "Về {{brand_name}}",
+        "tittle_comment": "Bình luận",
+        "tittle_exclusive_jamja": "Chỉ có tại JAMJA",
+        "tittle_exclusive_jamja_view_all": "Xem tất cả >",
+        "tittle_relative_deals": "Có thể bạn quan tâm"
+    },
+    "market": {
+        "tab_newest": "Mới nhất",
+        "tab_exclusive": "Độc quyền",
+        "search_description": "Tìm thương hiệu, sản phẩm"
+    },
+    "wallet": {
+        "title_wallet": "Ví",
+        "tab_coupon_code": "Mã ưu đãi",
+        "tab_bookmark": "Đánh dấu",
+        "tab_follow": "Theo dõi",
+        "deal_got": {
+            "header": {
+                "code_available": "MÃ CÒN HIỆU LỰC",
+                "code_not_available": "MÃ HẾT HIỆU LỰC"
+            },
+            "content": {
+                "expiry_date": "Hạn dùng: ",
+                "booking": "Đặt chỗ: ",
+                "canceled": "Đã hủy",
+                "expired": "Hết hạn",
+                "redeemed": "Đã đổi",
+                "deal_code": "Mã ưu đãi"
+            },
+            "empty": {
+                "first_info": "Nơi xem lại mã khuyến mãi đã lấy;",
+                "second_info": "Có rất nhiều khuyến mãi dành cho bạn,",
+                "please_choose": "vui lòng chọn ",
+                "get_code": "Lấy mã",
+                "or": " hoặc ",
+                "use_code": "Sử dụng mã",
+                "for_use_code": " để nhận ưu đãi.",
+                "return_market": "Quay lại",
+                "refresh": "Tải lại"
+            }
+        },
+        "login_required": {
+            "monopoly_deal": "ƯU ĐÃI ĐỘC QUYỀN",
+            "login_facebook": "Đăng nhập Facebook",
+            "jamja_dont_auto_get_data": "JAMJA không tự động đăng bài và lấy thông tin Facebook của bạn khi chưa được phép.",
+            "save_deal": "ĐÁNH DẤU ƯU ĐÃI",
+            "to_see_late_and_receive_notification": "Để xem lại và nhận thông báo nhắc nhở",
+            "to_see_your_deal_code": "Để xem mã khuyến mãi của bạn"
+        },
+        "deal_saved": {
+            "header": "ƯU ĐÃI",
+            "empty": {
+                "first_info": "Nơi xem lại mã khuyến mãi đã đánh dấu;",
+                "second_info": "Có rất nhiều khuyến mãi dành cho bạn,",
+                "please_choose": "vui lòng chọn ",
+                "for_save_deal": " để đánh dấu.",
+                "return_market": "Quay lại trang chợ",
+                "refresh": "Tải lại"
+            }
+        },
+        "brand_following": {
+            "follow_brand": "Thêm theo dõi",
+            "search_brand": "Tìm thương hiệu",
+            "see_deals": "Xem Ưu Đãi"
+        }
+    },
+    "notification": {
+        "tittle_notification": "Thông báo"
+    },
+    "more": {
+        "tittle_more": "Thêm"
+    },
+  "exclusive_reservation" : {
+    "title": "Thông Tin Mã Ưu Đãi",
+    "label_detail": "CHI TIẾT",
+    "label_store": "Cửa hàng",
+    "label_store_phone": "Điện thoại cửa hàng",
+    "label_code": "Mã ưu đãi",
+    "label_expire_date": "Hạn sử dụng",
+    "label_customer_name": "Khách hàng",
+    "label_customer_phone": "Điện thoại liên hệ",
+    "label_customer_email": "Email",
+    "header_more_info": "THÔNG TIN THÊM",
+    "dont_have_any_thing": "Không có thông tin",
+    "set_alarm": "Đặt nhắc nhở",
+    "cancel_alarm": "Huỷ nhắc nhở",
+    "condition": "Điều kiện sử dụng",
+    "deal_detail": "Xem chi tiết ưu đãi",
+    "use_code": "Sử dụng mã",
+    "number_store_applied": "Áp dụng tại ",
+    "stores_applied_of_brand": " cửa hàng của ",
+    "store": "cửa hàng",
+      "coupon_status_redeemed": "Mã đã đổi thành công",
+      "coupon_status_expired": "Mã đã hết hạn sử dụng",
+      "coupon_status_admin_cancel": "Mã đã bị hủy bởi admin",
+      "coupon_status_rejected": "Mã đã bị hủy bởi cửa hàng"
+  },
+  "info": {
+    "loading_deal_info": "Đang lấy thông tin ưu đãi...",
+    "not_found_redeem_url": "Không tìm thấy mã. Vui lòng thử lại sau",
+    "loading_normal": "Đang lấy thông tin...",
+    "loading_error": "Có lỗi xảy ra. Vui lòng thử lại sau.",
+    "processing": "Đang xử lý...",
+    "label_success": "Thành công",
+    "label_warning": "Chú ý",
+    "label_error": "Lỗi",
+    "label_close": "Đóng",
+    "label_accept": "Đồng ý",
+    "label_cancel": "Bỏ qua",
+    "title_remind_coupon": "Để nhắc bạn khỏi quên",
+    "info_jamja_remind_use_code": "JAMJA sẽ nhắc bạn sử dụng mã đặt chỗ vào thời điểm thích hợp!",
+    "info_cancel_coupon_remind": "Bạn có chắc chắn muốn hủy nhắc nhở sử dụng mã đặt chỗ?",
+    "info_cancel_coupon": "Bạn có chắc chắn muốn hủy mã đặt chỗ "
+  },
+  "redeem_code": {
+    "title": "Sử dụng mã",
+    "label_store_code": "Mã xác nhận cửa hàng",
+    "sub_store_code": "Vui lòng đưa thu ngân nhập",
+    "label_more_info": "Thêm thông tin",
+    "sub_more_info": "Giá trước & sau giảm, thông tin khác",
+    "label_pricing": "Giá gốc",
+    "sub_pricing": "Giá trước giảm",
+    "label_discount": "Giá sau giảm",
+    "sub_discount": "Giá sau khi áp dụng giảm giá",
+    "label_note": "Ghi chú",
+    "sub_note": "Ghi chú thông tin hóa đơn, thông tin khách hàng nếu cần",
+    "label_reject": "TỪ CHỐI",
+    "label_accept": "XÁC NHẬN",
+    "ladel_coupon_highlight": "Ưu đãi",
+    "label_warning": "Lưu ý",
+    "label_hint_text": "Số lượng khách",
+    "please_input_store_code": "Vui lòng đưa thu ngân nhập mã xác nhận cửa hàng!",
+    "please_input_slot": "Vui lòng nhập",
+    "wrong_slot": "Số lượng tối đa là 99",
+    "redeem_success_1": "Xin chúc mừng bạn! Mã ưu đãi ",
+    "redeem_success_2": " đã được đổi thành công!",
+    "reject_success_1": "Mã ưu đãi ",
+    "reject_success_2": " đã được hủy thành công!",
+    "redeem_early_1": "Hiện chưa đến giờ Sử dụng mã theo lịch bạn đã đặt (",
+    "redeem_early_2": "). Vui lòng yêu cầu cửa hàng xác nhận Sử dụng mã sớm!"
+  },
+  "last_min_reservation": {
+    "title": "Thông Tin Đặt Chỗ",
+    "label_detail": "CHI TIẾT",
+    "label_store": "Cửa hàng",
+    "label_store_phone": "Điện thoại cửa hàng",
+    "label_code": "Mã đặt chỗ",
+    "label_deal": "Ưu đãi",
+    "label_check_in_time": "Thời gian đến",
+    "label_slot": "Số chỗ",
+    "label_customer_name": "Khách đặt",
+    "label_customer_phone": "Số điện thoại liên hệ",
+    "label_customer_email": "Email liên hệ",
+    "label_booking_survey": "Dịp đặc biệt",
+    "header_more_info": "THÔNG TIN THÊM",
+    "dont_have_any_thing": "Không có thông tin",
+    "set_alarm": "Đặt nhắc nhở",
+    "cancel_alarm": "Huỷ nhắc nhở",
+    "condition": "Điều kiện sử dụng",
+    "use_code": "Sử dụng mã",
+    "number_store_applied": "Áp dụng tại ",
+    "stores_applied_of_brand": " cửa hàng của ",
+    "store": "cửa hàng",
+    "cancel_booking": "Hủy đặt chỗ",
+    "deal_detail": "Xem chi tiết ưu đãi"
+  },
+  "coupon_invalid_info": {
+    "coupon_status_expired": "Mã ưu đãi đã hết hạn!",
+    "coupon_status_redeemed": "Đã đổi",
+    "coupon_status_rejected": "Đã hủy bởi cửa hàng",
+    "coupon_status_admin_cancel": "Đã hủy bởi JAMJA",
+    "coupon_cancel_by_customer": "Đã hủy bởi khách hàng"
+  },
+  "label": {
+    "collection": "Bộ sưu tập",
+    "deal": "Khuyến mãi"
+  }
+}

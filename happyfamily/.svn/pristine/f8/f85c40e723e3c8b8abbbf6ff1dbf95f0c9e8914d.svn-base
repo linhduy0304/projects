@@ -1,0 +1,193 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Platform,
+  Dimensions,
+  ScrollView,
+} from 'react-native';
+
+const window = Dimensions.get('window');
+
+import NavBar, { NavButton, NavTitle } from 'react-native-nav';
+import css from '../../Css';
+import Loading from '../../components/Loading';
+import NoData from '../../components/NoData';
+import {Actions} from 'react-native-router-flux';
+import { connect } from 'react-redux';
+import {relationships} from '../../actions/individual';
+
+function mapStateToProps(state) {
+  return {
+    individual: state.individual
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        relationships: () => dispatch(relationships()),
+    }
+}
+
+class AddIndividualStep1 extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+
+        }
+    }
+
+    componentWillMount() {
+        this.props.relationships()
+    }
+    
+    setImage(code) {
+        var image = '';
+        switch(code) {
+            case 1:
+                image = require('../../images/icons/ic_mother.png');
+                break;
+            case 2:
+                image = require('../../images/icons/ic_father.png');
+                break;
+            case 3:
+            case 5:
+            case 15:
+                image = require('../../images/icons/ic_young_sister.png');
+                break;
+            case 4:
+            case 7:
+            case 8:
+            case 16:
+                image = require('../../images/icons/ic_brother.png');
+                break;
+            case 6:
+                image = require('../../images/icons/ic_old_sister.png');
+                break;
+            case 9:
+            case 10:
+                image = require('../../images/icons/ic_grandmother.png');
+                break;
+            case 11:
+            case 12:
+                image = require('../../images/icons/ic_grandfather.png');
+                break;
+            case 13:
+                image = require('../../images/icons/ic_wife.png');
+                break;
+            case 14:
+                image = require('../../images/icons/ic_husband.png');
+                break;
+            default:
+                image = '';
+                break;
+        }
+        return image;
+    }
+
+    onPress(code) {
+        var { request } = this.props;
+        this.props.close();
+        if(request) {
+            Actions.requestRelationship({'code': code})
+        } else {
+            Actions.addIndividual({'code': code})
+        }
+    }
+
+    getRelations() {
+        var { relationships } = this.props.individual;
+        if(relationships && relationships.length > 0) {
+            result = relationships.map((item, index) => {
+                return (
+                    <TouchableOpacity onPress={() => this.onPress(item.code)} style={styles.relation} key={index}>
+                        <Image source={this.setImage(item.code)} style={styles.image} />
+                        <Text style={styles.txtRelation}>{item.description}</Text>
+                    </TouchableOpacity>
+                );
+            });
+        } else {
+            result = <NoData />;
+        }
+        return result;
+    }
+
+    render() {
+        var {loadingRelationship} = this.props.individual;
+        return (
+            <View style={styles.container}>
+                <View style={{height: Platform.OS === 'ios' ? 20 : 0, backgroundColor: '#C6247D'}}></View>
+                <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'light-content', backgroundColor: '#C6247D'}} >
+                    <NavButton/>
+                    <NavTitle style={css.navTitle}>
+                        <Text style={css.txtTitle}>Chọn quan hệ</Text>
+                    </NavTitle>
+                    <NavButton/>
+                    <TouchableOpacity onPress={() => this.props.close()} style={{position: 'absolute', left: 0, padding: 15}}>
+                        <Image source={require('../../images/icons/ic_back.png')} />
+                    </TouchableOpacity>
+                </NavBar>
+                {
+                    loadingRelationship
+                    ?
+                        <Loading />
+                    :
+                    <ScrollView style={styles.content}
+                        keyboardShouldPersistTaps={'always'}>
+                        <Text style={styles.txtInfo}>Chọn quan hệ với bạn</Text>
+                        <View style={styles.boxListRelation}>
+                            {
+                                this.getRelations()
+                            }
+                        </View>
+                    </ScrollView>
+                }
+            </View>
+        )
+    }
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff'
+    },
+    content: {
+        paddingTop: 15,
+    },
+    boxListRelation: {
+        flexWrap: 'wrap',
+        flexDirection: 'row',
+        flex: 1,
+    },
+    txtInfo: {
+        paddingBottom: 15,
+        paddingLeft: 15,
+        fontWeight: 'bold',
+        fontSize: 18
+    },
+    relation: {
+        width: (window.width) /4,
+        alignItems: 'center'
+    },
+    image: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        margin: 20,
+        marginBottom: 0
+    },
+    txtRelation: {
+        paddingTop: 5,
+        fontSize: 14,
+        color: '#000000',
+        textAlign: 'center'
+    }
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddIndividualStep1);

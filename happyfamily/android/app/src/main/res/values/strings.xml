@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Happy Family</string>
+    <string name="fb_app_id">349750978886296</string>
+    <string name="fb_login_protocol_scheme">fb349750978886296</string>
+</resources>

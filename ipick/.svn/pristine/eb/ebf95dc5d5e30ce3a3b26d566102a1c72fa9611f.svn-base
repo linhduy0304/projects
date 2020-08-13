@@ -1,0 +1,216 @@
+import React, { Component } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  FlatList,
+  InteractionManager
+} from 'react-native';
+
+import NavBar, { NavButton, NavGroup, NavTitle } from 'react-native-nav';
+import { Actions } from "react-native-router-flux";
+import ScrollableTabView from 'react-native-scrollable-tab-view';
+import ScrollableTabBar from '../../components/ScrollableTabBar';
+import OtherPost from './OtherPost';
+import OtherPick from './OtherPick';
+import NoInternet from '../../components/NoInternet'
+var Analytics = require('react-native-firebase-analytics');
+
+let css = require('../../Css');
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { Map } from 'immutable';
+import * as profileActions from '../../actions/profileActions';
+const actions = [
+  profileActions
+];
+function mapStateToProps(state) {
+  return {
+    profile: state.profile,
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class OtherProfile extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      is_follow: null,
+    }
+  }
+
+  componentWillMount() {
+    this.props.actions.otherProfileRequest();
+    Analytics.logEvent("OtherProfile_Screen");
+  }
+
+  componentDidMount() {
+    this.props.actions.otherProfile(this.props.id);
+    // timeout = setTimeout( () => {
+    // }, 1000);
+    // InteractionManager.runAfterInteractions(()=> {
+    //   this.props.actions.otherProfile(this.props.id);
+    // })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.profile.otherProfile != this.props.profile.otherProfile && nextProps.profile.otherProfile) {
+      this.setState({
+        is_follow: nextProps.profile.otherProfile.is_follow_current_user,
+      })
+    }
+  }
+
+  follow() {
+    this.setState({
+      is_follow: this.state.is_follow == 1 ? 0 : 1,
+    })
+    this.props.actions.follow(this.props.id);
+  }
+
+  render() {
+    return (
+      <View style={css.container}>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'dark-content', backgroundColor: '#fff'}} >
+          <NavGroup>
+            <NavButton onPress={() => Actions.pop()} style={css.navBack}  >
+              <Image style={{height: 12, width: 13}} source={require('../../images/icons/ic_back.png')} />
+            </NavButton>
+            <View style={{marginLeft: 10, flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={[css.txtTitle,{color: 'rgb(0, 139, 125)'}]}>{this.props.profile.otherProfile ? this.props.profile.otherProfile.full_name : ''}</Text>
+              {/* <Image style={{marginLeft: 5}} source={require('../../images/icons/ic_ticked_blue.png')} /> */}
+            </View>
+          </NavGroup>
+          {/* <NavButton style={css.navSearch}>
+            <Image source={require('../../images/icons/ic_share_black.png')} />
+          </NavButton> */}
+        </NavBar>
+        <NoInternet />
+        <View style={{flex: 1}}>
+          {
+            this.props.profile.loadOther ?
+              <View style={css.ctLoading}>
+                {/* <Image style={{height: 30, width: 30}} source={require('../../images/load_more.gif')} /> */}
+                <Text style={[css.txtLoading, {marginBottom: 15}]}>Đang tải thông tin</Text>
+              </View>
+            :
+            this.props.profile.otherProfile ?
+            <View>
+              <View style={styles.ctHeader}>
+                <Image style={styles.avatar} source={this.props.profile.otherProfile.avatar ? {uri: this.props.profile.otherProfile.avatar +'_100x100.png'} : require('../../images/logo_home.png')} />
+                <View style={{flex: 1, paddingLeft: 15}}>
+                  <View style={styles.ctCount}>
+                    <View style={{flex: 1}}>
+                      <Text style={styles.txtCount}>{this.props.profile.otherProfile.count_post}</Text>
+                      <Text style={styles.txtPost}>Bài viết</Text>
+                    </View>
+                    <TouchableOpacity onPress={() =>this.props.profile.otherProfile.count_followers == 0 ? null : Actions.follower({id: this.props.profile.otherProfile.id})} style={{flex: 1}}>
+                      <Text style={styles.txtCount}>{this.props.profile.otherProfile.count_followers}</Text>
+                      <Text style={styles.txtPost}>Follower</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => this.props.profile.otherProfile.count_followings == 0 ? null : Actions.following({id: this.props.profile.otherProfile.id})} style={{flex: 1}}>
+                      <Text style={styles.txtCount}>{this.props.profile.otherProfile.count_followings}</Text>
+                      <Text style={styles.txtPost}>Following</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={{flexDirection: 'row'}}>
+                    {
+                      this.state.is_follow == 1 ?
+                        <TouchableOpacity onPress={() => this.follow()} style={[css.ctFollow, {borderColor: 'rgb(176, 184, 198)', backgroundColor: '#fff'}]}>
+                          <Image style={css.ic_follow} source={require('../../images/icons/ic_picked_plus.png')} />
+                          <Text style={{fontSize: 12, color: 'rgb(0, 139, 125)', fontWeight: 'bold'}}>Picked</Text>
+                        </TouchableOpacity>
+                      :
+                        <TouchableOpacity onPress={() => this.follow()} style={[css.ctFollow, {borderColor: 'rgb(176, 184, 198)', backgroundColor: '#fff'}]}>
+                          <Image style={css.ic_follow} source={require('../../images/icons/ic_pick_plus.png')} />
+                          <Text style={{fontSize: 12, color: 'rgb(0, 139, 125)', fontWeight: 'bold'}}>Pick</Text>
+                        </TouchableOpacity>
+                    }
+                  </View>
+                </View>
+              </View>
+              {/* <Text style={styles.txtDescrip}>{this.props.profile.otherProfile.description}</Text> */}
+            </View>
+          : null
+          }
+          <ScrollableTabView  renderTabBar={() => <ScrollableTabBar />}
+            initialPage={0}
+            tabBarBackgroundColor='white'
+            tabBarInactiveTextColor='rgba(0, 0, 0, 0.7)'
+            // tabBarActiveTextColor='rgb(51, 51, 51)'
+            tabBarActiveTextColor='rgb(0, 139, 125)'
+            prerenderingSiblingsNumber={0}
+            tabBarTextStyle={{fontSize: 14}}
+            scrollWithoutAnimation={true}
+            >
+              <OtherPost id={this.props.id} tabLabel="BÀI VIẾT" />
+              <OtherPick id = {this.props.id} tabLabel="PICK" />
+          </ScrollableTabView>
+        </View>
+      </View>
+    )
+  }
+}
+
+const styles= StyleSheet.create({
+  txtDescrip:{
+    fontSize: 15,
+    color: 'rgb(51, 51, 51)',
+    marginTop: 12,
+    margin: 15
+  },
+  icEdit: {
+    height: 14,
+    width: 14,
+  },
+  txtEdit: {
+    color: 'rgb(0, 139, 125)',
+    fontSize: 12,
+    marginLeft: 10,
+    fontWeight: 'bold'
+  },
+  ctEdit: {
+    flexDirection: 'row',
+    borderColor: 'rgb(217, 227, 237)',
+    borderWidth: 1,
+    width: 115,
+    alignItems: 'center',
+    height: 24,
+    justifyContent: 'center',
+    borderRadius: 12,
+  },
+  txtCount: {
+    fontSize: 20,
+    color: '#000'
+  },
+  txtPost: {
+    color: 'rgb(176, 184, 198)'
+  },
+  ctCount: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  ctHeader: {
+    flexDirection: 'row',
+    padding: 15
+  },
+  avatar: {
+    height: 80,
+    width: 80,
+    borderRadius: 4,
+  },
+});
+export default connect(mapStateToProps, mapDispatchToProps)(OtherProfile);

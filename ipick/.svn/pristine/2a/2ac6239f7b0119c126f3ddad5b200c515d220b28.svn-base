@@ -1,0 +1,23 @@
+'use strict';
+
+const {Record} = require('immutable');
+const {
+  HOME
+} = require('../../libs/actionTypes');
+
+var InitialState = Record({
+  state: HOME,
+  isFetching: null,
+  loadMore: null,
+  loadSearch: null,
+  posts: null,
+  userSuggests: null,
+  dailys: null,
+  breaking: null,
+  popular: null,
+  topPicks: null,
+  searchPost: null,
+  searchUser: null
+});
+export default InitialState;
+

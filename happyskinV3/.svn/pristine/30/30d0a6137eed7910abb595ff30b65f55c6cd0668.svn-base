@@ -1,0 +1,100 @@
+import React from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableHighlight,
+  ScrollView,
+  Dimensions,
+  TouchableOpacity
+} from "react-native";
+import {Actions} from "react-native-router-flux";
+import BoxAction from '../components/directives/BoxAction';
+import HTMLView from "react-native-htmlview";
+import {convertDateTime} from './Functions';
+let deviceWidth = Dimensions.get('window').width;
+
+// import {
+//     LazyloadScrollView,
+//     LazyloadView,
+//     LazyloadImage,
+//     LazyloadListView
+// } from 'react-native-lazyload';
+
+class BoxVideo extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    this.state={
+      isError: false
+    };
+  }
+  viewDetail(id, title) {
+    Actions.videoDetail({id: id, title: title});
+  }
+  
+  render(){
+    return (
+      <View host={this.props.listView} style={styles.boxVideo}>
+        <TouchableOpacity onPress={ () => this.viewDetail(this.props.video.id, this.props.video.title) }>
+            <Image defaultSource={require('../images/image_default.jpg')} host={this.props.listView} animation={false} source={ !this.state.isError &&  this.props.video.image_small != '' ? { uri: this.props.video.image_small } : require('../images/avatar.png') } style={styles.thumbVideo} onError={(e) => { this.setState({ isError: true}) } }>
+              <Image style={styles.iconPlay} source={require('../images/icons/ic_play_video.png')}/>
+            </Image>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={ () => this.viewDetail(this.props.video.id, this.props.video.title) }>
+          <Text style={[styles.titleVideo]} numberOfLines={2} >
+            {this.props.video.title}
+          </Text>
+        </TouchableOpacity>
+        <Text style={styles.time} >
+          {this.props.video.created_at ? convertDateTime(this.props.video.created_at) : null}
+        </Text>
+        <BoxAction like={this.props.video.count_like} comment={this.props.video.count_comment} isLike={this.props.video.is_like_by_current_id} itemId={this.props.video.id} itemType={'video'} itemFeedType={(this.props.video.feedtype) ? this.props.video.feedtype : null} itemTitle={this.props.video.title} />
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  boxVideo: {
+    borderBottomWidth: 15,
+    borderBottomColor: '#eaeaea',
+    marginTop: 15,
+    marginLeft: 15,
+    marginRight: 15,
+    width: deviceWidth-30
+  },
+  titleVideo:{
+    fontSize: 16,
+    color: '#D73554',
+    paddingBottom: 10,
+    paddingTop: 10,
+  },
+  thumbVideo: {
+    width: deviceWidth - 30,
+    height: 200,
+    marginRight: 10,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  time: {
+    color: "#6D6F73",
+    paddingBottom: 20
+  },
+  timeTitle: {
+    color: "#6D6F73",
+    fontWeight: "bold",
+  },
+  iconPlay: {
+    width: 43,
+    height: 43
+  },
+  windowWidth: {
+    width: deviceWidth
+  }
+  
+});
+
+module.exports = BoxVideo;

@@ -1,0 +1,12 @@
+-bug: Program type already present: com.google.android.gms.internal.measurement...
+-solution: https://github.com/idehub/react-native-google-analytics-bridge/wiki/Android-build-problems
+-note: check version of 'com.google.android.gms:play-services-analytics' and other google play lib. Make sure that all of the libs is same version
+
+
+react-native bundle --platform android --dev false --entry-file index.android.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+
+
+-react-native-fast-image (fork):
+npm install git+https://git@github.com/sinhpn92/react-native-fast-image.git --save
+git+https://github.com/sinhpn92/react-native-fast-image#v5.2.0

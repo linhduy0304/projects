@@ -1,0 +1,81 @@
+
+
+import React from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Dimensions
+} from 'react-native';
+import {Actions} from 'react-native-router-flux';
+
+const window = Dimensions.get('window')
+
+const PostRelate = ({
+  title,
+  data
+}) => (
+  <View>
+    <View style={css.header}>
+      <View style={{flexDirection: 'row'}}>
+        <View style={css.ctHeader}>
+          <Text style={css.title}>{title}</Text>
+        </View>
+      </View>
+    </View>
+    {
+      data.map((item, index) => {
+        return (
+          <TouchableOpacity onPress={() => Actions.postDetail({slug: item.slug, type: 'replace'})} key= {index} style={css.ctItem}>
+            <Image style={css.img} source={{uri: item.image_thumb +'.png'}} />
+            <View style={{marginLeft: 15, flex: 1, marginRight: 15}}>
+              <Text numberOfLines={2} style={css.itemTitle}>{item.title}</Text>
+              <Text style={css.itemSource}>{item.source}</Text>
+            </View>
+          </TouchableOpacity>
+        )
+      })
+    }
+  </View>
+)
+
+const css = StyleSheet.create({
+  itemTitle: {
+    color: '#c6247d',
+    // fontWeight: 'bold',
+    fontSize: 16,
+  },
+  itemSource: {
+    fontSize: 12,
+    color: '#9b9b9b'
+  },
+  img: {
+    height: 70,
+    width: 70
+  },
+  ctItem: {
+    flexDirection: 'row',
+    marginTop: 15,
+  },
+  title: {
+    color: '#333333',
+    // fontSize: 13,
+    fontWeight: 'bold',
+  },
+  ctHeader: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#c6247d',
+    paddingTop: 5,
+    paddingBottom: 5
+  },
+  header: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#eceef0',
+    
+  },
+})
+
+export default PostRelate;
+  

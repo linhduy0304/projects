@@ -1,0 +1,492 @@
+import React from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+  StatusBar,
+  Platform,
+  Alert,
+  Picker,
+  Animated
+} from "react-native";
+import Button from "react-native-button";
+import {Actions} from "react-native-router-flux";
+import ModalApplicationInfo from '../components/setting/ModalApplicationInfo';
+import ModalFeedBack from '../components/setting/ModalFeedBack';
+import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav'; 
+import {GoogleSignin} from 'react-native-google-signin';
+import ModalSearch from '../components/ModalSearch'
+
+var Modal = require('react-native-modalbox');
+var {FBLogin, FBLoginManager} = require('react-native-facebook-login');
+var Modal = require('react-native-modalbox');
+var Spinner = require('react-native-spinkit');
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+const StoreService = require('../services/StoreService').default;
+let Constant = require('../services/Constant');
+
+import * as profileActions from '../actions/profileActions';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import {Map} from 'immutable';
+
+const actions = [
+  profileActions
+];
+
+function mapStateToProps(state) {
+  return {
+    profile: state.profile,
+    home: state.home
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class More extends React.Component {
+  constructor(props) {
+    super()
+    this.state = {
+      modalFeedBack: false,
+      openModal: false,
+      scrollY: new Animated.Value(0),
+    }
+  }
+
+  componentDidMount() {
+    this._setupGoogleSignin();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps != this.props) {
+      if(nextProps.profile.closeModalFeedBack) {
+        this.setState({
+          modalFeedBack: false
+        })
+      }
+    }
+  }
+
+  async _setupGoogleSignin() {
+    try {
+      await GoogleSignin.configure({
+        iosClientId: '799479458926-tss4fdrt1og8nvnvmpibvng9ktihp0e2.apps.googleusercontent.com',
+        webClientId: '799479458926-tss4fdrt1og8nvnvmpibvng9ktihp0e2.apps.googleusercontent.com',
+        offlineAccess: false
+      });
+    }
+    catch (err) {
+      console.log("Google signin error", err.code, err.message);
+    }
+  }
+
+  logoutAction() {
+    Alert.alert(
+      'Thông báo',
+      'Bạn muốn thoát ứng dụng?',
+      [
+        {text: 'Thoát', onPress: () => this.logout(), style: 'cancel'},
+        {text: 'Huỷ bỏ', onPress: () => null}
+      ]
+    )
+  }
+
+  logout() {
+    var _this = this;
+    new StoreService().getSession(Constant.HS_HEADER_REQUEST)
+    .then((header) => {
+      if (header.Gotoken != '') {
+        GoogleSignin.signOut()
+        .then(() => {
+          _this.props.actions.logout(_this.props.profile.currentUser.device_ios);
+        })
+        .catch((err) => {
+        });
+      } else if (header.Fbtoken != '') {
+        FBLoginManager.logout(function(error, data){
+          _this.props.actions.logout(_this.props.profile.currentUser.device_ios);
+        });
+      } else {
+        _this.props.actions.logout(_this.props.profile.currentUser.device_ios);
+      }
+    })
+    .catch((err) => {
+    });
+  }
+
+  openModalApplicationInfo(){
+    this.refs.modalApplicationInfo.open();
+  }
+
+  openModalFeedBack() {
+    this.setState({
+      modalFeedBack: true
+    });
+  }
+
+  closeModalFeedBack() {
+    this.setState({
+      modalFeedBack: false
+    });
+  }
+
+  openModal(action) {
+    this.setState({
+      openModal: action
+    })
+  }
+
+  render(){
+    const navTranslate = Animated.diffClamp(this.state.scrollY, 0, 75).interpolate({
+      inputRange: [0, 75],
+      outputRange: [0, -75],
+      extrapolate: 'clamp',
+    });
+    const navOpacity = Animated.diffClamp(this.state.scrollY, 0, 75).interpolate({
+      inputRange: [0, 25],
+      outputRange: [1, 0],
+      extrapolate: 'clamp',
+    });
+    return (
+      <View style={styles.content}>
+        <View style={main.container}>
+          <ScrollView
+            scrollEventThrottle={16}
+            onScroll={Animated.event(
+              [{nativeEvent: {contentOffset: {y: this.state.scrollY}}}]
+            )}
+            bounces={false}>
+            <View style={{flex: 1, paddingBottom: 25, marginTop: 45}}>
+              <View style={{flexDirection: 'row', paddingTop: 25, paddingBottom: 15}}>
+                <TouchableOpacity onPress={() => Actions.profile()} >
+                  <Image style={styles.avatar} source={this.props.profile.currentUser.avatar ? {uri: this.props.profile.currentUser.avatar+'_100x100.png'} : require('../images/avatar.png') } />
+                </TouchableOpacity>
+                <View style={{paddingLeft: 15, flex: 1}}>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Text style={styles.txtName}>{this.props.profile.currentUser.full_name}</Text>
+                    <TouchableOpacity style={{margin: 5, padding: 8}} onPress={() => Actions.editProfile()}>
+                      <Image style={{height: 8, width: 8}} source={require('../images/icons/ic_edit_black.png')} />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={{flexDirection: 'row', marginTop: 5, alignItems: 'center'}}>
+                    { 
+                      this.props.profile.currentUser.skintest !== '' ?
+                      <TouchableOpacity style={styles.ctSkin} onPress={() => Actions.skinResult()}>
+                        <Text style={{color: '#fff'}}>{this.props.profile.currentUser.skintest}</Text>
+                      </TouchableOpacity>
+                      : null
+                    }
+                    <Text style={styles.txtSkin}>{this.props.profile.currentUser.level ? this.props.profile.currentUser.level.level_name : ''}</Text>
+                  </View>
+                  <View style={{flexDirection: 'row'}}>
+                    <View style={styles.boxSPoint}>
+                      <Image style={{height: 20, width: 20, marginRight: 13}} source={require('../images/icons/ic_spoint.png')} />
+                      <Text style={styles.txtCountPoint}>{this.props.profile.currentUser.s_point ? this.props.profile.currentUser.s_point : ''}</Text>
+                      <Text style={styles.txtPoint}>S·POINT</Text>
+                    </View>
+                  </View>
+                  <View style={{flexDirection: 'row', marginTop: 10}}>
+                    <TouchableOpacity onPress={() => Actions.spoint({spoint: this.props.profile.currentUser.s_point})} style={{flexDirection: 'row',alignItems: 'center'}}>
+                      <Text style={styles.txtDetail}>Xem chi tiết</Text>
+                      <Image style={{width: 6, height: 10}} source={require('../images/icons/ic_next_blue.png')} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+
+              <View style={styles.ctContent}>
+                <Text style={styles.txtContent}>CÁ NHÂN</Text>
+              </View>
+              <TouchableOpacity onPress={() => Actions.notification({notification: this.props.profile.currentUser.dashboard.notification})} style={styles.ctItem}>
+                <View style={styles.ctCircle}>
+                  <Image style={styles.icon} source={require('../images/icons/ic_notification.png')}/>
+                </View>
+                <Text style={styles.txtNotification}>Thông báo</Text>
+                {
+                  this.props.profile.currentUser.dashboard ?
+                  this.props.profile.currentUser.dashboard.notification == 0 ? null :
+                  <View style={styles.boxCountNotification}>
+                    <Text style={styles.txtCount}>{this.props.profile.currentUser.dashboard ? this.props.profile.currentUser.dashboard.notification : ''}</Text>
+                  </View>
+                  : null
+                }
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => Actions.skinDiary({skinDiary: this.props.home.home.skindiary})} style={styles.ctItem}>
+                <View style={styles.ctCircle}>
+                  <Image style={styles.icon} source={require('../images/icons/ic_photo.png')}/>
+                </View>
+                <Text style={styles.txtNotification}>Skin Diary</Text>
+                <Image style={{width: 6, height: 10}} source={require('../images/icons/ic_arrow_next_blue.png')}/>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => Actions.cosmeticsBag()} style={styles.ctItem}>
+                <View style={styles.ctCircle}>
+                  <Image style={styles.icon} source={require('../images/icons/ic_photo.png')}/>
+                </View>
+                <Text style={styles.txtNotification}>Tủ mỹ phẩm</Text>
+                <Image style={{width: 6, height: 10}} source={require('../images/icons/ic_arrow_next_blue.png')}/>
+              </TouchableOpacity>
+              {/* <TouchableOpacity style={styles.ctItem}>
+                <View style={styles.ctCircle}>
+                  <Image style={styles.icon} source={require('../images/icons/ic_timelapse.png')}/>
+                </View>
+                <Text style={styles.txtNotification}>Tạo video tiến trình của bạn</Text>
+                <Image style={{width: 6, height: 10}} source={require('../images/icons/ic_arrow_next_blue.png')}/>
+              </TouchableOpacity> */}
+              <TouchableOpacity onPress={() => Actions.postLiked({redirect: 'post', count: this.props.profile.currentUser.count_like_posts})} style={styles.ctItem}>
+                <View style={styles.ctCircle}>
+                  <Image style={styles.icon} source={require('../images/icons/ic_heart.png')}/>
+                </View>
+                <Text style={styles.txtNotification}>Bài viết yêu thích</Text>
+                <View style={styles.boxIcon}>
+                  <Text style={styles.txtCountPost}>{this.props.profile.currentUser.count_like_posts}</Text>
+                  <Image style={{width: 6, height: 10}} source={require('../images/icons/ic_arrow_next_blue.png')}/>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => Actions.postLiked({redirect: 'product'})} style={styles.ctItem}>
+                <View style={styles.ctCircle}>
+                  <Image style={styles.icon} source={require('../images/icons/ic_star_more.png')}/>
+                </View>
+                <Text style={styles.txtNotification}>Sản phẩm yêu thích</Text>
+                <View style={styles.boxIcon}>
+                  <Text style={styles.txtCountPost}>{this.props.profile.currentUser.count_like_products}</Text>
+                  <Image style={{width: 6, height: 10}} source={require('../images/icons/ic_arrow_next_blue.png')}/>
+                </View>
+              </TouchableOpacity>
+
+              <View style={styles.ctContent}>
+                <Text style={styles.txtContent}>TÀI KHOẢN</Text>
+              </View>
+              <TouchableOpacity onPress={() => Actions.inviteFriend()} style={styles.ctItem}>
+                <View style={styles.ctCircle}>
+                  <Image style={styles.icon} source={require('../images/icons/ic_invite.png')}/>
+                </View>
+                <Text style={styles.txtNotification}>Mời bạn bè tải app</Text>
+                <Image style={{width: 6, height: 10}} source={require('../images/icons/ic_arrow_next_blue.png')}/>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => Actions.setting()} style={styles.ctItem}>
+                <View style={styles.ctCircle}>
+                  <Image style={styles.icon} source={require('../images/icons/ic_setting.png')}/>
+                </View>
+                <Text style={styles.txtNotification}>Cài đặt</Text>
+                <Image style={{width: 6, height: 10}} source={require('../images/icons/ic_arrow_next_blue.png')}/>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => this.logoutAction()} style={styles.ctItem}>
+                <View style={styles.ctCircle}>
+                  <Image style={styles.icon} source={require('../images/icons/ic_logout.png')}/>
+                </View>
+                <Text style={styles.txtNotification}>Thoát</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.ctItem} onPress={() => this.openModalFeedBack()}>
+                <Text style={[styles.txtApp, {marginLeft: 0}]}>Góp ý & Báo lỗi</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.ctItem} onPress={() => this.openModalApplicationInfo()}>
+                <Text style={[styles.txtApp, {marginLeft: 0}]}>Phiên bản ứng dụng</Text>
+              </TouchableOpacity>
+             
+            </View>
+          </ScrollView>
+          <Animated.View style={[main.navScroll,{opacity: navOpacity, transform: [{translateY: navTranslate}]}]}>
+            <NavBar style={{navBar: main.navBarExplore, statusBar: main.statusBar}} statusBar={{barStyle: 'dark-content', backgroundColor: '#fff' }} >
+              <NavButton onPress={() => Actions.pop()} style={main.navButton}>
+                <Image style={{height: 12, width:13}} source={require('../images/icons/ic_back_blue2.png')}/>
+                <Text style={{fontSize: 14, color: 'rgb(68, 110, 182)', marginLeft: 7}}>Home</Text>
+              </NavButton>
+              {/* <NavTitle style={main.navExplore}>
+                Happy Skin
+              </NavTitle> */}
+              <NavButton onPress={() => this.openModal(true)} style={main.navSave}  >
+                <Image style={{height: 16, width: 16}} source={require('../images/icons/ic_search_black.png')} />
+              </NavButton>
+            </NavBar>
+          </Animated.View>
+          <Modal style={[styles.modal, styles.modalForgetPass]}
+             isOpen={this.state.modalFeedBack}
+             ref={"modalFeedBack"}
+             swipeToClose={true}
+             position={"center"}
+             onClosed={()=> this.closeModalFeedBack()}>
+             <ModalFeedBack />
+          </Modal>
+          <Modal style={[styles.modal, styles.modalForgetPass]}
+             ref={"modalApplicationInfo"}
+             swipeToClose={true}
+             position={"center"}>
+            <ModalApplicationInfo />
+          </Modal>
+          {
+            (this.props.profile.isFetching) ? 
+              <View style={main.mainSpin}>
+                <Spinner isFullScreen={true} isVisible={true} size={50} type={'Circle'} color={'#FFFFFF'}/>
+              </View> : null
+          }
+        </View>
+        <Modal 
+          style={main.modal}
+          isOpen={this.state.openModal}
+          swipeToClose={true}
+          position="top"
+          entry="bottom"
+          animationDuration={200}
+          backdropColor="#000"
+          onClosed={()=> this.openModal(false) }>
+          <ModalSearch closeModal={() => this.openModal(false)}/>
+        </Modal>
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  ctSkin: {
+    backgroundColor: 'rgba(233, 69, 122, 0.8)',
+    padding: 3,
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderRadius: 20,
+    marginRight: 15
+  },
+  txtDetail: {
+    marginRight: 10,
+    fontSize: 15,
+    color: 'rgb(68, 110, 182)',
+  },
+  content: {
+    flex: 1,
+    backgroundColor: '#fff'
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  },
+  ctHeader: {
+    width: deviceWidth,
+    height: 82
+  },
+  avatar: {
+    height: 90, 
+    width: 90,
+    marginLeft: 15, 
+    borderRadius: 45
+  },
+  txtName: {
+    flex: 1,
+    fontSize: 24,
+    color: 'rgb(68, 110, 182)'
+  },
+  txtSkin: {
+    color: 'rgb(51, 51, 51)',
+    fontSize: 15
+  },
+  ctContent: {
+    backgroundColor: '#F7F3F9',
+    padding: 12
+  },
+  txtContent: {
+    color: '#8750A1',
+    fontSize: 14
+  },
+  ctItem: {
+    paddingTop: 12,
+    paddingBottom: 12,
+    paddingLeft: 15,
+    paddingRight: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomColor: 'rgb(236, 238, 240)',
+    borderBottomWidth: 1
+  },
+  ctCircle: {
+    height: 32,
+    width: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgb(216, 216, 216)',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  txtNotification: {
+    fontSize: 17,
+    color: 'rgb(51, 51, 51)',
+    marginLeft: 14,
+    flex: 1
+  },
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modalForgetPass: {
+    height: 300,
+    width: 300,
+    borderRadius: 3
+  },
+  icon: {
+    width: 32,
+    height: 32
+  },
+  boxCountNotification: {
+    borderRadius: 10,
+    backgroundColor: '#446EB6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden'
+  },
+  txtCount: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    paddingLeft: 5,
+    paddingRight: 5,
+    paddingBottom: 3,
+    paddingTop: 3
+  },
+  boxIcon: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  txtCountPost: {
+    fontSize: 14,
+    color: '#879BCE',
+    paddingRight: 10
+  },
+  boxSPoint: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    paddingLeft: 10,
+    paddingRight: 10,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#FFB765',
+    marginTop: 13,
+    height: 40,
+    alignItems: 'center'
+  },
+  txtCountPoint: {
+    fontSize: 24,
+    color: '#FE7535',
+    fontWeight: 'bold'
+  },
+  txtPoint: {
+    fontSize: 15,
+    color: '#FE7535',
+    marginLeft: 6,
+  },
+  txtApp: {
+    fontSize: 16,
+    color: '#879BCE'
+  },
+});
+let main = require('../styles/Main');
+export default connect(mapStateToProps, mapDispatchToProps)(More);

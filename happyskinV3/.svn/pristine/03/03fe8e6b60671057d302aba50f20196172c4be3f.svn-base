@@ -1,0 +1,322 @@
+/**
+ * # authActions.js
+ * 
+ * All the request actions have 3 variations, the request, a success
+ * and a failure. They all follow the pattern that the request will
+ * set the ```isFetching``` to true and the whether it's successful or
+ * fails, setting it back to false.
+ * 
+ */
+'use strict';
+
+/**
+ * ## Imports
+ * 
+ * The actions supported
+//  */
+const {
+  LOGIN_REQUEST,
+  LOGIN_SUCCESS,
+  LOGIN_FAILURE,
+  ON_LOGIN_FORM_FIELD_CHANGE,
+  CHECK_LOGIN_REQUEST,
+  CHECK_LOGIN_SUCCESS,
+  FORGOT_PASSWORD_REQUEST,
+  FORGOT_PASSWORD_SUCCESS,
+  FORGOT_PASSWORD_FAILURE,
+  SKINTEST_UPDATE_CONTINUE_PAGE,
+  SKINTEST_UPDATE_QUESTIONS,
+  LOGIN_SOCIAL_FAILURE,
+  PROFILE_USER_SUCCESS,
+  COMMUNITY_GROUP_REQUEST,
+  COMMUNITY_GROUP_SUCCESS,
+  COMMUNITY_GROUP_FAILURE,
+} = require('../libs/actionTypes');
+import Toast from 'react-native-simple-toast';
+import Constant from '../services/Constant';
+var buffer = require('buffer');
+const StoreService = require('../services/StoreService').default;
+const CommunityService = require('../services/Community');
+/**
+ * Project requirements
+ */
+const AuthService = require('../services/Auth');
+
+import {Actions} from 'react-native-router-flux';
+
+/**
+ * ## Logout actions
+ */
+export function loginRequest() {
+  return {
+    type: LOGIN_REQUEST
+  };
+} 
+
+export function loginSuccess() {
+  return {
+    type: LOGIN_SUCCESS
+  };
+} 
+export function loginFailure(error) {
+  return {
+    type: LOGIN_FAILURE,
+    error: error
+  };
+}
+
+export function forgotPasswordRequest() {
+  return {
+    type: FORGOT_PASSWORD_REQUEST
+  };
+}
+
+export function forgotPasswordSuccess() {
+  return {
+    type: FORGOT_PASSWORD_SUCCESS
+  };
+}
+export function forgotPasswordFailure(error) {
+  return {
+    type: FORGOT_PASSWORD_FAILURE,
+    error: error
+  };
+}
+
+export function checkLoginRequest() {
+  return {
+    type: CHECK_LOGIN_REQUEST
+  };
+}
+
+export function checkLoginSuccess() {
+  return {
+    type: CHECK_LOGIN_SUCCESS
+  };
+}
+
+export function skintestUpdateContinuePage(page) {
+  return {
+    type: SKINTEST_UPDATE_CONTINUE_PAGE,
+    page: page
+  };
+}
+
+export function skintestUpdateQuestion(questions) {
+  return {
+    type: SKINTEST_UPDATE_QUESTIONS,
+    questions: questions
+  };
+}
+
+export function profileUserSuccess(data, checkCurentUser) {
+  return {
+    type: PROFILE_USER_SUCCESS,
+    data: data,
+    checkCurrentUser: checkCurentUser
+  };
+}
+
+export function submitLogin(username, password) {
+  return dispatch => {
+    dispatch(loginRequest());
+    return AuthService.submitLogin(username, password)
+      .then(function (res) {
+        if (res.status == 200) {
+          var b = new buffer.Buffer(username + ':' + password);
+          var auth = 'Basic ' + b.toString('base64');
+          var headers = {
+            'Authorization': auth,
+            'Fbtoken': '',
+            'Gotoken': '',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          };
+          new StoreService().storeSession(Constant.HS_HEADER_REQUEST, headers);
+          new StoreService().storeSession(Constant.HS_IS_LOGIN, true);
+          Actions.homeNew({'type': 'reset'});
+          dispatch(profileUserSuccess(res.data));
+          dispatch(loginSuccess());
+        } else if(res.status == 500) {
+          Toast.show('Hệ thống đang bận, xin vui lòng đăng nhập lại sau!');
+          dispatch(loginFailure(res.errors));
+        } else {
+          dispatch(loginFailure(res.errors));
+        }
+      })
+      .catch((error) => {
+        dispatch(loginFailure(error));
+      });
+  };
+}
+
+export function submitForgotPassword(email) {
+  return dispatch => {
+    dispatch(forgotPasswordRequest());
+    return AuthService.submitForgotPassword(email)
+      .then(function (res) {
+        if (res.status == 200) {
+          dispatch(forgotPasswordSuccess());
+          alert(res.message);
+          Actions.pop({type: 'reset'})
+        } else {
+          dispatch(forgotPasswordFailure(res.errors));
+        }
+      })
+      .catch((error) => {
+        dispatch(forgotPasswordFailure(error));
+      });
+  };
+}
+
+// update group community
+export function communityGroupRequest() {
+  return {
+    type: COMMUNITY_GROUP_REQUEST
+  };
+}
+
+export function communityGroupSuccess(data) {
+  return {
+    type: COMMUNITY_GROUP_SUCCESS,
+    data: data
+  };
+}
+
+export function communityGroupFailure(error) {
+  return {
+    type: COMMUNITY_GROUP_FAILURE,
+    error: error
+  };
+}
+
+
+export function checkLogin() {
+  return dispatch => {
+    dispatch(checkLoginRequest());
+    //new StoreService().deleteSessionToken(Constant.HS_TOKEN_KEY);
+    new StoreService().storeSession(Constant.HS_SHOW_ALERT_NOT_CONNECT, null);
+    return new StoreService().getSession(Constant.HS_IS_LOGIN)
+      .then((is_login) => {
+        if (is_login) {
+          var store = new StoreService();
+          return store.getSession(Constant.HS_SKIN_CONTINUE_PAGE)
+          // .then((page) => {
+          //   dispatch(skintestUpdateContinuePage(page));
+          // }).then(() => {
+          //   store.getSession(Constant.HS_SKIN_QUESTION).then((questions) => {
+          //     if (questions != null) {
+          //       dispatch(skintestUpdateQuestion(questions));
+          //     }
+          //   })
+          // })
+          .then(() => {
+            dispatch(communityGroupRequest());
+            CommunityService.communityGroup().then((resGroup) => {
+              if(resGroup.status == 200){
+                dispatch(communityGroupSuccess(resGroup.data));
+              }else{
+                dispatch(communityGroupFailure(resGroup.error));
+              }
+            });
+          })
+          .then(() => {
+             store.getSession(Constant.HS_HEADER_REQUEST).then(headers => {
+              return AuthService.checkLogin(headers).then(res => {
+                if(res.status == 500) {
+                  Actions.login({'type': 'reset'});
+                  return;
+                }
+                dispatch(profileUserSuccess(res.data));
+                store.storeSession(Constant.HS_DATA_USER, res.data);
+                Actions.homeNew({'type': 'reset'});
+              }).catch((error) => {
+                Actions.login({'type': 'reset'});
+              });
+            })
+          }).then(() => {
+            dispatch(checkLoginSuccess());
+          });
+        } else {
+          dispatch(checkLoginSuccess());
+          return new StoreService().getSession(Constant.HS_IS_FIRST)
+          .then((isFirst) => {
+            if (isFirst) {
+              Actions.login({type: 'reset'});
+              dispatch(checkLoginSuccess());
+            } else {
+              Actions.welcome({type: 'reset'});
+              dispatch(checkLoginSuccess());
+            }
+          });
+        }
+      });
+  };
+}
+
+export function setFirstApp() {
+  return dispatch => {
+    //dispatch(checkLoginRequest());
+    new StoreService().storeSession(Constant.HS_IS_FIRST, true);
+  };
+}
+
+export function loginFacebook(token) {
+  return dispatch => {
+    dispatch(loginRequest());
+    return AuthService.loginFacebook(token)
+    .then(function (res) {
+      if (res.status == 200) {
+        var headers = {
+          'Authorization': '',
+          'Fbtoken': token,
+          'Gotoken': '',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        };
+        new StoreService().storeSession(Constant.HS_HEADER_REQUEST, headers);
+        new StoreService().storeSession(Constant.HS_IS_LOGIN, true);
+        Actions.homeNew({'type': 'reset'});
+        dispatch(profileUserSuccess(res.data));
+        dispatch(loginSuccess());
+      } else if (res.status == -1) {
+        dispatch({type: LOGIN_SOCIAL_FAILURE, code: 1, errors: res.errors});
+      } else {
+        dispatch(loginFailure(res.errors));
+      }
+    })
+    .catch((error) => {
+      dispatch(loginFailure(error));
+    });
+  };
+}
+
+export function loginGoogle(token) {
+  return dispatch => {
+    dispatch(loginRequest());
+    return AuthService.loginGoogle(token)
+    .then(function (res) {
+      if (res.status == 200) {
+        var headers = {
+          'Authorization': '',
+          'Fbtoken': '',
+          'Gotoken': token,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        };
+        new StoreService().storeSession(Constant.HS_HEADER_REQUEST, headers);
+        new StoreService().storeSession(Constant.HS_IS_LOGIN, true);
+        Actions.homeNew({'type': 'reset'});
+        dispatch(profileUserSuccess(res.data));
+        dispatch(loginSuccess());
+      } else if (res.status == -2) {
+        dispatch({type: LOGIN_SOCIAL_FAILURE, code: 2, errors: res.errors});
+      } else {
+        dispatch(loginFailure(res.errors));
+      }
+    })
+    .catch((error) => {
+      dispatch(loginFailure(error));
+    });
+  };
+}

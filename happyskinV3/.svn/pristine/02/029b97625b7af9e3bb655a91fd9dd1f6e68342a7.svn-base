@@ -1,0 +1,418 @@
+import React, { Component } from 'react';
+import {
+    AppRegistry,
+    StyleSheet,
+    Text,
+    View,
+    ScrollView,
+    Image,
+    Dimensions,
+    TouchableOpacity,
+    TextInput,
+    Platform,
+    Keyboard,
+    TouchableHighlight
+} from 'react-native';
+
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+var {FBLogin, FBLoginManager} = require('react-native-facebook-login');
+import Spinner from "react-native-spinkit";
+import NoInternet from '../components/NoInternet';
+
+//import Button from "react-native-button";
+import {GoogleSignin} from 'react-native-google-signin';
+import { Actions } from "react-native-router-flux";
+import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav';
+import { TextField } from 'react-native-material-textfield';
+import { GoogleAnalyticsTracker } from 'react-native-google-analytics-bridge';
+let tracker = new GoogleAnalyticsTracker('UA-57146563-2');
+import SplashScreen from 'react-native-splash-screen'
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import {Map} from 'immutable';
+import * as loginActions from '../actions/loginActions';
+
+const actions = [
+  loginActions
+];
+function mapStateToProps(state) {
+  return {
+  login: state.login
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class Login extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        username: '',
+        password: '',
+        errorUser: '',
+        errorEmail: '',
+        errorPass: '',
+        error:  '',
+        active: false
+      }
+    }
+
+    componentDidMount() {
+      SplashScreen.hide();
+      this._setupGoogleSignin();
+  
+      tracker.trackScreenView('Login Screen: ');
+    }
+    
+    componentWillReceiveProps(nextProps) {
+      if(nextProps.login != this.props.login) {
+        this.setState({
+          error: nextProps.login.error
+        })
+      }
+    }
+    
+
+    validateLogin() {
+      if (this.state.username == '') {
+        this.setState({
+          errorUser: 'Tên đăng nhập không được bỏ trống'
+        });
+        return false;
+      }
+      if (this.state.password == '') {
+        this.setState({
+          errorPass: 'Mật khẩu không được bỏ trống'
+        });
+        return false;
+      }
+      return true;
+    }
+
+    onChange(field, value) {
+      if (field == 'username') {
+        this.setState({
+          username: value,
+        });
+      }
+      if (field == 'password') {
+        this.setState({
+          password: value
+        });
+      }
+      setTimeout(() => {
+        if(this.state.username != '' && this.state.password != '') {
+          this.setState({active: true})
+        }else {
+          this.setState({active: false})
+        }
+      },100)
+     
+    }
+
+    submitLogin() {
+      this.setState({
+        errorUser: '',
+        errorPass: '',
+        error: ''
+      })
+      loginSocial = false;
+      if (!this.validateLogin()) {
+        return;
+      }
+      this.props.actions.submitLogin(this.state.username, this.state.password);
+    }
+  
+    loginWithFacebook() {
+      var _this = this;
+      loginSocial = true;
+      if(Platform.OS == 'android') {
+        FBLoginManager.loginWithPermissions(["email","user_friends"], function(error, data){
+          if(data){
+            var token = data.credentials.token;
+            _this.props.actions.loginFacebook(token);
+          }
+        });
+      }else {
+        FBLoginManager.getCredentials(function(error, data){
+          if (error) {
+            FBLoginManager.loginWithPermissions(["email","user_friends"],function (error, data) {
+              if (!error) {
+                var token = data.credentials.token;
+                _this.props.actions.loginFacebook(token);
+              }
+            })
+          } else {
+            var token = data.credentials.token;
+                _this.props.actions.loginFacebook(token);
+          }
+        });
+      }
+    }
+  
+    loginWithGoogle() {
+      loginSocial = true;
+      GoogleSignin.currentUserAsync().then((user) => {
+       if (user == null) {
+         GoogleSignin.signIn()
+         .then((user) => {
+           var token = user.accessToken;
+           this.props.actions.loginGoogle(token);
+         })
+         .catch((err) => {
+           console.log('WRONG SIGNIN', err);
+         })
+       .done();
+       } else {
+         var token = user.accessToken;
+         this.props.actions.loginGoogle(token);
+       }
+      }).done();
+    }
+  
+    async _setupGoogleSignin() {
+      try {
+        await GoogleSignin.configure({
+          iosClientId: '799479458926-tss4fdrt1og8nvnvmpibvng9ktihp0e2.apps.googleusercontent.com',
+          webClientId: Platform.OS == 'android' ? '799479458926-cir133f5fmppa7el6o18u5b3j7arhao4.apps.googleusercontent.com' : '799479458926-tss4fdrt1og8nvnvmpibvng9ktihp0e2.apps.googleusercontent.com',
+          offlineAccess: false
+        });
+      }
+      catch (err) {
+        console.log("Google signin error", err.code, err.message);
+      }
+    }
+
+  
+    
+
+    render() {
+        return (
+          <View style={styles.content}>
+            
+            <View style={main.container}>
+              
+              <NoInternet />
+              <ScrollView
+                style={styles.scrollView}
+                bounces={false}
+                keyboardShouldPersistTaps={'always'}
+              >
+                  <View style={styles.boxLogo}>
+                    <Image style={styles.imgLogo} source={require('../images/happyskin_logo.png')}/>
+                  </View>
+                  <TextField
+                    label='Email hoặc tên đăng nhập'
+                    autoCorrect={false}
+                    onChangeText={(username) => this.onChange('username', username)}
+                    onSubmitEditing={() => this.refs.password.focus()}
+                    tintColor="#5A5E6F"
+                    textColor="#0E0E11"
+                    baseColor="rgb(194, 197, 208)"
+                    autoCapitalize="none"
+                    value={this.state.username}
+                  />
+                  {
+                    this.state.errorUser ?
+                    <Text style={styles.txtError}>{this.state.errorUser}</Text>
+                    : null
+                  }
+                  <TextField
+                    ref="password"
+                    label='Mật khẩu'
+                    autoCorrect={false}
+                    onChangeText={(password) => this.onChange('password', password)}
+                    onSubmitEditing={ () => this.submitLogin() }
+                    tintColor="#5A5E6F"
+                    textColor="#0E0E11"
+                    baseColor="rgb(194, 197, 208)"
+                    autoCapitalize="none"
+                    secureTextEntry={true}
+                    value={this.state.password}
+                  />
+                  {
+                    this.state.errorPass ?
+                    <Text style={styles.txtError}>{this.state.errorPass}</Text>
+                    : null
+                  } 
+
+                  {
+                    this.state.error ?
+                    <Text style={styles.txtError}>{this.state.error}</Text>
+                    : null
+                  }
+
+                  <TouchableOpacity name="facebook"
+                      style={[styles.btnSumit, this.state.active ? {backgroundColor: 'rgb(215,53,84)'} : null]}
+                      onPress={ () => this.state.active ? this.submitLogin() : null}>
+                      <Text style={{fontSize: 16, color: '#fff', fontWeight: 'bold'}}>Đăng nhập</Text>
+                  </TouchableOpacity>
+                 
+                 
+                  <View style={styles.actions}>
+                      <Text onPress={() => Actions.forgetPassword()} style={styles.greyFont}>
+                          Quên mật khẩu ?
+                      </Text>
+                  </View>
+                  <View style={styles.boxSocial}>
+                      <TouchableOpacity
+                          onPress={() => this.loginWithFacebook()} style={[styles.btnSocial, {backgroundColor: '#2672CB'}]} underlayColor='#d73554'>
+                          <Image style={styles.fbIcon} source={require('../images/icons/ic_fblogin.png')}/>
+                          <Text style={[styles.colorButton, {marginLeft: 5}]}>Đăng nhập với Facebook</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                          onPress={() => this.loginWithGoogle()} style={[styles.btnSocial, {backgroundColor: '#FF566B'}]} underlayColor='#d73554'>
+                          <Image style={styles.ggIcon} source={require('../images/icons/ic_gglogin.png')}/>
+                          <Text style={[styles.colorButton, {marginLeft: 5}]}>Đăng nhập với Google</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                          onPress={() => Actions.register() } style={[styles.btnSocial, {backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E9457A'}]} underlayColor='#d73554'>
+                          <Image style={styles.emailIcon} source={require('../images/icons/ic_email.png')}/>
+                          <Text style={[styles.colorEmail, {marginLeft: 5}]}>Đăng ký mới với email</Text>
+                      </TouchableOpacity>
+                  </View>
+              </ScrollView>
+            </View>
+            {
+              (this.props.login.isFetching) ? 
+                <View style={main.mainSpin}>
+                  <Spinner isFullScreen={true} isVisible={true} size={50} type={'Circle'} color={'#FFFFFF'}/>
+                </View> : null
+            }
+          </View>
+        );
+    }
+}
+
+let main = require('../styles/Main');
+
+const styles = StyleSheet.create({
+  colorWhite: {
+    fontSize: 14,
+    color: '#FFFFFF',
+  },
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalForgetPass: {
+    height: 300,
+    width: 300,
+    borderRadius: 3,
+  },
+  containerModel: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF"
+  },
+  input: {
+    width: 230,
+    height: 40,
+    fontSize: 15,
+    borderRadius: 7,
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  btnSumitModel: {
+    backgroundColor: "#b92626",
+    alignItems: 'center',
+    width: 230,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 15,
+    paddingRight: 15,
+    marginBottom: 20,
+    marginTop: 20
+  },
+  txtError: {
+    color: 'rgb(255, 183, 101)',
+    fontSize: 16
+  },
+  content: {
+      flex: 1,
+      backgroundColor: 'white'
+  },
+  container: {
+      flex: 1
+  },
+  scrollView: {
+      flex: 1,
+      paddingLeft: 15,
+      paddingRight: 15,
+  },
+  boxLogo: {
+      paddingTop: 10,
+      paddingBottom: 10,
+      alignItems: 'center',
+      justifyContent: 'center'
+  },
+  imgLogo: {
+      height: 60,
+      resizeMode: 'contain'
+  },
+  btnSumit: {
+      backgroundColor: '#E0E0E1',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: 48,
+      borderRadius: 4,
+      marginTop: 20
+  },
+  colorButton: {
+      color: '#FFFFFF',
+      fontSize: 16,
+  },
+  actions: {
+    flexDirection: 'row',
+    // paddingBottom: 15,
+    paddingTop: 15,
+  },
+  greyFont: {
+    padding: 5,
+    fontSize: 14,
+    color: '#446EB6'
+  },
+  boxSocial: {
+      paddingBottom: 20
+  },
+  btnSocial: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      height: 48,
+      borderRadius: 4,
+      marginTop: 15,
+      justifyContent: 'center'
+  },
+  fbIcon: {
+      width: 18,
+      height: 18,
+      marginRight: 5
+  },
+  ggIcon: {
+      width: 17,
+      height: 17,
+      marginRight: 5
+  },
+  emailIcon: {
+      width: 22,
+      height: 22,
+      marginRight: 5
+  },
+  colorEmail: {
+      fontSize: 16,
+      color: '#E30052'
+  },
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

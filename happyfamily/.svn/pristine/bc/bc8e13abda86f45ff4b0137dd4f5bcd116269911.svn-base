@@ -1,0 +1,13 @@
+
+
+const {Record} = require('immutable');
+const {
+  AUTH
+} = require('../actionTypes');
+
+var InitialState = Record({
+  state: AUTH,
+});
+
+export default InitialState;
+

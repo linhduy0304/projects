@@ -1,0 +1,94 @@
+{
+  "project_info": {
+    "project_number": "1095577327775",
+    "firebase_url": "https://jamja-testing.firebaseio.com",
+    "project_id": "jamja-testing",
+    "storage_bucket": "jamja-testing.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1095577327775:android:6303dfbd596d5b7f",
+        "android_client_info": {
+          "package_name": "com.jamja.test"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1095577327775-9k9njm9aqk6n90kci7glkqbn9mcgon8g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoPNu4aVM4qbOaJ-fpq3I90EvHpeU0Wic"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1095577327775:android:059953f8abefaf85",
+        "android_client_info": {
+          "package_name": "com.jamjavn.jamjadev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1095577327775-0k3m0c0t5cog465i6tg5ql4ht7oh1775.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jamjavn.jamjadev",
+            "certificate_hash": "357071d07909a43a311147b9e9d107f12fc7f951"
+          }
+        },
+        {
+          "client_id": "1095577327775-9k9njm9aqk6n90kci7glkqbn9mcgon8g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoPNu4aVM4qbOaJ-fpq3I90EvHpeU0Wic"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1095577327775-9k9njm9aqk6n90kci7glkqbn9mcgon8g.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1095577327775-hhh59mcqjhbqvmoomocqpk2e77fqeljp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "vn.jamja.ios.JAMJA",
+                "app_store_id": "123456789"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

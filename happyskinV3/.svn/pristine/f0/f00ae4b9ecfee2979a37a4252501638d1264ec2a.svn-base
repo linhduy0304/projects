@@ -1,0 +1,298 @@
+import React from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Image,
+  StatusBar,
+  TouchableHighlight,
+  AlertIOS,
+  SegmentedControlIOS,
+  ListView,
+  TouchableOpacity,
+  InteractionManager,
+  Alert,
+  Animated,
+  Platform
+} from "react-native"
+
+import {Actions} from "react-native-router-flux";
+var DeviceInfo = require('react-native-device-info');
+// Google Analytic tracking
+import GoogleAnalytics from 'react-native-google-analytics-bridge';
+GoogleAnalytics.setTrackerId('UA-57146563-2');
+
+//var ScrollableTabView = require('react-native-scrollable-tab-view');
+import ScrollableTabView from 'react-native-scrollable-tab-view';
+import ScrollableTabBar from '../components/community/ScrollableTabBar';
+
+import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav';
+import CommunityTop from '../components/community/CommunityTop';
+// import ModalSearch from './Modals/ModalSearch';
+var Spinner = require('react-native-spinkit');
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import {Map} from 'immutable';
+import * as communityActions from '../actions/communityActions';
+const actions = [
+  communityActions
+];
+
+var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+function mapStateToProps(state) {
+  return {
+    community: state.community
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class Community extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      scrollY: new Animated.Value(DeviceInfo.getSystemVersion().slice(0, 1) > 5 ? 70 : 50),
+      isRefreshing: false,
+      progress: 0,
+      value: 5,
+      groups: [],
+      tabActive: 0,
+      tabMerge: [
+        // {
+        //   id: "1", name: "Nhóm những người da OSPW",
+        //   description: "kenh tao de test api dev",
+        //   short_name: "TOP",
+        //   image_thumb: "http://static.happyskin.vn/images/channels/nhom-nhung-nguoi-da-ospw_03xCxV"}
+        // ,
+        {
+          id: "2",
+          name: "News",
+          description: "News",
+          short_name: "NEW",
+          image_thumb: "http://static.happyskin.vn/images/channels/nhom-nhung-nguoi-da-ospw_03xCxV"
+        }
+      ],
+      
+    };
+  }
+
+  componentWillMount() {
+    this.props.actions.createTabOptions(this.state.tabMerge.concat(this.props.community.groups));
+  }
+
+  componentDidMount(){
+    GoogleAnalytics.trackScreenView('Community Home Feed: ');
+  }
+
+  loadTabCommunity(){
+
+  }
+
+  // changePage(page){
+  //   var group_id = this.props.community.tabs.map(function(group, index){
+  //     if(page == index){
+  //       return group.id;
+  //     }
+  //   });
+  //   this.props.actions.loading(page);
+  //   var _this = this;
+  //   setTimeout(function(){
+  //     _this.props.actions.loadTabCommunity(group_id, page);
+  //   }, 500);
+  // }
+  animate(e){
+  if (e.nativeEvent.contentOffset.y > 0) {
+    const currentOffset = e.nativeEvent.contentOffset.y
+    const direction = (currentOffset > 0 && currentOffset > this._listViewOffset)
+    ? 'down'
+    : 'up'
+    if(direction === 'down'){
+     Animated.timing(this.state.scrollY,{
+      toValue: DeviceInfo.getSystemVersion().slice(0, 1) > 5 ? 20 : 0,
+      duration: 400,
+    }).start();
+    this.state.scrollY.setValue(DeviceInfo.getSystemVersion().slice(0, 1) > 5 ? 20 : 0);
+    }
+    else{
+      Animated.timing(this.state.scrollY,{
+      toValue: DeviceInfo.getSystemVersion().slice(0, 1) > 5 ? 70 : 50,
+      duration: 400,
+    }).start();
+    }
+    this._listViewOffset = currentOffset
+  }
+  }
+  changeTab(e) {
+    //console.log(e.ref.props.id);
+  }
+
+  render(){
+    
+    var _this=this;
+    return (
+      <View style={styles.content}>
+        
+          <NavBar style={{navBar: main.navBarWhite, statusBar: main.statusBar}} statusBar={{barStyle: 'dark-content', backgroundColor: '#fff' }} >
+            {/* <NavButton onPress={Actions.groups}>
+              <Image style={[main.navIcon, {width: 20, height: 18}]} source={require('../images/icons/ic_menu.png')}/>
+            </NavButton>
+            <NavTitle style={main.navTitle}>
+              {"Hội nhóm"}
+            </NavTitle>
+            <NavButton onPress={() => this.refs.modalSearch.openModal() } >
+              <Image style={main.navIcon} source={require('../images/icons/ic_search_small.png')}/>
+            </NavButton> */}
+            <NavButton onPress={() => Actions.pop()} style={main.navBack}>
+                <Image style={{height: 12, width:13}} source={require('../images/icons/ic_back_blue2.png')}/>
+                <Text style={{fontSize: 14, color: 'rgb(68, 110, 182)', marginLeft: 7}}>Hội nhóm</Text>
+              </NavButton>
+              {/* <NavButton onPress={() => this.openModal(true)} style={main.navSave}  >
+                <Image style={{height: 16, width: 16}} source={require('../images/icons/ic_search_black.png')} />
+              </NavButton> */}
+          </NavBar>
+
+        <View statusBar={{barStyle: 'light-content', backgroundColor: 'black' }} style={[styles.formContent, {opacity : (this.props.community.isFetching) ? 0 : 1}]}>
+          <ScrollableTabView
+            renderTabBar={() => <ScrollableTabBar />}
+            initialPage={0}
+            tabBarBackgroundColor='#B37384'
+            tabBarInactiveTextColor='#DFB4C8'
+            tabBarActiveTextColor='#FFFFFF'
+            tabBarUnderlineColor='#FFFFFF'
+            underlineStyle={{backgroundColor: '#FFF'}}
+            prerenderingSiblingsNumber={0}
+            onChangeTab={(e) => this.changeTab(e) }
+            scrollWithoutAnimation={false}
+          >
+            {this.props.community.tabs.map(function (group, index) {
+                return <CommunityTop onScroll={Animated.event([{nativeEvent: {contentOffset: {y: _this.state.scrollY}}}])} tabLabel={'#'+group.short_name} group={group} key={index} id={group.id}/>
+              })
+            }
+          </ScrollableTabView>
+        </View>
+        {/* <ModalSearch ref="modalSearch" typeSearch="news" /> */}
+        <Spinner isFullScreen={true} isVisible={this.props.community.isFetching} size={50} type={theme.SpinnerType} color={theme.SpinnerColor}/>
+      </View>
+    );
+  }
+}
+const HEADER_MAX_HEIGHT = 64;
+const HEADER_MIN_HEIGHT = 20;
+const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
+let theme = require('../services/Theme');
+
+const styles = StyleSheet.create({
+  content: {
+    flex: 1
+  },
+  navbar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderBottomColor: '#dedede',
+    borderBottomWidth: 1,
+    justifyContent: 'center',
+    // paddingTop: 24,
+  },
+  navIcon: {
+    width: 20,
+    height: 20
+  },
+  formContent: {
+    flex: 1,
+    overflow: 'visible',
+  },
+  formTypes: {
+    backgroundColor: 'transparent',
+    position: 'absolute',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    bottom: 20,
+    left: 0,
+    right: 0
+  },
+  buttonTypes: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 15,
+    marginRight: 15
+  },
+  buttonImage: {
+    width: 42,
+    height: 42,
+    borderRadius: 21
+  },
+  typeQuestion: {
+    backgroundColor: '#fb7045'
+  },
+  typeImage: {
+    backgroundColor: '#fbd545'
+  },
+  typeTips: {
+    backgroundColor: '#34a1ea'
+  },
+  typeReview: {
+    backgroundColor: '#b390f1'
+  },
+  typesName: {
+    fontSize: 8,
+    color: '#FFFFFF',
+    backgroundColor: 'transparent'
+  },
+  typeIcon: {
+    width: 20,
+    height: 20
+  },
+  tabIsFetching: {
+    backgroundColor: 'transparent'
+  },
+  navButton: {
+    justifyContent: 'center',
+    height: 56,
+    width: 40
+  },
+  actionButtonIcon: {
+    width: 30,
+    fontSize: 20,
+    height: 22,
+    color: 'white',
+  },
+});
+
+const stylesBar = StyleSheet.create({
+  statusBar: {
+    backgroundColor: '#fcf6f5'
+  },
+  navBar: {
+    backgroundColor: '#fcf6f5',
+    padding: 0
+  },
+  title: {
+    color: '#fff'
+  },
+  buttonText: {
+    color: '#b5b5b5'
+  }
+});
+
+let main = require('../styles/Main');
+
+export default connect(mapStateToProps, mapDispatchToProps)(Community);

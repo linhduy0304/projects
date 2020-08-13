@@ -1,0 +1,131 @@
+
+import React from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+  WebView,
+  Platform,
+  Linking
+} from "react-native";
+
+import {Actions} from "react-native-router-flux";
+
+import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav';
+let window = Dimensions.get('window');
+
+import Web from 'react-native-webview2';
+
+import GoogleAnalytics from 'react-native-google-analytics-bridge';
+GoogleAnalytics.setTrackerId('UA-57146563-2');
+
+class PageSkinDetail extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      back: true
+    }
+  }
+  componentDidMount() {
+    GoogleAnalytics.trackScreenView('View Page Skin: '+this.props.title);
+  }
+
+  back(){
+    if(this.state.back){
+      Actions.pop();
+      this.setState({
+        back: false
+      })
+      let _this = this;
+      setTimeout(function(){
+        _this.setState({
+          back: true
+        });
+      }, 2000);
+    }
+  }
+  
+  render(){
+    
+    var script = '<script>window.location.hash = 1;document.title = document.height;</script>';
+    var style = '<style type="text/css">body{font-size: 15px;font-family: arial;} img{max-width: 100%;height: auto} p{font-size: 15px;} table{max-width: 100%;} td{border: 0px;padding: 5px;} tr:nth-child(2n){background: #e2e2e2; margin: 0px !important; padding: 0px !important; } tr:nth-child(2n+1){background: #efefef; } .videoWrapper {position: relative;padding-top: 25px;height: 0px;} .videoWrapper iframe {position: absolute;top: 0;left: 0;right: 0;bottom: 0px;}</style>';
+    var html = '<!DOCTYPE html><html><header><meta charset="utf-8"><meta http-equiv="Content-Type" content="text/html; charset=utf-8">'+style+'</header><body>'+this.props.content+script+'</body></html>';
+    return (
+      <View style={styles.container}>
+        <View style={main.container}>
+          <NavBar style={{navBar: main.navBarWhite, statusBar: main.statusBar}} statusBar={{barStyle: 'dark-content', backgroundColor: '#fff'}} >
+              <NavButton onPress={() => Actions.pop()} style={{flexDirection: 'row',  alignItems: 'center',marginLeft: 0, padding: Platform.OS === 'ios' ? 7 : 15,}}>
+                  <Image style={{height: 12, width: 13}} source={require('../images/icons/ic_back_blue2.png')}/>
+                  <View>
+                      <Text style={{fontSize: 14, color: 'rgb(68, 110, 182)', marginLeft: 7}}>Hồ sơ làm đẹp</Text>
+                  </View>
+              </NavButton>
+          </NavBar>
+
+          <ScrollView style={styles.scrollView}>
+              <Web
+                ref={(c) => {this.webview = c}}
+                source={{html: this.props.content, baseUrl:'' }}
+                scrollEnabled={false}
+                onNavigationStateChange={(event) => {
+                  if (event.url !== uri) {
+                    this.webview.stopLoading();
+                    Linking.openURL(event.url);
+                  }
+                }}
+                startInLoadingState
+                automaticallyAdjustContentInsets={true}
+                style={{ margin: 0, width: windowSize.width }}
+                scalesPageToFit={false}
+                dataDetectorTypes="none"
+                scalesPageToFit={Platform.OS=='ios' ? false : true}
+
+              />
+          </ScrollView>
+        </View>
+      </View>
+    );
+  }
+}
+let main = require('../styles/Main');
+const styles = StyleSheet.create({
+  customerNavBack: {
+    padding: 15,
+    paddingLeft: Platform.OS === 'ios' ? 7 : 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  content: {
+    flex: 1,
+    padding: 15,
+    backgroundColor: '#FFFFFF'
+  },
+  backIcon: {
+    width: 13,
+    height: 20
+  },
+  navIcon: {
+    width: 20,
+    height: 20
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF'
+  },
+  scrollView: {
+    width: window.width,
+    paddingLeft: 15,
+    paddingRight: 15,
+    flex: 1,
+  },
+});
+
+
+module.exports = PageSkinDetail;

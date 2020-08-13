@@ -1,0 +1,2 @@
+pas: 123456
+alias: sinhpn

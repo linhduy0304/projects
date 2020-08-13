@@ -1,0 +1,150 @@
+
+'use strict'
+import { Alert } from 'react-native';
+import {Actions} from 'react-native-router-flux'
+import SimpleToast from 'react-native-simple-toast';
+const {
+    INDIVIDUAL_REQUEST,
+    INDIVIDUAL_SUCCESS,
+    INDIVIDUAL_FAIL,
+    ADD_INDIVIDUAL_REQUEST,
+    ADD_INDIVIDUAL_SUCCESS,
+	ADD_INDIVIDUAL_FAIL,
+	RELATIONSHIP_REQUEST,
+	RELATIONSHIP_SUCCESS,
+	RELATIONSHIP_FAIL
+} = require('../config/actionTypes');
+
+const Individual = require('../services/Individual');
+
+//load individual
+export function individualRequest() {
+  return {
+    type: INDIVIDUAL_REQUEST,
+  }
+}
+
+export function individualSuccess(data) {
+  return {
+    type: INDIVIDUAL_SUCCESS,
+    data
+  }
+}
+
+export function individualFail() {
+  return {
+    type: INDIVIDUAL_FAIL,
+  }
+}
+
+export function loadIndividual() {
+  return dispatch => {
+    dispatch(individualRequest());
+    return Individual.individual().then(res => {
+      switch(res.status) {
+        case 200:
+          dispatch(individualSuccess(res.data));
+
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            [{text: 'Ok', style: 'cancel'}],
+          );
+          dispatch(individualFail())
+          return;
+        default:
+          dispatch(individualFail());
+          return;
+      }
+    })
+  }
+}
+
+export function addIndividualRequest() {
+  return {
+    type: ADD_INDIVIDUAL_REQUEST,
+  }
+}
+
+export function addIndividualSuccess(data) {
+  return {
+    type: ADD_INDIVIDUAL_SUCCESS,
+    data: data
+  }
+}
+
+export function addIndividualFail() {
+  return {
+    type: ADD_INDIVIDUAL_FAIL,
+  }
+}
+
+export function addIndividual(body) {
+  return dispatch => {
+    dispatch(addIndividualRequest());
+    return Individual.addIndividual(body).then(res => {
+        switch(res.status) {
+            case 200:
+				dispatch(addIndividualSuccess(res.data));
+				Actions.individual();
+                return;
+            case 500: 
+                Alert.alert(
+                  'Thông báo!',
+                  'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+                  [{text: 'Ok', style: 'cancel'}],
+                );
+                dispatch(addIndividualFail())
+                return;
+            default:
+                dispatch(addIndividualFail());
+                return;
+        }
+    })
+  }
+}
+
+export function relationshipRequest() {
+	return {
+	  type: RELATIONSHIP_REQUEST,
+	}
+  }
+  
+  export function relationshipSuccess(data) {
+	return {
+	  type: RELATIONSHIP_SUCCESS,
+	  data: data
+	}
+  }
+  
+  export function relationshipFail() {
+	return {
+	  type: RELATIONSHIP_FAIL,
+	}
+  }
+
+export function relationships() {
+  return dispatch => {
+    dispatch(relationshipRequest());
+    return Individual.relationships().then(res => {
+        switch(res.status) {
+            case 200:
+                dispatch(relationshipSuccess(res.data))
+                return;
+            case 500: 
+                Alert.alert(
+                  'Thông báo!',
+                  'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+                  [{text: 'Ok', style: 'cancel'}],
+                );
+                dispatch(relationshipFail())
+                return;
+            default:
+                dispatch(relationshipFail());
+                return;
+        }
+    })
+  }
+}

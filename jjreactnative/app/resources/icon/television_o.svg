@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/24x24_television_o</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M21,18 C21,18.542 20.542,19 20,19 L16.815,19 C16.928,18.686 17,18.352 17,18 L17,10 C17,9.648 16.928,9.314 16.815,9 L20,9 C20.542,9 21,9.458 21,10 L21,18 Z M4,19 C3.458,19 3,18.542 3,18 L3,10 C3,9.458 3.458,9 4,9 L14,9 C14.542,9 15,9.458 15,10 L15,18 C15,18.542 14.542,19 14,19 L4,19 Z M19,10 C19.552,10 20,10.448 20,11 C20,11.552 19.552,12 19,12 C18.448,12 18,11.552 18,11 C18,10.448 18.448,10 19,10 Z M19,13 C19.552,13 20,13.448 20,14 C20,14.552 19.552,15 19,15 C18.448,15 18,14.552 18,14 C18,13.448 18.448,13 19,13 Z M20,7 L14,7 L11.414,7 L13.707,4.707 C14.098,4.316 14.098,3.684 13.707,3.293 C13.316,2.902 12.684,2.902 12.293,3.293 L9,6.586 L5.707,3.293 C5.316,2.902 4.684,2.902 4.293,3.293 C3.902,3.684 3.902,4.316 4.293,4.707 L6.586,7 L4,7 C2.35,7 1,8.35 1,10 L1,18 C1,19.65 2.35,21 4,21 L14,21 L20,21 C21.65,21 23,19.65 23,18 L23,10 C23,8.35 21.65,7 20,7 Z" id="path-1"></path>
+    </defs>
+    <g id="icon/24x24_television_o" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="24x24_television_o" fill-rule="nonzero"></g>
+        <g id="COLOR/JJ_4.black" mask="url(#mask-2)" fill="#0F0A0A">
+            <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        </g>
+    </g>
+</svg>

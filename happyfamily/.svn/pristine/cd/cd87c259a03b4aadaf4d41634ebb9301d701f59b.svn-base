@@ -1,0 +1,27 @@
+
+'use strict';
+
+const InitialState = require('./state').default;
+  
+const {
+    ADD_INDIVIDUAL_REQUEST,
+    ADD_INDIVIDUAL_SUCCESS,
+    ADD_INDIVIDUAL_FAIL
+} = require('../../config/actionTypes');
+
+const initialState = new InitialState;
+
+export default function reducer(state = initialState, action) {
+
+  switch (action.type) {
+      //post detail
+    case ADD_INDIVIDUAL_REQUEST:
+      return state.setIn(['loading'], true);
+    case ADD_INDIVIDUAL_SUCCESS:
+      return state.setIn(['loading'], null).setIn(['individual'], action.data);
+    case ADD_INDIVIDUAL_FAIL:
+      return state.setIn(['loading'], null)
+  }
+ 
+  return state;
+}

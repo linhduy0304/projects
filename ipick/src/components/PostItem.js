@@ -1,0 +1,271 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ * @flow
+ */
+
+import React, { Component } from 'react';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Dimensions
+} from 'react-native';
+
+import { Actions } from "react-native-router-flux";
+import Button from "react-native-button";
+import Constant from '../services/Constant';
+import TimeAgo from "react-native-timeago";
+import HTMLView from 'react-native-htmlview';
+
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+let css = require('../Css');
+const StoreService = require('../services/StoreService').default;
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { Map } from 'immutable';
+import * as postActions from '../actions/postActions';
+
+const actions = [
+  postActions,
+];
+function mapStateToProps(state) {
+  return {
+    post: state.post,
+    profile: state.profile,
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class PostItem extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      is_like: this.props.data.is_like,
+      is_save: this.props.data.is_saved,
+      count_like: this.props.data.count_like_posts
+    }
+  }
+
+  // componentWillReceiveProps(nextProps) {
+  //   if(nextProps != this.props) {
+
+  //   }
+  // }
+
+  load(id) {
+    if(this.props.profile.currentUser.id == id) {
+      return null
+    }else Actions.otherProfile({id: id})
+    // console.log(id)
+    // var store = new StoreService();
+    // return store.getSession(Constant.IP_DATA_USER).then(res => {
+     
+    //   if(res.id == id) {
+    //     console.log('oooo')
+    //     Actions.tab({page: 'profile'});
+    //   }else Actions.otherProfile({id: id})
+    // })
+    // if(this.props.profile.currentUser.id == id) {
+    //   Actions.tab({page: 'profile', type: 'reset'});
+    // }else {
+    //   Actions.otherProfile({id: id})
+    // }
+  }
+
+  like(is_like, id) {
+    this.setState({
+      is_like: this.state.is_like == 1 ? 0: 1,
+      count_like: is_like == 1 ? this.state.count_like - 1 : this.state.count_like + 1
+    });
+    this.props.actions.like(is_like, id)
+  }
+
+  save(is_save, id) {
+    this.setState({
+      is_save: this.state.is_save == 1 ? 0: 1
+    });
+    this.props.actions.save(is_save, id)
+  }
+
+  edit(data) {
+    switch(data.type) {
+      case 'post':
+        return Actions.editArticle({data: data})
+      case 'image':
+        return Actions.editImage({data: data});
+      case 'link':
+        return Actions.editLink({data: data});
+      case 'video':
+        return Actions.editVideo({data: data});
+      case 'audio':
+        return Actions.editAudio({data: data});
+    }
+  }
+
+  renderTime(time) {
+    var new1 = time.split(" ");
+    new2 = new1[0].split("-");
+    new3 = new2[2]+'-'+new2[1]+'-'+new2[0]+' '+new1[1]
+    return (<TimeAgo time={new3}/>)
+  }
+
+  render() {
+    return (
+      <View style={styles.ctItem}>
+        <View style={styles.ctHeader}>
+          <TouchableOpacity onPress={() => this.load(this.props.data.user.id)}>
+            <Image style={styles.ctAvatar} source={this.props.data.user.avatar ? {uri: this.props.data.user.avatar+'_100x100.png'} : require('../images/avatar_default.png')} />
+          </TouchableOpacity>
+          <View style={styles.ctName}>
+            <Text onPress={() => this.load(this.props.data.user.id)} style={styles.txtName}>{this.props.data.user.full_name}</Text>
+            <Text style={styles.txtTime}>{this.props.data.user.job} · <Text>{this.renderTime(this.props.data.created_at)}</Text></Text>
+          </View>
+
+          {
+            this.props.data.user.id == this.props.profile.currentUser.id ?
+              <TouchableOpacity onPress={() => this.edit(this.props.data)} style={{padding: 11}}>
+                <Image source={require('../images/icons/ic_menu_2.png')} />
+              </TouchableOpacity>
+            : null
+          }
+          
+        </View>
+        <Text onPress={() => Actions.postDetail({slug: this.props.data.slug})} style={styles.txtTitle}>
+          <HTMLView value={this.props.data.title} />
+        </Text>
+        <TouchableOpacity  onPress={() => Actions.postDetail({slug: this.props.data.slug})}>
+          <Image style={styles.img} source={{uri: this.props.data.image_thumb+ '_600x400.png'}} />
+        </TouchableOpacity>
+        <View style={styles.ctCount}>
+          <Image source={require('../images/icons/ic_pick_count.png')} />
+          <Text style={styles.txtCount}>{this.state.count_like}</Text>
+          {/* <Image source={require('../images/icons/ic_view_count.png')} />
+          <Text style={styles.txtCount}>{this.props.data.count_view}</Text> */}
+          <Image source={require('../images/icons/ic_comment_count.png')} />
+          <Text style={styles.txtCount}>{this.props.data.count_comment_post}</Text>
+        </View>
+        <View style={styles.ctAction}>
+          {
+            this.state.is_like == 1 ?
+              <TouchableOpacity onPress={() => this.like(this.state.is_like, this.props.data.id)} style={{flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                <Image source={require('../images/icons/ic_picked.png')} />
+              </TouchableOpacity>
+            :
+              <TouchableOpacity onPress={() => this.like(this.state.is_like, this.props.data.id)} style={{flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                <Image source={require('../images/icons/ic_pickup.png')} />
+                <Text style={{fontSize: 15, color: 'rgb(135, 155, 206)', marginLeft: 7}}>Pick</Text>
+              </TouchableOpacity>
+          }
+
+          <TouchableOpacity onPress={() => Actions.postDetail({slug: this.props.data.slug, comment: true})} style={{flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <Image source={require('../images/icons/ic_comment_blue.png')} />
+            <Text style={{fontSize: 15, color: 'rgb(135, 155, 206)', marginLeft: 7}}>Bình luận</Text>
+          </TouchableOpacity>
+          
+          {
+            this.state.is_save == 1 ?
+              <TouchableOpacity onPress={() => this.save(this.state.is_save, this.props.data.id)} style={{flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                {/* <Image source={require('../images/icons/ic_saved_post.png')} /> */}
+                <Text style={{fontSize: 15, color: 'rgb(0, 139, 125)', marginLeft: 7}}>Đã lưu</Text>
+              </TouchableOpacity>
+            :
+              <TouchableOpacity onPress={() => this.save(this.state.is_save, this.props.data.id)} style={{flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                <Image source={require('../images/icons/ic_saved_post.png')} />
+                <Text style={{fontSize: 15, color: 'rgb(135, 155, 206)', marginLeft: 7}}>Lưu lại</Text>
+              </TouchableOpacity>
+          }
+
+          
+        </View>
+      </View>
+    )
+  }
+}
+
+const styles= StyleSheet.create({
+  ctAction: {
+    flexDirection: 'row',
+    paddingTop: 16,
+    paddingBottom: 16
+  },
+  txtCount: {
+    fontSize: 12,
+    color: 'rgb(176, 184, 198)',
+    marginRight: 24,
+    marginLeft: 5
+  },
+
+  ctCount: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 13,
+    paddingBottom: 13,
+    borderBottomColor: 'rgb(237, 239, 241)',
+    borderBottomWidth: 1
+  },
+  img: {
+    width: deviceWidth - 30,
+    height: (deviceWidth - 30)*400/600,
+    borderRadius: 2,
+    resizeMode: 'cover',
+    marginTop: 10
+  },
+  txtTitle: {
+    color: 'rgb(53, 69, 164)',
+    fontSize: 20,
+    marginTop: 12
+  },
+  txtTime: {
+    fontSize: 13,
+    color: 'rgb(176, 184, 198)'
+  },
+  txtName: {
+    color: '#000',
+    // color: 'rgb(0, 139, 125)',
+    fontWeight: 'bold'
+  },
+  ctAvatar: {
+    height: 32,
+    width: 32,
+    borderRadius: 4
+  },
+  ctName: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  ctHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomColor: 'rgb(237, 239, 241)',
+    borderBottomWidth: 1,
+    paddingTop: 10,
+    paddingBottom: 10
+  },
+  ctItem: {
+    paddingLeft: 15,
+    // paddingTop: 20,
+    paddingRight: 15,
+    marginBottom: 8,
+    backgroundColor: '#fff'
+  },
+});
+export default connect(mapStateToProps, mapDispatchToProps)(PostItem);
+
+

@@ -1,0 +1,452 @@
+'use strict';
+const {
+    COSMETICS_SEARCH_REQUEST,
+    COSMETICS_SEARCH_SUCCESS,
+    COSMETICS_SEARCH_FAIL,
+    ADD_PRODUCT_REQUEST,
+    ADD_PRODUCT_SUCCESS,
+    ADD_PRODUCT_FAIL,
+    COSMETICS_PRODUCT_REQUEST,
+    COSMETICS_PRODUCT_SUCCESS,
+    COSMETICS_PRODUCT_FAIL,
+    COSMETICS_PRODUCT_SUGGEST_REQUEST,
+    COSMETICS_PRODUCT_SUGGEST_SUCCESS,
+    COSMETICS_PRODUCT_SUGGEST_FAIL,
+    CM_PRODUCT_DELETE_REQUEST,
+    CM_PRODUCT_DELETE_SUCCESS,
+    CM_PRODUCT_DELETE_FAIL,
+    CM_DETAIL_REQUEST,
+    CM_DETAIL_SUCCESS,
+    CM_DETAIL_FAIL,
+    CM_PRODUCT_UPDATE_REQUEST,
+    CM_PRODUCT_UPDATE_SUCCESS,
+    CM_PRODUCT_UPDATE_FAIL,
+    CM_REVIEW_DELETE_REQUEST,
+    CM_REVIEW_DELETE_SUCCESS,
+    CM_REVIEW_DELETE_FAIL,
+    CM_REVIEW_UPDATE_REQUEST,
+    CM_REVIEW_UPDATE_SUCCESS,
+    CM_REVIEW_UPDATE_FAIL,
+    CM_REVIEW_REQUEST,
+    CM_REVIEW_SUCCESS,
+    CM_REVIEW_FAIL,
+  } = require('../libs/actionTypes');
+
+import Constant from '../services/Constant';
+const StoreService = require('../services/StoreService').default;
+
+const Cosmetics = require('../services/Cosmetics');
+import Toast from 'react-native-simple-toast';
+
+import {Actions} from 'react-native-router-flux';
+
+//review product
+export function reviewRequest() {
+  return {
+    type: CM_REVIEW_REQUEST
+  };
+}
+
+export function reviewSuccess(data) {
+  return {
+    type:  CM_REVIEW_SUCCESS,
+    data: data
+  };
+}
+export function reviewFail(error) {
+  return {
+    type: CM_REVIEW_FAIL,
+    error: error
+  };
+}
+export function review(content, product_id, raty_score, name = '') {
+  return dispatch => {
+    dispatch(reviewRequest());
+    Cosmetics.review(content, product_id, raty_score, name)
+      .then((res) => {
+        switch(res.status) {
+          case 200:
+            dispatch(reviewSuccess(res.data));
+            return;
+          case 500: 
+            Actions.login({type: 'reset'});
+            return;
+          default:
+            Toast.show(res.errors)
+            dispatch(reviewFail(res.errors));
+            return;
+        }
+      })
+      .catch((error) => {
+        dispatch(reviewFail());
+      });
+  };
+}
+
+//update review
+export function reviewUpdateRequest() {
+  return {
+    type: CM_REVIEW_UPDATE_REQUEST
+  };
+}
+
+export function reviewUpdateSuccess(data) {
+  return {
+    type: CM_REVIEW_UPDATE_SUCCESS,
+    data: data
+  };
+}
+export function reviewUpdateFail() {
+  return {
+    type: CM_REVIEW_UPDATE_FAIL,
+  };
+}
+
+export function reviewUpdate(id, rating, content) {
+  return dispatch => {
+    dispatch(reviewUpdateRequest())
+    return Cosmetics.reviewUpdate(id, rating, content).then((res) => {
+      switch(res.status) {
+        case 200:
+          dispatch(reviewUpdateSuccess(res.data))
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          dispatch(reviewUpdateFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(reviewUpdateFail())
+    })
+  }
+}
+
+//delete review
+export function reviewDeleteRequest() {
+  return {
+    type: CM_REVIEW_DELETE_REQUEST
+  };
+}
+
+export function reviewDeleteSuccess() {
+  return {
+    type: CM_REVIEW_DELETE_SUCCESS,
+  };
+}
+export function reviewDeleteFail() {
+  return {
+    type: CM_REVIEW_DELETE_FAIL,
+  };
+}
+
+export function reviewDelete(id) {
+  return dispatch => {
+    dispatch(reviewDeleteRequest())
+    return Cosmetics.reviewDelete(id).then((res) => {
+      switch(res.status) {
+        case 200:
+          dispatch(reviewDeleteSuccess())
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          dispatch(reviewDeleteFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(reviewDeleteFail())
+    })
+  }
+}
+
+//update product
+export function updateRequest() {
+  return {
+    type: CM_PRODUCT_UPDATE_REQUEST
+  };
+}
+
+export function updateSuccess(data, id) {
+  return {
+    type: CM_PRODUCT_UPDATE_SUCCESS,
+    data: data, 
+    id: id
+  };
+}
+export function updateFail() {
+  return {
+    type: CM_PRODUCT_UPDATE_FAIL,
+  };
+}
+
+export function productUpdate(id) {
+  return dispatch => {
+    dispatch(updateRequest())
+    return Cosmetics.productUpdate(id).then((res) => {
+      switch(res.status) {
+        case 200:
+          dispatch(updateSuccess(res.data, id))
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          dispatch(updateFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(updateFail())
+    })
+  }
+}
+
+//load Detail
+export function loadDetailRequest() {
+  return {
+    type: CM_DETAIL_REQUEST,
+  };
+}
+export function loadDetailSuccess(data) {
+  return {
+    type: CM_DETAIL_SUCCESS,
+    data: data,
+  };
+}
+export function loadDetailFail() {
+  return {
+    type: CM_DETAIL_FAIL,
+  };
+}
+
+export function loadDetail(id) {
+  return dispatch => {
+    // dispatch(exRelateRequest());
+    return Cosmetics.loadDetail(id).then((res) => {
+      switch(res.status) {
+        case 200:
+          dispatch(loadDetailSuccess(res.data))
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          dispatch(loadDetailFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(loadDetailFail())
+    })
+  }
+}
+
+
+//delete
+export function deleteRequest() {
+  return {
+    type: CM_PRODUCT_DELETE_REQUEST
+  };
+}
+
+export function deleteSuccess(id) {
+  return {
+    type: CM_PRODUCT_DELETE_SUCCESS,
+    id: id
+  };
+}
+export function deleteFail() {
+  return {
+    type: CM_PRODUCT_DELETE_FAIL,
+  };
+}
+
+export function productDelete(id) {
+  return dispatch => {
+    dispatch(deleteRequest())
+    return Cosmetics.productDelete(id).then((res) => {
+      switch(res.status) {
+        case 200:
+          dispatch(deleteSuccess(id))
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          dispatch(deleteFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(deleteFail())
+    })
+  }
+}
+
+//product suggest
+export function productSuggestRequest() {
+  return {
+    type: COSMETICS_PRODUCT_SUGGEST_REQUEST
+  };
+}
+
+export function productSuggestSuccess(data, action) {
+  return {
+    type: COSMETICS_PRODUCT_SUGGEST_SUCCESS,
+    data: data,
+    action: action
+  };
+}
+export function productSuggestFail() {
+  return {
+    type: COSMETICS_PRODUCT_SUGGEST_FAIL,
+  };
+}
+
+export function productSuggest(typeSkin, action, page= 1,) {
+  return dispatch => {
+    // dispatch(addProductRequest())
+    return Cosmetics.productSuggest(typeSkin, page).then((res) => {
+      switch(res.status) {
+        case 200:
+          dispatch(productSuggestSuccess(res.data, action));
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          dispatch(productSuggestFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(productFail())
+    })
+  }
+}
+
+//product
+export function productRequest() {
+  return {
+    type: COSMETICS_PRODUCT_REQUEST
+  };
+}
+
+export function productSuccess(data, direct, action) {
+  return {
+    type: COSMETICS_PRODUCT_SUCCESS,
+    data: data,
+    direct: direct,
+    action: action
+  };
+}
+export function productFail() {
+  return {
+    type: COSMETICS_PRODUCT_FAIL,
+  };
+}
+
+export function product(direct, action, page= 1,) {
+  return dispatch => {
+    // dispatch(addProductRequest())
+    return Cosmetics.product(direct, page).then((res) => {
+      switch(res.status) {
+        case 200:
+          dispatch(productSuccess(res.data, direct, action ));
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          ispatch(productFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(productFail())
+    })
+  }
+}
+
+//add product
+export function addProductRequest() {
+  return {
+    type: ADD_PRODUCT_REQUEST
+  };
+}
+
+export function addProductSuccess(data) {
+  return {
+    type: ADD_PRODUCT_SUCCESS,
+    data: data
+  };
+}
+export function addProductFail() {
+  return {
+    type: ADD_PRODUCT_FAIL,
+  };
+}
+
+export function addProduct(product) {
+  return dispatch => {
+    dispatch(addProductRequest())
+    return Cosmetics.addProduct(product).then((res) => {
+      switch(res.status) {
+        case 200:
+          Toast.show('Thêm sản phẩm thành công');
+          Actions.pop()
+          dispatch(addProductSuccess(res.data))
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          Toast.show('Thêm sản phẩm không thành công.Vui lòng thử lại');
+          dispatch(addProductFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(addProductFail())
+    })
+  }
+}
+
+//search product
+export function searchRequest() {
+  return {
+    type: COSMETICS_SEARCH_REQUEST
+  };
+}
+
+export function searchSuccess(data) {
+  return {
+    type: COSMETICS_SEARCH_SUCCESS,
+    data: data,
+  };
+}
+export function searchFail() {
+  return {
+    type: COSMETICS_SEARCH_FAIL,
+  };
+}
+
+export function search(keyword, page =1) {
+  return dispatch => {
+    dispatch(searchRequest())
+    return Cosmetics.search(keyword, page).then((res) => {
+      switch(res.status) {
+        case 200:
+          dispatch(searchSuccess(res.data))
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          dispatch(searchFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(searchFail())
+    })
+  }
+}
+
+

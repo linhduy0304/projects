@@ -1,0 +1,68 @@
+
+'use strict';
+
+const InitialState = require('./state').default;
+
+const {
+  CATEGORY_REQUEST,
+  CATEGORY_SUCCESS,
+  CATEGORY_FAIL,
+  POST_CATE_REQUEST,
+  POST_CATE_SUCCESS,
+  POST_CATE_FAIL,
+  POST_DETAIL_REQUEST,
+  POST_DETAIL_SUCCESS,
+  POST_DETAIL_FAIL,
+  CATEGORY_LV2_SUCCESS,
+  LIKE_REQUEST,
+  LIKE_SUCCESS,
+  LIKE_FAIL,
+  } = require('../../config/actionTypes');
+
+const initialState = new InitialState;
+
+export default function reducer(state = initialState, action) {
+
+  switch (action.type) {
+
+    //like
+    case LIKE_REQUEST:
+    case LIKE_SUCCESS:
+    case LIKE_FAIL: 
+      return state
+
+    //post detail
+    case POST_DETAIL_REQUEST:
+      return state.setIn(['loading'], true);
+    case POST_DETAIL_SUCCESS:
+      return state.setIn(['loading'], null).setIn(['postDetail'], action.data);
+    case POST_DETAIL_FAIL:
+      return state.setIn(['loading'], null)
+
+    //post category
+    case POST_CATE_REQUEST:
+      return state.setIn(['loading'], true);
+    case POST_CATE_SUCCESS:
+      return state.setIn(['loading'], null)
+                  .setIn(['postCategory'], action.data);
+    case POST_CATE_FAIL:
+      return state.setIn(['loading'], null)
+
+    //category LV 2:
+    case CATEGORY_LV2_SUCCESS:
+      return state.setIn(['loading'], null)
+                  .setIn(['categoryLv2'], action.data);
+    //category
+    case CATEGORY_REQUEST:
+      return state.setIn(['loading'], action.action === 'L' ? true : null);
+    case CATEGORY_SUCCESS:
+      return state.setIn(['loading'], null)
+                  .setIn(['category'], action.action === 'LM' ? state.getIn(['category']).concat(action.data) : action.data)
+                  .setIn(['loadMore'], action.data.length >= 15 ? true : null)
+    case CATEGORY_FAIL:
+      return state.setIn(['loading'], null)
+
+  }
+ 
+  return state;
+}

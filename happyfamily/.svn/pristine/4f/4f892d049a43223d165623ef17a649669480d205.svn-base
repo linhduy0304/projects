@@ -1,0 +1,39 @@
+
+
+import React from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image
+} from 'react-native';
+import TimeAgo from 'react-native-timeago'; 
+import {renderTime} from '../Functions'
+
+const ItemEvent = ({
+  onPress,
+  data
+}) => (
+  <View style={css.ctItem}>
+    <Text style={css.name}>{data.name}</Text>
+</View>
+)
+
+const css = StyleSheet.create({
+  name: {
+    color: '#000'
+  },
+  ctItem: {
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    padding: 15,
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+  },
+})
+
+export default ItemEvent;
+  

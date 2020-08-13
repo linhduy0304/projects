@@ -1,0 +1,29 @@
+
+var keyMirror = function(obj) {
+  var ret = {};
+  var key;
+  if (!(obj instanceof Object && !Array.isArray(obj))) {
+    throw new Error('keyMirror(...): Argument must be an object.');
+  }
+  for (key in obj) {
+    if (!obj.hasOwnProperty(key)) {
+      continue;
+    }
+    ret[key] = key;
+  }
+  return ret;
+};
+
+module.exports = keyMirror({
+  HF_IS_LOGIN: null,
+  HF_IS_FIRST: null,
+  HF_DATA_USER: null,
+  HF_HEADER_REQUEST: null,
+  HF_IS_PASS: null,
+  HF_IS_FIRST_LOGIN: null,
+
+  SET_SESSION_TOKEN: null,
+  SET_STORE: null,
+  SET_STATE: null,
+  GET_STATE: null,
+});

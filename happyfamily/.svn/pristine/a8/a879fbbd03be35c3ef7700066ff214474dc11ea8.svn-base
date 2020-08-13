@@ -1,0 +1,60 @@
+
+
+import React, { Component } from 'react';
+import { Scene, Router } from 'react-native-router-flux';
+import { Provider } from 'react-redux';
+
+
+import App from './screens/App';
+import Welcome from './screens/Welcome';
+import Login from './screens/Login';
+import ForgotPass from './screens/ForgotPass';
+import Register from './screens/Register';
+import Tab from './screens/Tab'
+import ChatOne from './screens/chat/ChatOne';
+import ChatGroup from './screens/chat/ChatGroup';
+import CreateGroup from './screens/chat/CreateGroup';
+import CategoryLv2 from './screens/posts/CategoryLv2';
+import PostCategory from './screens/posts/PostCategory';
+import PostDetail from './screens/posts/PostDetail';
+import Individual from './screens/family/Individual';
+import AddIndividual from './screens/family/AddIndividual';
+import AddEvent from './screens/calendar/AddEvent';
+
+import configureStore from './config/configStore';
+
+import io from 'socket.io-client';
+const socket = io('http://hfchat.techup.vn',{jsonp: false});
+
+class Root extends React.Component {
+    render() {
+      const store = configureStore();
+      // store.dispatch(setStore(store));
+      return (
+        <Provider store = {store}>
+          <Router>
+            <Scene key="root">
+              <Scene key="app" initial={true} component={App} hideNavBar={true} panHandlers={null} />
+              <Scene key="welcome" component={Welcome} hideNavBar={true} panHandlers={null} />
+              <Scene key="login"component={Login} hideNavBar={true} panHandlers={null} />
+              <Scene key="register" component={Register} hideNavBar={true} panHandlers={null} />
+              <Scene key="forgotPass" component={ForgotPass} hideNavBar={true} panHandlers={null} />
+              <Scene key="tab" socket = {socket} component={Tab} hideNavBar={true} panHandlers={null} />
+              <Scene key="createGroup" component={CreateGroup} hideNavBar={true} panHandlers={null} />
+              <Scene key="chatOne" component={ChatOne} hideNavBar={true} panHandlers={null} />
+              <Scene key="chatGroup" component={ChatGroup} hideNavBar={true} panHandlers={null} />
+              <Scene key="categoryLv2" component={CategoryLv2} hideNavBar={true} panHandlers={null} />
+              <Scene key="postCategory" component={PostCategory} hideNavBar={true} panHandlers={null} />
+              <Scene key="postDetail" component={PostDetail} hideNavBar={true} panHandlers={null} />
+              <Scene key="individual" component={Individual} hideNavBar={true} panHandlers={null} />
+              <Scene key="addIndividual" component={AddIndividual} hideNavBar={true} panHandlers={null} />
+              <Scene key="addEvent" component={AddEvent} hideNavBar={true} panHandlers={null} />
+            </Scene>
+          </Router>
+        </Provider>
+      );
+    }
+}
+
+export default Root;
+

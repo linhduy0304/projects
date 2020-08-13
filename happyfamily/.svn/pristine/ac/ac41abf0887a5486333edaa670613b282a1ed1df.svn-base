@@ -1,0 +1,199 @@
+
+
+import React, { Component } from 'react';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Dimensions,
+  TouchableOpacity
+} from 'react-native';
+import { TabNavigator, TabBarBottom, StackNavigator } from 'react-navigation';
+import Welcome from './screens/Welcome';
+import Login from './screens/Login';
+import Register from './screens/Register';
+import Profile from './screens/Profile';
+import Setting from './screens/Setting';
+import Chat from './screens/chat/Chat';
+import ChatOne from './screens/chat/ChatOne';
+import ChatGroup from './screens/chat/ChatGroup';
+import CreateGroup from './screens/chat/CreateGroup';
+
+windowSize = Dimensions.get('window');
+
+const Root_Chat = StackNavigator(
+  {
+    chat: {
+      screen: Chat,
+      navigationOptions: ({navigation}) => ({
+        header: ( /* Your custom header */
+          <View
+            style={{
+              height: 44,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#297FCA'
+            }}
+          >
+            <TouchableOpacity onPress={() => navigation.navigate('create_group')} style={{position: 'absolute', right: 10, padding: 10}}>
+              <Image source={require('./images/icons/ic_edit.png')} />
+            </TouchableOpacity>
+            <Text numberOfLines={1} style={{color: '#fff', fontSize: 16, maxWidth: windowSize.width - 150}}>Chats</Text>
+          </View>
+        )
+      })
+    },
+    chat_one: {
+      screen: ChatOne,
+      navigationOptions: ({navigation}) => ({
+        header: ( /* Your custom header */
+          <View
+            style={{
+              height: 44,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#297FCA'
+            }}
+          >
+            <TouchableOpacity onPress={() => navigation.goBack()} style={{position: 'absolute', padding: 10, left: 10}}>
+              <Image source={require('./images/icons/ic_back.png')} />
+            </TouchableOpacity>
+            <Image style={{position: 'absolute', right: 20}} source={require('./images/icons/ic_user.png')} />
+            <Text  numberOfLines={1} style={{color: '#fff', fontSize: 16, maxWidth: windowSize.width - 150}}>{navigation.getParam('title')}</Text>
+          </View>
+        )
+      })
+    },
+    chat_group: {
+      screen: ChatGroup,
+      navigationOptions: ({navigation}) => ({
+        header: ( /* Your custom header */
+          <View
+            style={{
+              height: 44,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#297FCA'
+            }}
+          >
+            <TouchableOpacity onPress={() => navigation.goBack()} style={{position: 'absolute', padding: 10, left: 10}}>
+              <Image source={require('./images/icons/ic_back.png')} />
+            </TouchableOpacity>
+            <Text style={{position: 'absolute', right: 20, color: '#E4F0FC', fontSize: 17}}>Details</Text>
+            <Text  numberOfLines={1} style={{color: '#fff', fontSize: 16, maxWidth: windowSize.width - 150}}>{navigation.getParam('title')}</Text>
+          </View>
+        )
+      })
+    },
+    create_group: {
+      screen: CreateGroup,
+      navigationOptions: ({navigation}) => ({
+        header: ( /* Your custom header */
+          <View
+            style={{
+              height: 44,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#297FCA'
+            }}
+          >
+            <TouchableOpacity onPress={() => navigation.goBack()} style={{position: 'absolute', padding: 10, left: 10}}>
+              <Image source={require('./images/icons/ic_back.png')} />
+            </TouchableOpacity>
+            <Text style={{position: 'absolute', right: 20, color: '#E4F0FC', fontSize: 17}}>Done</Text>
+            <Text  numberOfLines={1} style={{color: '#fff', fontSize: 16, maxWidth: windowSize.width - 150}}>Create Group</Text>
+          </View>
+        )
+      })
+    }
+
+  }
+);
+const App_Tab = TabNavigator(
+  {
+    profile: {
+      screen: Profile,
+      
+    },
+    chat: {
+      screen: Root_Chat,
+      
+    },
+    setting: {
+      screen: Setting,
+    },
+  },
+  {
+    initialRouteName: 'chat',
+    navigationOptions: ({navigation}) => ({
+      tabBarIcon: ({ focused,tintColor }) => {
+        const { routeName } = navigation.state;
+        switch(routeName) {
+          case 'profile':
+            return <Image source={focused ? require('./images/icons/ic_profile_active.png') : require('./images/icons/ic_profile.png')}/>
+          case 'setting':
+            return <Image source={focused ? require('./images/icons/ic_setting_active.png') : require('./images/icons/ic_setting.png')}/>
+          default:
+            return <Image source={focused ? require('./images/icons/ic_chat_active.png') : require('./images/icons/ic_chat.png')}/>
+        }
+      },
+    }),
+    tabBarOptions: {
+      showLabel: false,
+      style: {
+        backgroundColor: '#F7FCFE',
+      },
+    },
+    tabBarPosition: 'bottom',
+    tabBarComponent: TabBarBottom,
+    tabBarPosition: 'bottom',
+    animationEnabled: true,
+  }
+);
+
+const App_Login = StackNavigator(
+  {
+    login: {
+      screen: Login,
+      navigationOptions: {
+        header: null
+      }
+    },
+    register: {
+      screen: Register
+    },
+    root_tab: {
+      screen: App_Tab,
+      navigationOptions: {
+        header: null
+      }
+    }
+  }
+);
+
+const App_Welcome = StackNavigator(
+  {
+    welcome: {
+      screen: Welcome
+    },
+    root_login: {
+      screen: App_Login
+    }
+  },
+  {
+    navigationOptions: {
+      header: null
+    }
+  }
+)
+class Router extends Component {
+  render() {
+    return (
+      <App_Welcome />
+    );
+  }
+}
+
+export default Router;

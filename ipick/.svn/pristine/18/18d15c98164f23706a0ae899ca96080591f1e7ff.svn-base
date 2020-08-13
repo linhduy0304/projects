@@ -1,0 +1,348 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ * @flow
+ */
+
+import React, { Component } from 'react';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+  TextInput
+} from 'react-native';
+
+import { Actions } from "react-native-router-flux";
+import Button from "react-native-button";
+import ImagePicker from 'react-native-image-crop-picker';
+import ImageResizer from 'react-native-image-resizer';
+import dismissKeyboard from 'react-native/Libraries/Utilities/dismissKeyboard'
+
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+let css = require('../../Css');
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { Map } from 'immutable';
+import * as postActions from '../../actions/postActions';
+import * as exploreActions from '../../actions/exploreActions';
+const actions = [
+  postActions,
+  exploreActions
+];
+function mapStateToProps(state) {
+  return {
+    post: state.post,
+    explore: state.explore,
+    profile: state.profile,
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class PostImage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      images: [],
+      paths: [],
+      category: [],
+      tags: '',
+      title: '',
+      content: '',
+      error: null,
+    }
+  }
+
+  addCategory(category) {
+    var arrCate = this.state.category;
+    for(var i=0; i<= arrCate.length; i++) {
+      if(arrCate[i] == category.id) {
+        arrCate: arrCate.splice(i, 1);
+        this.setState({
+          category: arrCate,
+        })
+        return;
+      }
+    }
+    arrCate: arrCate.unshift(category.id);
+    this.setState({
+      category: arrCate
+    })
+  }
+
+  selectImage(){
+    ImagePicker.openPicker({
+      width: 800,
+      height: 800,
+      cropping: true,
+      multiple: true,
+      includeBase64: true
+    }).then(images => {
+      var source;
+      var urlImages = [] ;
+      var paths= [];
+      images.map((image, index) => {
+        ImageResizer.createResizedImage(image.path, 600, 800, 'JPEG', 80).then((uri) => {
+          // source = {uri: 'data:image/jpeg;base64,' + uri.uri, isStatic: true};
+          urlImages = urlImages.concat(uri.uri);
+          paths= paths.concat(uri.path)
+          this.setState({
+            images: urlImages,
+            paths: paths
+          })
+        }).catch((er)=> {
+        })
+      })
+    }).catch(e => {});
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.post.title || nextProps.post.content) {
+      this.setState({
+        title: nextProps.post.title,
+        content: nextProps.post.content
+      })
+    }
+  }
+
+  renderCategory() {
+    var data = this.props.explore.explore.categories;
+    var dataView = [];
+    var length = parseInt(data.length/2);
+    length = length%2 == 0 ? length : length+1;
+    for(const j= 0; j < length; j ++) {
+      dataView.push(
+        <View key={j}>
+          <TouchableOpacity onPress={() => this.addCategory(data[2*j])}  style={[styles.ctCategory, this.state.category.indexOf(data[2*j].id) != -1 ? {backgroundColor: 'rgb(0, 193, 125)'} : null]}>
+            <Text style={{color: '#fff'}}>{data[2*j].title}</Text>
+          </TouchableOpacity>
+          {
+          2*j+1 < data.length ?
+            <TouchableOpacity onPress={() => this.addCategory(data[2*j+1])}  style={[styles.ctCategory, this.state.category.indexOf(data[2*j+1].id) != -1 ? {backgroundColor: 'rgb(0, 193, 125)'} : null]}>
+              <Text style={{color: '#fff'}}>{data[2*j+1].title}</Text>
+            </TouchableOpacity>
+          : null
+          }
+        </View>
+      );
+    }
+    return dataView;
+  }
+
+  send() {
+    this.setState({error: null});
+    dismissKeyboard();
+    if(this.state.title == '') {
+      this.setState({
+        error: 'Tiêu đề không được bỏ trống.Nhấn thêm nội dung'
+      })
+      this.props.scroll()
+      return;
+    }
+    if(this.state.content == '') {
+      this.setState({
+        error: 'Nội dung không được bỏ trống.Nhấn thêm nội dung'
+      })
+      this.props.scroll()
+      return;
+    }
+    if(this.state.images.length == 0) {
+      this.setState({
+        error: 'Bạn phải chọn ít nhất 1 ảnh.'
+      })
+      this.props.scroll()
+      return;
+    }
+    // title, content, category_ids, atribute_image, tags
+    this.props.actions.postImage(this.state.title, this.state.content, this.state.category, this.state.paths, this.state.tags)
+
+  }
+
+  render() {
+    return (
+      <View style={{padding: 15}}>
+        {
+          this.state.error ?
+            <Text style={[css.txtError, {marginBottom: 10}]}>{this.state.error}</Text>
+          : null
+        }
+        <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity onPress={() => Actions.editHtml({title: this.state.title, content: this.state.content})} style={css.ctAddContent}>
+            <Text style={{fontSize: 14, fontWeight: 'bold', color: '#fff'}}>Thêm nội dung</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* <View style={css.ctTitle}>
+          <TextInput
+            style={css.ctInputTitle}
+            placeholder="Tiêu đề bài viết"
+            underlineColorAndroid="transparent"
+            placeholderTextColor="rgb(194, 197, 208)"
+            onChangeText={(title) => this.setState({title: title})}
+            value={this.state.title}
+            autoCapitalize="none"
+          />
+        </View>
+        <View style={css.ctContent}>
+          <TextInput
+            style={css.ctInputContent}
+            placeholder="Nội dung..."
+            underlineColorAndroid="transparent"
+            autoGrow={true}
+            placeholderTextColor="rgb(194, 197, 208)"
+            onChangeText={(content) => this.setState({content: content})}
+            value={this.state.content}
+            autoCapitalize="none"
+            multiline={true}
+          />
+        </View> */}
+        <View style={css.ctTags}>
+          <TextInput
+            style={css.ctInputTags}
+            placeholder="Tags: hà nội, khởi nghiệp, du lịch, ..."
+            underlineColorAndroid="transparent"
+            placeholderTextColor="rgb(194, 197, 208)"
+            onChangeText={(tags) => this.setState({tags: tags})}
+            value={this.state.tags}
+            autoCapitalize="none"
+          />
+        </View>
+        <View>
+        {
+          this.state.images.length != 0 ?
+            <ScrollView horizontal={true}>
+              {
+                this.state.images.map((item, index) => {
+                  return (
+                    <Image key={index} style={{height:50, width: 50,marginTop: 10, marginRight: 5}} source={{uri: item}} />
+                  )
+                })
+              }
+            </ScrollView>
+          : null
+        }
+        </View>
+        <View style={{alignItems: 'center'}}>
+          <TouchableOpacity onPress={() => this.selectImage()} style={styles.ctAddImage}>
+            <Text style={{fontSize: 14,fontWeight: 'bold', color: '#fff'}}>Thêm ảnh</Text>
+          </TouchableOpacity>
+        </View>
+      
+        <View style={{alignItems: 'center'}}>
+          <TouchableOpacity onPress={() => this.props.actions.explore()} style={styles.ctAddImage}>
+            <Text style={{fontSize: 14, fontWeight: 'bold', color: '#fff'}}>Chọn chuyên mục</Text>
+          </TouchableOpacity>
+        </View>
+        {
+          this.props.explore.isFetching ?
+          <View style={css.ctLoading}>
+            <Image style={{width: 30, height: 30}} source={require('../../images/sending.gif')} />
+            <Text style={{fontSize: 12, color: 'rgb(0, 193, 125)'}}>Đang tải chuyên mục...</Text>
+          </View>
+          :
+          <View style={{flexWrap: 'wrap', flexDirection: 'row', marginTop: 15}}>
+          { this.props.explore.explore ?
+              this.props.explore.explore.categories.length != 0 ?
+                <ScrollView showsHorizontalScrollIndicator={false} horizontal={true}>
+                  {this.renderCategory()}
+                </ScrollView>
+                // this.props.explore.explore.categories.map((item, index) => {
+                //   return (
+                //     <View key={index}>
+                //       {
+                //         this.state.category.indexOf(item.id) != -1 ?
+                //           <TouchableOpacity onPress={() => this.addCategory(item)}  style={[styles.ctCategory, {backgroundColor: 'rgb(0, 193, 125)'}]}>
+                //             <Text style={{color: '#fff'}}>{item.title}</Text>
+                //           </TouchableOpacity>
+                //         : 
+                //         <TouchableOpacity onPress={() => this.addCategory(item)} style={styles.ctCategory}>
+                //           <Text style={{color: '#fff'}}>{item.title}</Text>
+                //         </TouchableOpacity>
+                //       }
+                //     </View>
+                //   )
+                // })
+              : null
+            : null
+          }
+          </View>
+        }
+        {
+          this.props.post.loadPost ?
+            <View style={css.ctLoading}>
+              <Image style={{width: 30, height: 30}} source={require('../../images/sending.gif')} />
+              <Text style={css.txtLoading}>Đang đăng bài</Text>
+            </View>
+          :
+            <View style={{flexDirection: 'row', justifyContent: 'space-around', marginTop: 20}}>
+              <Button 
+                containerStyle={styles.btnSend}
+                style={styles.txtSend}
+                onPress={() => null}
+                >
+                Lưu nháp
+              </Button>
+              <Button 
+                containerStyle={styles.btnSend}
+                style={styles.txtSend}
+                onPress={() => this.send()}
+                >
+                Đăng bài
+              </Button>
+            </View>
+        }
+        
+      </View>
+    )
+  }
+}
+
+const styles= StyleSheet.create({
+  txtSend: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  btnSend: {
+    width: 100,
+    height: 40,
+    backgroundColor:"rgb(48, 88, 154)", 
+    borderRadius: 4, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+  },
+  ctCategory: {
+    backgroundColor: '#ccc',
+    borderRadius: 5,
+    padding:5,
+    alignItems: 'center',
+    marginRight: 5,
+    marginBottom: 5
+  },
+  ctAddImage: {
+    backgroundColor: 'rgb(0, 193, 125)',
+    width: 200, 
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 5,
+    marginTop: 15
+  },
+});
+export default connect(mapStateToProps, mapDispatchToProps)(PostImage);
+
+

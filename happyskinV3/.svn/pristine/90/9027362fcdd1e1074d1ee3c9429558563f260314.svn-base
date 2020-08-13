@@ -1,0 +1,132 @@
+import React, { Component } from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Image,
+  Dimensions,
+  StatusBar,
+  TouchableOpacity
+} from 'react-native';
+import {Actions} from "react-native-router-flux";
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import {Map} from 'immutable';
+import * as routineActions from '../actions/routineActions';
+const actions = [
+  routineActions
+];
+function mapStateToProps(state) {
+  return {
+    routine: state.routine,
+    profile: state.profile
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+class RoutineDone extends React.Component {
+  constructor(){
+    super()
+  }
+  render() {
+    return (
+      <View style={styles.content}>
+        <Image style={styles.background} source={require('../images/background_routine.png')}>
+          <StatusBar
+            backgroundColor="white"
+            barStyle="default"
+          />
+          <ScrollView>
+          <View style={styles.boxInfo}>
+            <Text style={styles.txtCongrats} onPress={() => Actions.pop()}>Chúc mừng</Text>
+            <Image style={styles.image_thumb} source={require('../images/routine_done.png')}>
+              <Image source={{uri: this.props.profile.currentUser.avatar + '_100x100.png'}} style={styles.avatarUser} />
+            </Image>
+            <View style={styles.boxTextSuccess}>
+              <Text style={styles.txtSuccess}>Chúc mừng <Text style={{fontWeight: 'bold'}}>{this.props.profile.currentUser.full_name}</Text> đã tham gia liệu trình {}, được hướng dẫn bởi <Text style={{fontWeight: 'bold'}}>{this.props.data.author.full_name}</Text>.</Text>
+            </View>
+          </View>
+          <TouchableOpacity onPress={() => Actions.routineSubscribed({id: this.props.data.id, image_thumb: this.props.data.image_thumb, title: this.props.data.title, back: 'routine'})} style={styles.boxButtonDetail}>
+            <Text style={styles.txtButton}>Xem chi tiết liệu trình</Text>
+          </TouchableOpacity>
+          </ScrollView>
+        </Image>
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  content: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  background: {
+    flex: 1,
+    width: deviceWidth,
+    height: deviceHeight,
+  },
+  boxInfo: {
+  },
+
+  txtCongrats: {
+    fontSize: 32,
+    color: '#FFFFFF',
+    marginLeft: 15,
+    marginBottom: 20,
+  },
+  image_thumb: {
+    width: deviceWidth - 30,
+    height: (deviceWidth - 30)*738/692,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 15,
+  },
+  avatarUser: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    borderWidth: 4,
+    borderColor: '#FFFFFF',
+  },
+  boxTextSuccess: {
+    paddingLeft: 36,
+    paddingRight: 36,
+    paddingTop: 20,
+    backgroundColor: 'transparent'
+  },
+  txtSuccess: {
+    fontSize: 16,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  boxButtonDetail: {
+    marginBottom: 15,
+    marginLeft: 15,
+    marginTop: 15,
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    width: deviceWidth-30,
+    paddingTop: 15,
+    paddingBottom: 15
+  },
+  txtButton: {
+    fontSize: 16,
+    color: '#FE7535'
+  }
+});
+export default connect(mapStateToProps, mapDispatchToProps)(RoutineDone);

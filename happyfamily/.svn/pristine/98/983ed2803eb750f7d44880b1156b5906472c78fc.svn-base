@@ -1,0 +1,136 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  FlatList,
+  Dimensions
+} from 'react-native';
+
+const window = Dimensions.get('window');
+
+import {Actions} from 'react-native-router-flux';
+import NavBar, { NavButton, NavGroup, NavTitle } from 'react-native-nav';
+import css from '../../Css'
+
+class Posts extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data : [
+        {
+          image_thumb: 'https://static.ipick.vn/images/posts/9a09ca4da679665a3fcd06e709b5b022/tai-sao-an-do-khong-thanh-cong-voi-mo-hinh-dac-khu-kinh-te_tdJq78_1140x600.png',
+          title: 'Mẹo vặt cuộc sống',
+        },
+        {
+          image_thumb: 'https://static.ipick.vn/images/posts/9a09ca4da679665a3fcd06e709b5b022/he-den-cho-con-lam-gi_LA0tXJ_1140x600.png',
+          title: 'Truyện tiếu lâm',
+        },
+        {
+          image_thumb: 'https://static.ipick.vn/images/posts/9a09ca4da679665a3fcd06e709b5b022/he-den-cho-con-lam-gi_LA0tXJ_1140x600.png',
+          title: 'Món ngon mỗi ngày',
+        },
+        {
+          image_thumb: 'https://static.ipick.vn/images/posts/9a09ca4da679665a3fcd06e709b5b022/tai-sao-an-do-khong-thanh-cong-voi-mo-hinh-dac-khu-kinh-te_tdJq78_1140x600.png',
+          title: 'Cẩm nang chăm sóc bé',
+        },
+        {
+          image_thumb: 'https://static.ipick.vn/images/posts/9a09ca4da679665a3fcd06e709b5b022/he-den-cho-con-lam-gi_LA0tXJ_1140x600.png',
+          title: 'Cẩm nang châm ngôn',
+        },
+        {
+          image_thumb: 'https://static.ipick.vn/images/posts/c12ea1d56de77f6eca6d17733d38177b/nhung-dau-hieu-nhan-biet-mot-giao-phai-lech-lac_k4QA9E_1140x600.png',
+          title: 'Món ngon mỗi ngày',
+        },
+        {
+          image_thumb: 'https://static.ipick.vn/images/posts/9a09ca4da679665a3fcd06e709b5b022/phang-vuong-va-phat-sang_Aqy1LP_1140x600.png',
+          title: 'Cẩm nang du lịch',
+        },
+      ],
+    }
+  }
+
+  renderItem(data) {
+    return (
+      <TouchableOpacity onPress={() => Actions.postCategory({title: data.title})} style={{marginLeft: 15, marginTop: 15}}>
+        <Image style={{width: (window.width-45)/2, height:  (window.width-45)/2 + 50}} source={{uri: data.image_thumb}} />
+        <View style={styles.ctBlur}/>
+        <Text numberOfLines={2} style={styles.txtTitle}>{data.title}</Text>
+      </TouchableOpacity>
+    )
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'light-content', backgroundColor: '#297FCA'}} >
+          <NavButton/>
+          <NavTitle style={css.navTitle}>
+            <Text style={css.txtTitle}>Bài viết</Text>
+          </NavTitle>
+          <NavButton/>
+          <TouchableOpacity onPress={() => Actions.pop()} style={{position: 'absolute', right: 0, padding: 15}}>
+            <Image source={require('../../images/icons/ic_search.png')} />
+          </TouchableOpacity>
+        </NavBar>
+
+        <View style={styles.ctContent}>
+        <FlatList
+              ref="listRef"
+              contentContainerStyle={styles.list}
+              data={this.state.data}
+              numColumns={2}
+              // refreshControl={
+              //   <RefreshControl
+              //       refreshing={this.state.isRefreshing}
+              //       onRefresh={() => this._onRefresh()}
+              //   />
+              // }
+              onEndReachedThreshold={0.2}
+              renderItem={(data) => this.renderItem(data.item)}
+            />
+        </View>
+     
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  txtTitle: {
+    position: 'absolute',
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+    // bottom: 50,
+    top: (window.width-45)/2,
+    left: 10,
+    right: 10
+  },
+  ctBlur: {
+    width: (window.width-45)/2,
+    height:  (window.width-45)/2 + 50,
+    position: 'absolute',
+    top: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)'
+  },
+
+  ctContent: {
+    flex: 1
+  },
+  list: {
+    paddingBottom: 20
+    // flexDirection: 'row',
+    // flexWrap: 'wrap',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  }
+})
+
+export default (Posts);

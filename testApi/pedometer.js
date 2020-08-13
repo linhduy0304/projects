@@ -1,0 +1,35 @@
+import Pedometer from 'react-native-universal-pedometer';
+
+// determine pedometer availability
+Pedometer.isStepCountingAvailable((error, isAvailable) => {
+  // do something
+});
+
+Pedometer.isDistanceAvailable((error, isAvailable) => {
+  // do something
+});
+
+Pedometer.isFloorCountingAvailable((error, isAvailable) => {
+  // do something
+});
+
+Pedometer.isCadenceAvailable((error, isAvailable) => {
+  // do something
+});
+
+// start tracking from current time
+const now = new Date();
+Pedometer.startPedometerUpdatesFromDate(now.getTime(), (pedometerData) => {
+  // do something with pedometer data
+});
+
+// query pedometer data from selected date to other selected date
+const startDate = new Date();
+startDate.setHours(0,0,0,0);
+const endDate = new Date();
+Pedometer.queryPedometerDataBetweenDates(startDate.getTime(), endDate.getTime(), (pedometerData) => {
+  // do something with pedometer data
+});
+
+// stop pedometer updates
+Pedometer.stopPedometerUpdates();

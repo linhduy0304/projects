@@ -1,0 +1,20 @@
+
+'use strict';
+
+const InitialState = require('./state').default;
+
+const {
+  
+  } = require('../actionTypes');
+
+const initialState = new InitialState;
+
+export default function reducer(state = initialState, action) {
+  if (!(state instanceof InitialState)) return initialState.mergeDeep(state);
+
+  switch (action.type) {
+    
+  }
+ 
+  return state;
+}

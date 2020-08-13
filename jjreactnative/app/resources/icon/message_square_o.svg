@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/24x24_message_square_o</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M5.4368272,16.3347351 C5.65249404,16.1204078 5.94500104,16 6.25,16 L20.05,16 C20.6851274,16 21.2,15.4883254 21.2,14.8571429 L21.2,3.42857143 C21.2,2.79738886 20.6851274,2.28571429 20.05,2.28571429 L3.95,2.28571429 C3.31487254,2.28571429 2.8,2.79738886 2.8,3.42857143 L2.8,18.9551845 L5.4368272,16.3347351 Z M6.72634559,18.2857143 L2.4631728,22.5224078 C1.73871321,23.2423675 0.5,22.7324627 0.5,21.7142857 L0.5,3.42857143 C0.5,1.53502371 2.04461761,0 3.95,0 L20.05,0 C21.9553823,0 23.5,1.53502371 23.5,3.42857143 L23.5,14.8571429 C23.5,16.7506905 21.9553823,18.2857143 20.05,18.2857143 L6.72634559,18.2857143 Z" id="path-1"></path>
+    </defs>
+    <g id="icon/24x24_message_square_o" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="24x24_message_square_o" fill-rule="nonzero"></g>
+        <g id="COLOR/JJ_4.black" mask="url(#mask-2)" fill="#0F0A0A">
+            <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,36 @@
+
+'use strict';
+
+const InitialState = require('./state').default;
+  
+const {
+  PROFILE_SUCCESS,
+  FEED_BACK_REQUEST,
+  FEED_BACK_SUCCESS,
+  FEED_BACK_FAIL,
+  } = require('../../config/actionTypes');
+
+const initialState = new InitialState;
+
+export default function reducer(state = initialState, action) {
+
+  switch (action.type) {
+
+      //feedback
+      case FEED_BACK_REQUEST:
+        return state.setIn(['loading'], true);
+
+      case FEED_BACK_SUCCESS:
+        return state.setIn(['loading'], null);
+
+      case FEED_BACK_FAIL:
+        return state.setIn(['loading'], null);
+      //creategorup
+      case PROFILE_SUCCESS: 
+        return state.setIn(['currentUser'], action.data);
+
+
+  }
+ 
+  return state;
+}

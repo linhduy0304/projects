@@ -1,0 +1,326 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  StatusBar,
+  Platform,
+  RefreshControl,
+  Dimensions
+} from 'react-native';
+const window = Dimensions.get('window')
+import NavBar, { NavButton, NavTitle } from 'react-native-nav';
+import {Actions} from 'react-native-router-flux';
+import css from '../../Css'
+import Header from '../../components/home/Header';
+import ItemPost from '../../components/home/ItemPost';
+import ItemImage from '../../components/home/ItemImage';
+import Loading from '../../components/Loading';
+import NoData from '../../components/NoData';
+import Carousel from 'react-native-snap-carousel';
+import HomeFirstLogin from '../../components/home/HomeFirstLogin';
+import ModalStatus from '../../components/home/ModalStatus';
+import ModalSearch from '../../components/ModalSearch';
+import LoadMore from '../../components/LoadMore';
+import RNFirebase from 'react-native-firebase';
+import ModalConfirm from '../../components/ModalConfirm';
+
+var Modal = require('react-native-modalbox');
+
+import {loadHome, relationship} from '../../actions/home'
+import { connect } from 'react-redux'
+
+class Home extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      status: '',
+      modalStatus: false,
+      refreshing: false,
+      page: 1,
+      openSearch: false,
+      data: {
+        avatar: 'https://static.ipick.vn/images/avatars/conheonho_9x_Rxpj7AObCG_300x300.png',
+        full_name: 'Le Linh Duy',
+        city: 'Hà Nội',
+        birthday: '25-03-1993',
+        relationship: 'Chồng'
+      },
+    }
+  }
+
+  componentWillMount() {
+    this.props.loadHome();
+  }
+
+  componentDidMount() {
+    //when app closed
+    RNFirebase.notifications().getInitialNotification().then(closed => {
+      console.log(closed)
+      // if(closed) {
+      //   switch(closed.notification.data.type) {
+      //     case 'post':
+      //       Actions.postDetail({slug: closed.notification.data.slug})
+      //       return;
+      //     case 'user':
+      //       Actions.otherProfile({id: closed.notification.data.slug})
+      //       return;
+      //     case 'update':
+      //       Linking.openURL(closed.notification.data.slug)
+      //       return;
+      //     default:
+      //       return;
+      //   }
+      // }
+    })
+
+    //when opening app
+    RNFirebase.notifications().onNotification((notification) => {
+      console.log(notification)
+      // if(notification) {
+      //   switch(notification.data.type) {
+      //     case 'post':
+      //       Alert.alert(
+      //         'Thông báo từ IPICK',
+      //         notification.data.title,
+      //         [
+      //           { text: 'Xem ngay', onPress: () => Actions.postDetail({slug: notification.data.slug}), style: 'cancel' },
+      //           { text: 'Đóng', onPress: () => { } }
+      //         ]
+      //       );
+      //       return;
+      //     case 'user':
+      //       Alert.alert(
+      //         'Thông báo từ IPICK',
+      //         notification.data.title,
+      //         [
+      //           { text: 'Xem ngay', onPress: () => Actions.otherProfile({id: notification.data.slug}), style: 'cancel' },
+      //           { text: 'Đóng', onPress: () => { } }
+      //         ]
+      //       );
+      //       return;
+      //     case 'update':
+      //       Linking.openURL(notification.data.slug)
+      //       return;
+      //     default:
+      //       return;
+      //   }
+        
+      // }
+    });
+
+    //when close but not kill app
+    RNFirebase.notifications().onNotificationOpened((notification) => {
+      console.log(notification)
+      // if(notification) {
+      //   switch(notification.notification.data.type) {
+      //     case 'post':
+      //       Actions.postDetail({slug: notification.notification.data.slug})
+      //       return;
+      //     case 'user':
+      //       Actions.otherProfile({id: notification.notification.data.slug})
+      //       return;
+      //     case 'update':
+      //       Linking.openURL(notification.notification.data.slug)
+      //       return;
+      //     default:
+      //       return;
+      //   }
+      // }
+    });
+   
+  }
+
+  relationship(status, id) {
+    var body = {
+      status
+    };
+    this.props.relationship(id, body)
+  }
+
+  renderRequest({item, index}) {
+    return <ModalConfirm loading = {this.props.home.loadConfirm} onPress={(status, id) => this.relationship(status, id)} data={item}/>
+  }
+
+  renderHeader() {
+    return (
+      <View>
+        <Header 
+          onPress={() => this.setState({modalStatus: true})}
+          onChange={(status) => this.setState({status})}
+          uri = {this.props.profile.currentUser ? this.props.profile.currentUser.avatar : null}
+          value = {this.state.status}
+        />
+        {
+          this.props.home.requests ?
+          <View style={{alignItems: 'center', paddingTop: 10,}}>
+            <Carousel
+                data={this.props.home.requests}
+                onSnapToItem={this.changeIndex}
+                renderItem={this.renderRequest.bind(this)}
+                sliderWidth={window.width}
+                itemWidth={window.width-60}
+                inactiveSlideScale={1}
+                inactiveSlideOpacity={1}
+                activeSlideAlignment={'center'}
+              />
+          </View>
+          : null
+        }
+        
+        {
+          this.props.home.loading ?
+          <Loading/>
+          : 
+          null
+        }
+        {
+          this.props.home.home ?
+            this.props.home.home.length === 0 ?
+              <HomeFirstLogin />
+            : null
+          : null
+        }
+      </View>
+    )
+  }
+
+  onRefresh() {
+    this.setState({
+      refreshing: true,
+      page: 1
+    });
+    this.props.loadHome('RF');
+    this.setState({
+      refreshing: false,
+    })
+  }
+
+  loadMore() {
+    if (!this.props.home.loadMore) {
+        return;
+    }
+    this.props.loadHome('LM', this.state.page + 1);
+    this.setState({
+        page: this.state.page + 1,
+    });
+  }
+
+  renderFooter() {
+    if(this.props.home.loadMore) {
+      return (
+        <LoadMore />)
+    }else return null;
+  }
+
+  detail(data) {
+    Actions.homeDetail({data})
+  }
+  renderItem(data) {
+    switch(data.type) {
+      case 'text':
+        return <ItemPost detail={(data) => this.detail(data)} full_name = {this.props.profile.currentUser.full_name} data = {data}/>
+      default:
+        return <ItemImage detail={(data) => this.detail(data)} full_name = {this.props.profile.currentUser.full_name} data = {data}/>
+    }
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={{height: Platform.OS === 'ios' ? 20 : 0, backgroundColor: '#C6247D'}}></View>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'light-content', backgroundColor: '#C6247D'}} >
+          <NavButton/>
+          <NavTitle style={css.navTitle}>
+            <Text style={css.txtTitle}>Happy Family</Text>
+          </NavTitle>
+          <NavButton/>
+          {/* <TouchableOpacity onPress={() => null} style={{position: 'absolute', left: 0, padding: 15}}>
+            <Image source={require('../images/icons/ic_menu.png')} />
+          </TouchableOpacity> */}
+          <TouchableOpacity onPress={() => this.setState({openSearch: true})} style={{position: 'absolute', right: 0, padding: 15}}>
+            <Image source={require('../../images/icons/ic_search.png')} />
+          </TouchableOpacity>
+        </NavBar>
+
+        <FlatList 
+          ListHeaderComponent={() => this.renderHeader()}
+          ListFooterComponent={() => this.renderFooter()}
+          data = {this.props.home.home}
+          refreshControl={
+            <RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={() => this.onRefresh()}
+            />
+          }
+          removeClippedSubviews 
+          onEndReachedThreshold={0.2}
+          onEndReached={() => this.loadMore()}
+          renderItem = {(data) => this.renderItem(data.item)}
+          keyExtractor={(item, index) => index.toString()}
+        />
+
+        <Modal 
+          style={{backgroundColor: 'rgba(103, 103, 103, 0.51)',alignItems: 'center',}}
+          isOpen={this.state.modalStatus}
+          swipeToClose={false}
+          position="top"
+          entry="top"
+          animationDuration={0}
+          // backdropColor="red"
+          onClosed={()=> this.setState({modalStatus: false}) }
+          >
+            <ModalStatus close={() => this.setState({modalStatus: false})} />
+        </Modal>
+
+        <Modal 
+          style={css.ctModalSearch}
+          isOpen={this.state.openSearch}
+          // swipeToClose={true}
+          position="top"
+          entry="top"
+          animationDuration={0}
+          backdropColor="#000"
+          onClosed={()=> this.setState({openSearch: false}) }
+          >
+            <ModalSearch closeModal={() => this.setState({openSearch: false})} />
+        </Modal>
+
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  ctModal: {
+    height: window.height,
+    padding: 15,
+    backgroundColor: '#fff',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#F1F8FF'
+  }
+})
+
+const mapStateToProps = (state) => {
+  return {
+    home: state.home,
+    profile: state.profile
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    loadHome: (action, page) => dispatch(loadHome(action, page)),
+    relationship: (id, body) => dispatch(relationship(id, body)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);

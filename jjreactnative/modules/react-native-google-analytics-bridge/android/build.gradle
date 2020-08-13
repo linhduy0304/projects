@@ -1,0 +1,25 @@
+apply plugin: 'com.android.library'
+
+def DEFAULT_GOOGLE_PLAY_SERVICES_VERSION = "+"
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion '28.0.3'
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+    }
+
+    lintOptions {
+        warning 'InvalidPackage' // prevent error: https://github.com/square/okio/issues/58
+    }
+}
+
+dependencies {
+    def googlePlayServicesVersion = project.hasProperty('googlePlayServicesVersion') ? project.googlePlayServicesVersion : DEFAULT_GOOGLE_PLAY_SERVICES_VERSION
+    implementation 'com.facebook.react:react-native:0.55.4'
+    implementation "com.google.android.gms:play-services-analytics:16.0.4"
+}

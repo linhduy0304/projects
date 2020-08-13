@@ -1,0 +1,347 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Dimensions
+} from 'react-native';
+const window = Dimensions.get('window');
+import {Actions} from 'react-native-router-flux';
+import NavBar, { NavButton, NavTitle } from 'react-native-nav';
+import dismissKeyboard from 'react-native/Libraries/Utilities/dismissKeyboard'
+import css from '../../Css'
+import Input from '../../components/Input';
+import Button from '../../components/Button';
+import DatePicker from 'react-native-datepicker';
+import getLunarDate from "../../libs/react-native-lunar-calendar/calendar/getLunarDate";
+
+import {addEvent} from '../../actions/calendar';
+import { connect } from 'react-redux';
+
+import ModalTypeEvent from '../../components/calendar/ModalTypeEvent';
+import ModalTypeRemind from '../../components/calendar/ModalTypeRemind';
+import ButtonTypeCalendar from '../../components/calendar/ButtonTypeCalendar';
+import SimpleToast from 'react-native-simple-toast';
+import Loading from '../../components/Loading';
+
+class AddEvent extends React.Component {
+  constructor(props) {
+    super(props);
+    let cur = new Date()
+    this.state = {
+      name: '',
+      openTypeEvent: false,
+      openTypeRemind: false,
+      date: this.getNow(cur),
+      typeEvent: '',
+      typeRemind: [],
+      arrType: [],
+      typeCalendar: 0,  //0: âm, 1: dương
+    }
+  }
+
+  setTypeEvent(data) {
+    this.setState({
+      openTypeEvent: false, 
+      typeEvent: data,
+    })
+  }
+
+  setTypeRemind(data) {
+    var remind = this.state.typeRemind;
+    var arrType = this.state.arrType;
+    for(const i= 0; i < remind.length ; i++ ){
+      if(remind[i].type === data.type){
+        remind.splice(i, 1);
+        arrType.splice(i, 1);
+        this.setState({
+          typeRemind: remind,
+          arrType: arrType
+        })
+        return ;
+      }
+    }
+
+    //chọn không nhắc
+    if(data.type === 0) {
+      this.setState({
+        typeRemind: [data],
+        arrType: [0]
+      })
+      return;
+    }
+
+    //chọn '"không nhắc"' xong chọn cái khác
+    for(const i= 0; i < remind.length ; i++ ){
+      if(remind[i].type === 0){
+        remind.splice(i, 1);
+        arrType.splice(i, 1);
+        this.setState({
+          typeRemind: remind,
+          arrType: arrType
+        })
+      }
+    }
+    remind.unshift(data);
+    arrType.unshift(data.type)
+    this.setState({
+      typeRemind: remind,
+      arrType: arrType
+    })
+  }
+
+  addEvent() {
+    dismissKeyboard();
+    if(this.state.name === '') {
+      SimpleToast.show('Bạn phải nhập tên sự kiện');
+      return;
+    }
+    if(this.state.typeEvent === '') {
+      SimpleToast.show('Bạn phải chọn loại sự kiện');
+      return;
+    }
+    var body = {
+      name: this.state.name,
+      type_event: this.state.typeEvent.type,
+      type_time: this.state.typeCalendar,
+      time_start: this.props.date,
+      time_reminds: this.state.arrType,
+    };
+    this.props.addEvent(body);
+  }
+
+  pickEvent() {
+    dismissKeyboard();
+    this.setState({openTypeEvent: true})
+  }
+
+  pickRemind() {
+    dismissKeyboard();
+    this.setState({openTypeRemind: true})
+  }
+
+  getNow(today) {
+    var now = today.getDate()+'-'+(today.getMonth()+1)+'-'+today.getFullYear()+' '+today.getHours()+':'+today.getMinutes()+':'+today.getSeconds();
+    return now;
+  }
+
+  getLunar(today) {
+    let new1 = today.split(" ");
+    let new2 = new1[0].split('-');
+    let lunar = getLunarDate(new Date(new2[2],new2[1]-1, new2[0]));
+    let day = lunar.day.length === 1 ? ('0'+lunar.day) : lunar.day;
+    let month = lunar.month < 10 ? ('0'+lunar.month.toString()) : lunar.month;
+    return  day+' - '+month+ ' '+lunar.year;
+  }
+
+  getDate(date) {
+    var new1 = date.split(" ");
+    return new1[0]
+  }
+
+  render() {
+    console.log(this.state.date)
+    return (
+      <View style={styles.container}>
+        <View style={{height: Platform.OS === 'ios' ? 20 : 0, backgroundColor: '#C6247D'}}></View>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'light-content', backgroundColor: '#C6247D'}} >
+          <NavButton/>
+          <NavTitle style={css.navTitle}>
+            <Text style={css.txtTitle}>{'Thêm sự kiện'}</Text>
+          </NavTitle>
+          <NavButton/>
+          <TouchableOpacity onPress={() => Actions.pop()} style={{position: 'absolute', left: 0, padding: 15}}>
+            <Image source={require('../../images/icons/ic_back.png')} />
+          </TouchableOpacity>
+          {/* <TouchableOpacity onPress={() => this.addEvent()} style={{position: 'absolute', right: 0, padding: 15}}>
+            <Image style={{width: 20, height: 20}} source={require('../../images/icons/ic_check_white.png')} />
+          </TouchableOpacity> */}
+        </NavBar>
+        <KeyboardAvoidingView behavior='padding' keyboardVerticalOffset={Platform.OS === 'android' ? -500 : 0} style={{ flex: 1 }}>
+          <ScrollView keyboardShouldPersistTaps={'always'}>
+            <View style={styles.content}>
+              <View style={styles.ctEvent}>
+                <Image source={require('../../images/icons/ic_event.png')} />
+                <Input 
+                  title='Tên sự kiện'
+                  value ={this.state.name}
+                  marginLeft = {10}
+                  onChange={(name) => this.setState({name})}
+                />
+              </View>
+              <TouchableOpacity onPress={() => this.pickEvent()} style={styles.ctEvent}>
+                <Image source={require('../../images/icons/ic_event.png')} />
+                <Input 
+                  title='Loại sự kiện'
+                  value ={this.state.typeEvent.title}
+                  marginLeft = {10}
+                  editable = {false}
+                />
+              </TouchableOpacity>
+
+              <View style={styles.ctEvent}>
+                <DatePicker
+                  style={{width: window.width-30}}
+                  date={this.state.date}
+                  mode="datetime"
+                  placeholder="Ngày diễn ra sự kiện"
+                  format="DD-MM-YYYY h:mm:ss"
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
+                  minDate='01-01-1900'
+                  maxDate={'01-01-2200'}
+                  onDateChange={(date) => this.setState({date: date})}
+                  customStyles={
+                    {
+                      dateIcon: {
+                        position: 'absolute',
+                        left: 0,
+                        top: 4,
+                        marginLeft: 0
+                      },
+                        dateInput: {
+                          marginLeft: 40,
+                        borderWidth: 0,
+                        alignItems:'flex-start',
+                        flex: 1,
+                      },
+                      placeholderText:{color:'#c2c5d0',fontSize: 15}
+                  }}
+                />
+              </View>
+
+              <TouchableOpacity onPress={() => this.pickRemind()} style={styles.ctEvent}>
+                <Image source={require('../../images/icons/ic_remind.png')} />
+                
+                {
+                  this.state.typeRemind.length === 0 ?
+                    <Input 
+                      title='Nhắc nhở'
+                      value ={''}
+                      marginLeft = {10}
+                      editable = {false}
+                    />
+                    : 
+                    <View>
+                    {
+                      this.state.typeRemind ?
+                      this.state.typeRemind.map((item, index) => {
+                        return (
+                          <Text key={index} style={{marginLeft: 10, color: '#141823'}}>{item.title}</Text>
+                        )
+                      })
+                      : null
+                    }
+                    </View>
+                }
+                
+              </TouchableOpacity>
+              
+              <View style={styles.ctCalendar}>
+                <View style={{alignItems: 'center'}}>
+                  <ButtonTypeCalendar
+                    title = 'Âm lịch'
+                    check={this.state.typeCalendar}
+                    source = {require('../../images/icons/ic_facebook.png')}
+                    color = '#C6247D'
+                    check = {this.state.typeCalendar === 0 ? true : null}
+                    onPress = {() => this.setState({typeCalendar: 0})}
+                    fontSize = {16}
+                    borderWidth = {this.state.typeCalendar === 0 ? 0 : 1}
+                    fontWeight = '400'
+                  />
+                  <Text style={{color: '#000', marginTop: 5}}>( {this.getLunar(this.state.date)} )</Text>
+                </View>
+                <View style={{alignItems: 'center'}}>
+                <ButtonTypeCalendar
+                  title = 'Dương lịch'
+                  source = {require('../../images/icons/ic_facebook.png')}
+                  color = '#C6247D'
+                  onPress = {() => this.setState({typeCalendar: 1})}
+                  fontSize = {16}
+                  check = {this.state.typeCalendar === 1 ? true : null}
+                  borderWidth = {this.state.typeCalendar === 1 ? 0 : 1}
+                  // backgroundColor = {this.state.typeCalendar === 1 ? 'rgb(38, 114, 203)' : '#fff'}
+                  fontWeight = '400'
+                />
+                 <Text style={{color: '#000', marginTop: 5}}>( {this.getDate(this.state.date)} )</Text>
+                </View>
+              </View>
+              {
+                this.props.calendar.loading ?
+                <Loading title={'Đang tạo mới'}/>
+                :
+                <Button
+                  title = 'Tạo mới sự kiện'
+                  color = 'white'
+                  onPress = {() => this.addEvent()}
+                  fontSize = {16}
+                  fontWeight = '500'
+                  backgroundColor = '#c6247d'
+                />
+              }
+              
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+        <ModalTypeEvent 
+          isOpen = {this.state.openTypeEvent}
+          onPress ={(data) => this.setTypeEvent(data)}
+          close = {() => this.setState({openTypeEvent: false})}
+          // data = {this.state.data}
+        />
+        <ModalTypeRemind 
+          data={this.state.arrType}
+          isOpen = {this.state.openTypeRemind}
+          onPress ={(data) => this.setTypeRemind(data)}
+          close = {() => this.setState({openTypeRemind: false})}
+        />
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  ctCalendar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  ctEvent: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgb(194, 196, 202)',
+    // height: 60,
+    paddingLeft: 15,
+    padding: 10,
+    marginTop: 15,
+    alignItems: 'center',
+  },
+  content: {
+    padding: 15
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  }
+})
+
+const mapStateToProps = (state) => {
+  return {
+    calendar: state.calendar,
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addEvent: (body) => dispatch(addEvent(body)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddEvent);

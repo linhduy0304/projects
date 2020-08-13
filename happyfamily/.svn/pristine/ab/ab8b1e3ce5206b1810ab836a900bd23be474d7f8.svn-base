@@ -1,0 +1,91 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ * @flow
+ */
+
+import React, { Component } from 'react';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  BackHandler,
+  AppRegistry
+} from 'react-native';
+
+import TabNavigator from 'react-native-tab-navigator';
+import { Actions } from "react-native-router-flux";
+import Chat from './chat/Chat'
+import Profile from './Profile'
+import Setting from './Setting'
+
+let css = require('../Css');
+
+
+class Tab extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      page: this.props.page ? this.props.page : 'chat',
+    }
+  }
+
+  changeTab(page) {
+    // if(!this.props.home.isFetching) {
+    //   if(this.state.page == page){
+    //     this.props.actions.scrollToTop(page);
+    //   }
+    // }
+    this.setState({page: page});
+  }
+
+  render() {
+    return (
+        <TabNavigator tabBarStyle={styles.tabNavigator}>
+        <TabNavigator.Item
+          selected={this.state.page === 'profile'}
+          renderIcon={() => <Image source={require('../images/icons/ic_profile.png')} />}
+          renderSelectedIcon={() => <Image source={require('../images/icons/ic_profile_active.png')} />}
+          onPress={() => this.changeTab('profile')}>
+          <Profile/>
+        </TabNavigator.Item>
+        <TabNavigator.Item
+          selected={this.state.page === 'chat'}
+          renderIcon={() => <Image source={require('../images/icons/ic_chat.png')} />}
+          renderSelectedIcon={() => <Image source={require('../images/icons/ic_chat_active.png')} />}
+          onPress={() => this.changeTab('chat')}>
+          <Chat/>
+        </TabNavigator.Item>
+        <TabNavigator.Item
+          selected={this.state.page === 'setting'}
+          renderIcon={() => <Image source={require('../images/icons/ic_setting.png')} />}
+          renderSelectedIcon={() => <Image source={require('../images/icons/ic_setting_active.png')} />}
+          onPress={() => this.changeTab('setting')}>
+          <Setting/>
+        </TabNavigator.Item>
+        
+      </TabNavigator>
+    )
+  }
+}
+
+const styles= StyleSheet.create({
+
+  tabTitle: {
+    backgroundColor: 'red'
+  },
+  tabNavigator: {
+    backgroundColor: "#FFFFFF",
+    justifyContent: 'center',
+    flex: 1,
+    height: 49,
+    borderTopColor: 'rgb(236, 238, 240)',
+    borderTopWidth: 1,
+  },
+});
+export default (Tab);
+
+

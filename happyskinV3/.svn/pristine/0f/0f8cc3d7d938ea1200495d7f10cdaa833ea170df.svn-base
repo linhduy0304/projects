@@ -1,0 +1,1041 @@
+import React from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+  StatusBar,
+  Platform,
+  Alert,
+  FlatList,
+  NativeModules,
+  InteractionManager,
+  Linking,
+  Clipboard,
+} from "react-native";
+
+import Button from "react-native-button";
+import BoxReview from '../magazine/BoxReview'
+import {Actions} from "react-native-router-flux";
+import StarRating from 'react-native-star-rating';
+import ImagePicker from 'react-native-image-crop-picker';
+import ImageResizer from 'react-native-image-resizer';
+import Slider from 'react-native-slider';
+import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav';
+import Accordion from 'react-native-collapsible/Accordion';
+import HTMLView from "react-native-htmlview";
+import Web from 'react-native-webview2';
+import BoxAction from './BoxAction';
+import BoxAction1 from '../BoxAction';
+import BoxSkinCare from '../magazine/BoxSkinCare';
+import CommentList from '../CommentList';
+import BoxUserReview from '../BoxUserReview'
+import ModalReview from '../ModalReview'
+import dismissKeyboard from 'react-native/Libraries/Utilities/dismissKeyboard';
+import Toast from 'react-native-simple-toast';
+import Share, {ShareSheet, Button as ButtonShare} from 'react-native-share';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import TimeAgo from "react-native-timeago";
+let ConstantSystem = require('../../services/ConstantSystem');
+var Modal = require('react-native-modalbox');
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+let shareOptions = {
+  title: "Happy Skin",
+  message: "Hola mundo",
+  url: "http://facebook.github.io/react-native/",
+  subject: "Share Link" //  for email
+};
+
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import {Map} from 'immutable';
+import * as exploreActions from '../../actions/exploreActions';
+import * as commonActions from '../../actions/commonActions';
+const actions = [
+  exploreActions,
+  commonActions
+];
+function mapStateToProps(state) {
+  return {
+    explore: state.explore,
+    common: state.common
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class ExploreReview extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      active: 1,
+      openModal: false,
+      images: [],
+      content:'',
+      parentId: '',
+      editComment: false,
+      userName: '',
+      id_edit: '',
+      showTip: false,
+      checkImage: false,
+      visible: false,
+      page: 1,
+      firstLoad: true
+    }
+  }
+
+  componentWillMount() {
+    this.props.actions.loadDetailRequest();
+  }
+
+  componentDidMount() {
+    timeout = setTimeout( () => {
+    }, 12000);
+    InteractionManager.runAfterInteractions(()=> {
+      this.props.actions.loadDetail(this.props.id, 'product', this.state.firstLoad);
+    })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.explore != this.props.explore) {
+      if(nextProps.explore.exDetail) {
+        var url = 'http://happyskin.vn';
+        url = url+'/review/'+nextProps.explore.exDetail.slug;
+        shareOptions.title = nextProps.explore.exDetail.name;
+        shareOptions.message = nextProps.explore.exDetail.name;
+        shareOptions.url = url;
+        shareOptions.subject = nextProps.explore.exDetail.name;
+      }
+    }
+    if(!nextProps.common.error && this.props.common != nextProps.common ) {
+      this.setState({
+        parentId: '',
+        content: '',
+        images: [],
+        userName: '',
+        editComment: false,
+        showTip: false,
+      })
+      dismissKeyboard()
+    }
+  }
+  
+
+  _renderHeader(section) {
+    return (
+      <View style={styles.productInfoTitle}>
+        <Text style={styles.title}>{section.title}</Text>
+        <Image style={styles.navIcon} source={require('../../images/icons/ic_arrow_5.png')}/>
+      </View>
+    );
+  }
+
+  _renderContent(section) {
+    return (
+        <View style={{paddingRight: 15, paddingLeft: 15}}>
+          <HTMLView
+            stylesheet={htmlStyles}
+            value={section.content}
+            onLinkPress={(link) => this.openBrowser(link)}
+          />
+        </View>
+    );
+  }
+
+  renderProductInfo() {
+    var SECTIONS = [];
+    if(this.props.explore.exDetail.product_say) {
+      var product_say = {
+        title: 'Thông tin nhà sản xuất',
+        content: this.props.explore.exDetail.product_say,
+      }
+      SECTIONS.push(product_say);
+    }
+
+    if(this.props.explore.exDetail.how_to_use) {
+      var how_to_use = {
+        title: 'Cách sử dụng',
+        content: this.props.explore.exDetail.how_to_use,
+      }
+      SECTIONS.push(how_to_use);
+    }
+
+    if(this.props.explore.exDetail.ingredients) {
+      var ingredients = {
+        title: 'Thành phần',
+        content: this.props.explore.exDetail.ingredients,
+      }
+      SECTIONS.push(ingredients);
+    }
+    return (
+      <View>
+        <Accordion
+          sections={SECTIONS}
+          renderHeader={this._renderHeader}
+          renderContent={this._renderContent}
+          underlayColor="#FFFFFF"
+        />
+      </View>
+    );
+  }
+
+  renderLoading() {
+    return (
+      <View style={{ alignItems: 'center'}}>
+        <Image style={{width: 75, height: 75}} source={require('../../images/spinner.gif')} />
+      </View>
+    )
+  }
+  
+  openLink(product_id) {
+    Linking.openURL('https://www.skinstore.vn/view-product/'+product_id);
+  }
+
+  sendComment() {
+    var img = '';
+    (this.state.images.length > 0) ?
+    this.state.images.map(function(image, index){
+      if(img == '') {
+        img = image.data;
+      } else {
+        img = img+'###'+image.data;
+      }
+    })
+    : '';
+    this.props.actions.comment(this.props.id, 'product', this.state.content, img, this.state.parentId)
+  }
+
+  saveComment() {
+    this.props.actions.editComment(this.state.id_edit, this.state.content);
+  }
+
+  pickImages() {
+    var _this = this;
+    ImagePicker.openPicker({
+      width: 800,
+      height: 800,
+      cropping: true,
+      multiple: true,
+      includeBase64: true,
+      maxFiles: 10
+    }).then(images => {
+      this.setState({checkImage: false})
+      var urlImages = [];
+      var itemImage=[];
+      images.map(function(image, index){
+        ImageResizer.createResizedImage(image.path, 600, 800, 'JPEG', 80)
+        .then((uri) => {
+          if(Platform.OS == 'android') {
+            NativeModules.RNImageToBase64.getBase64String(uri.uri ,( err, base64) => {
+              var itemImage = {
+                'data': base64
+              }
+              if(images.length > 5){
+                // urlImages.push(itemImage);
+                // if(index + 1 == 5){
+                //   Toast.show('Bạn chỉ được chọn tối đa 5 ảnh');
+                //   _this.onChange('images', urlImages);
+                // }
+                urlImages.push(itemImage);
+                if(images.length == index + 1){
+                  _this.setState({images: urlImages});
+                }
+              }else {
+                urlImages.push(itemImage);
+                if(images.length == index + 1){
+                  _this.setState({images: urlImages});
+                }
+              }
+            }).catch(error => {console.log(error)});
+          } else {
+            var itemImage = {
+            'data': uri
+            }
+            urlImages.push(itemImage);
+             if(images.length == index + 1){
+               _this.setState({images: urlImages});
+             }
+             _this.setState({images: urlImages});
+          }
+        }).catch((err1) => {
+        });
+      })
+    }).catch(e => {});
+  }
+
+  reply(comment, action) {
+    this.setState({
+      editComment: false,
+      parentId: action == 'child' ? comment.parent_id : comment.id,
+      showTip: true,
+      userName: comment.user_data.full_name
+    });
+    this.refs.input.focus()
+  }
+
+  closeModalTip() {
+    this.setState({
+      parentId: '',
+      userName: '',
+      id_edit: '',
+      editComment: false,
+      checkImage: false,
+      showTip: false
+    })
+  }
+
+  editComment(comment) {
+    this.setState({
+      showTip: true,
+      checkImage: true,
+      editComment: true,
+      content: comment.content,
+      images: comment.images ? comment.images : '',
+      id_edit: comment.id
+    })
+  }
+
+  openShare(){
+    if(shareOptions.url == 'http://facebook.github.io/react-native/'){
+      return;
+    }
+    var _this = this;
+    setTimeout(function(){
+      _this.onOpen();
+    }, 200);
+    
+  }
+
+  onCancel() {
+    this.setState({visible:false});
+  }
+  onOpen() {
+    this.setState({visible:true});
+  }
+  loadMoreReview() {
+    this.props.actions.loadMoreReview(this.props.id, this.state.page + 1);
+    this.setState({page: this.state.page + 1})
+  }
+
+  render(){
+    console.log(this.props.explore.exDetail)
+    var uri = 'https://mapipro3.happyskin.vn/v2/webview?id='+this.props.id+'&type=product'; 
+    // var uri = (Platform.OS=='ios') ? 'https://mapipro3.happyskin.vn/v2/webview?id='+this.props.id+'&type='+this.props.type : 'https://mapipro3.happyskin.vn/v2/webview?id='+this.props.id+'&type='+this.props.type; 
+    return (
+      <View style={styles.content}>
+        <View style={main.container}>
+           <NavBar style={{navBar: main.navBarWhite, statusBar: main.statusBar}} statusBar={{barStyle: 'dark-content', backgroundColor: '#fff'}} >
+            <NavButton onPress={() => Actions.pop()} style={main.navButton}>
+              <Image style={{height: 12, width: 13}} source={require('../../images/icons/ic_back_blue2.png')}/>
+              <View>
+                <Text style={main.txtBack}>Khám phá</Text>
+              </View>
+            </NavButton>
+            {
+              this.props.explore.exDetail.skinstore_product_id ?
+              this.props.explore.exDetail.skinstore_product_id != '' ?
+              <NavButton onPress={() => this.openLink(this.props.explore.exDetail.skinstore_product_id)} style={{flexDirection: 'row',  alignItems: 'center', paddingRight: 7,}}>
+                <Text style={{fontSize: 14, color: '#E30052', marginRight: 10}}>Đặt mua</Text>
+                <Image style={{height: 16, width: 16}} source={require('../../images/icons/ic_cart_orange.png')}/>
+              </NavButton>
+              : null : null
+            }
+            
+          </NavBar>
+
+          {
+            this.props.explore.isFetching ?
+            <View style={main.mainSpin1}>
+              <Image style={main.imgLoading} source={require('../../images/rolling.gif')} />
+            </View>
+            : null
+          }
+          <KeyboardAwareScrollView
+            extraHeight={80}
+            viewIsInsideTabBar={true}
+            keyboardShouldPersistTaps={'always'}
+            scrollEnabled={false}
+            contentContainerStyle={{ flex: 1, flexDirection: 'column', justifyContent: 'space-between' }}
+            >
+            <ScrollView style={styles.scrollView}>
+              <View style={styles.boxHeader}>
+                <View style={styles.boxProduct}>
+                  <View style={styles.boxTitle}>
+                    <Text style={styles.txtReview}>Review</Text>
+                    <Text style={styles.txtTitle}>{this.props.explore.exDetail.name}</Text>
+                  </View>
+                  <Image style={styles.image} source={{uri: this.props.explore.exDetail.image_thumb + '.png'}}/>
+                </View>
+                <View style={styles.boxCategory}>
+                  {
+                    this.props.explore.exDetail.categories ?
+                      this.props.explore.exDetail.categories.length !== 0 ?
+                      <View style={styles.category}>
+                        <Text style={styles.txtCategory}>{this.props.explore.exDetail.categories[0].name}</Text>
+                      </View>
+                      : <View/>
+                    : null
+                  }
+                  
+                  <BoxAction1 view={this.props.explore.exDetail.count_views} like={this.props.explore.exDetail.count_like} comment={this.props.explore.exDetail.count_comment} isLike={this.props.explore.exDetail.is_like_by_current_id}  />
+                </View>
+              </View>
+              {
+                this.props.explore.exDetail.author_raties ?
+                  this.props.explore.exDetail.author_raties.length > 0 ?
+                  <View style={styles.boxEditor}>
+                    <View style={styles.boxRating}>
+                      <Text style={styles.txtEditor}>EDITOR'S REVIEW</Text>
+                      <View style={styles.boxRating}>
+                        <View style={styles.rating}>
+                          <StarRating
+                            disabled={true}
+                            emptyStar={require('../../images/icons/ic_start_old.png')}
+                            fullStar={require('../../images/icons/ic_star_ok.png')}
+                            halfStar={require('../../images/icons/ic_star_half.png')}
+                            selectedStar={(rating) => this.onStarRatingPress(rating)}
+                            maxStars={5}
+                            rating={this.props.explore.exDetail.raty_score}
+                            starSize={13}
+                            margin={2}
+                            starStyle={{marginRight: 2}}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                    <Text style={styles.txtShortContent}>“{this.props.explore.exDetail.author_raties[0].author_say}”</Text>
+                    <View style={styles.hr}></View>
+                    <View style={styles.boxAuthor}>
+                      <Image style={styles.avatar} source={require('../../images/avatar_happyskin.png')}/>
+                      <View style={styles.author}>
+                        <Text style={styles.authorName}>{this.props.explore.exDetail.author_raties[0].author.name}</Text>
+                        <Text style={styles.authorRole}>HappySkin Editor</Text>
+                      </View>
+                    </View>
+                  </View>
+                : null : null
+              }
+              
+              <View>
+                <View style={styles.boxContent}>
+                  {
+                    this.props.explore.exDetail ?
+                    <Web
+                    ref={(c) => {this.webview = c}}
+                    source={{uri: uri}}
+                    scrollEnabled={false}
+                    onNavigationStateChange={(event) => {
+                      if (event.url !== uri) {
+                        this.webview.stopLoading();
+                        Linking.openURL(event.url);
+                      }
+                    }}
+                    renderLoading={this.renderLoading}
+                    startInLoadingState
+                    automaticallyAdjustContentInsets={true}
+                    style={{ margin: 0, width: windowSize.width }}
+                    scalesPageToFit={false}
+                    dataDetectorTypes="none"
+                    javaScriptEnabled={true}
+                  />
+                    : null
+                  }
+                 
+                </View>
+                <View style={styles.hr2}>
+                  <View style={{ width: 88, height: 2, backgroundColor: '#F3AEC1'}}></View>
+                </View>
+              </View>
+              <View>
+                <View style={styles.mainContent}>
+                  <View style={styles.boxRating}>
+                    <Text style={styles.txtEditorRating}>EDITOR'S RATING</Text>
+                    <View style={styles.boxCountReview}>
+                      <View style={styles.boxRating}>
+                        <View style={styles.rating}>
+                          <StarRating
+                            disabled={true}
+                            emptyStar={require('../../images/icons/ic_start_old.png')}
+                            fullStar={require('../../images/icons/ic_star_ok.png')}
+                            halfStar={require('../../images/icons/ic_star_half.png')}
+                            selectedStar={(rating) => this.onStarRatingPress(rating)}
+                            maxStars={5}
+                            rating={this.props.explore.exDetail.raty_score}
+                            starSize={13}
+                            margin={2}
+                            starStyle={{marginRight: 2}}
+                          />
+                        </View>
+                        <Text style={styles.txtCountReview}>{this.props.explore.exDetail.raty_score}</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View style={styles.hr3}>
+                    <View style={{ width: 134, height: 2, backgroundColor: '#1F2027'}}></View>
+                  </View>
+                  
+                  {
+                    this.props.explore.exDetail.author_raties ?
+                    this.props.explore.exDetail.author_raties.length > 0 ?
+                      this.props.explore.exDetail.author_raties[0].raty_point.map((item, index) => {
+                        return (
+                        <View style={styles.boxInfoProduct}>
+                          <View style={styles.infoProduct}>
+                            <View style={styles.info_name}>
+                              <Text style={styles.info_text}>{item.name}</Text>
+                              <Text style={styles.info_number}>{item.value}</Text>
+                            </View>
+                            <Slider
+                              maximumValue={5}
+                              minimumValue={0}
+                              value={Number(item.value)}
+                              minimumTrackTintColor="#D73554"
+                              maximumTrackTintColor="#ECEEF0"
+                              thumbTintColor="#D73554"
+                              thumbStyle={{width: 0, height: 0}}
+                              animateTransitions={true}
+                              animationType="spring"
+                              disabled={true}
+                            />
+                          </View>
+                        </View>)
+                      })
+                    : null : null
+                  }
+                  
+
+                </View>
+                <View style={styles.hr2}>
+                  <View style={{ width: 88, height: 2, backgroundColor: '#F3AEC1'}}></View>
+                </View>
+              </View>
+              <View style={styles.boxBuy}>
+                <Text style={[styles.txtAuthor, {paddingBottom: 20}]}>Đăng bởi {this.props.explore.exDetail.author_raties ? this.props.explore.exDetail.author_raties.length > 0 ? this.props.explore.exDetail.author_raties[0].author.name : '' : ''}, HappySkin Editor.</Text>
+                {/* <Text style={[styles.txtAuthor, {paddingBottom: 20}]}><TimeAgo time={this.props.explore.exDetail.author_raties ? this.props.explore.exDetail.author_raties[0].author.created_at : ''}/></Text> */}
+                {
+                  this.props.explore.exDetail.skinstore_product_id != '' ?
+                  <TouchableOpacity onPress={() => this.openLink(this.props.explore.exDetail.skinstore_product_id)} style={styles.boxButtonBuy}>
+                    <Text style={styles.txtBuy}>Mua sản phẩm này trên Skin Store</Text>
+                  </TouchableOpacity>
+                  : null
+                }
+                
+              </View>
+              <View style={{paddingBottom: 20}}>
+                {this.renderProductInfo()}
+              </View>
+              <View style={{alignItems: 'center',}}>
+                <View style={{ width: 88, height: 2, backgroundColor: '#F3AEC1'}}></View>
+              </View>
+              <BoxAction focus={() => this.refs.input.focus()} openShare={() => this.openShare()} isLike={this.props.explore.exDetail.is_like_by_current_id} id={this.props.explore.exDetail.id} typePost={this.props.explore.exDetail.type} count_like={this.props.explore.exDetail.count_like}/>
+              <CommentList editComment={(comment) => this.editComment(comment)} reply={(comment, action) => this.reply(comment, action)} count_like = {this.props.explore.exDetail.count_like} count_comment = {this.props.explore.exDetail.count_comment} typePost={this.props.explore.exDetail.type} target_id={this.props.explore.exDetail.id}/>
+              
+              <View style={styles.boxReview}>
+                <Text style={[styles.txtRelated, {marginTop: 12, marginBottom: 12}]}>NGƯỜI DÙNG REVIEW</Text>
+
+                <View>
+                  <View style={{flexDirection: 'row', borderBottomColor: 'rgb(230, 230, 230)', borderBottomWidth: 1}}>
+                    <TouchableOpacity style={this.state.active == 1 ? styles.ctActive : styles.ctInActive} onPress={() => this.setState({active: 1})}>
+                      <Text style={this.state.active == 1 ? styles.txtActive : styles.txtInActive}>TRONG NƯỚC</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={this.state.active == 2 ? styles.ctActive : styles.ctInActive} onPress={() => this.setState({active: 2})}>
+                      <Text style={this.state.active == 2 ? styles.txtActive : styles.txtInActive}>NGOÀI NƯỚC</Text>
+                    </TouchableOpacity>
+                  </View>
+                  {
+                    this.state.active == 1 ?
+                      <View >
+                        {
+                          this.props.explore.exDetail.user_raties ?
+                            this.props.explore.exDetail.user_raties.length == 0 ?
+                              <View style={styles.ctEmpty}>
+                                <Text>Hãy là người đầu tiên review sản phẩm này</Text>
+                              </View>  
+                              :
+                              <View>
+                                {
+                                  this.props.explore.exDetail.user_raties.map((item, index) => {
+                                    return (<BoxUserReview key={index} data={item}/>)
+                                  })
+                                }
+                                {
+                                  this.props.explore.loadMoreReview ?
+                                    this.props.explore.fetchingLoadMore ?
+                                      <View style={{ alignItems: 'center'}}>
+                                        <Image style={main.imgLoading} source={require('../../images/spinner.gif')} />
+                                      </View> 
+                                        :
+                                      <TouchableOpacity onPress={() => this.loadMoreReview()} style={{marginRight: 15, alignItems: 'center'}}>
+                                        <Text style={{color: '#446EB6',}}>Xem thêm</Text>
+                                      </TouchableOpacity>
+                                    : null
+                                }
+                              </View>
+                          : null
+                        }
+                        <Button 
+                            onPress={() => this.setState({openModal: true})}
+                            containerStyle={{marginRight: 15,marginBottom: 15, backgroundColor:"rgb(254, 117, 53)", marginTop: 13, borderRadius:2, height: 48, justifyContent: 'center', alignItems: 'center'}}
+                            style={styles.btnWrite}>
+                          Viết đánh giá sản phẩm
+                        </Button>
+                      </View>
+                    :
+                      <View>
+                       {
+                          this.props.explore.exDetail.out_raties || this.state.loadDetail ?
+                            this.props.explore.exDetail.out_raties.length == 0 ?
+                              <View style={styles.ctEmpty}>
+                                <Text>Hãy là người đầu tiên review sản phẩm này</Text>
+                              </View>  
+                              :
+                              this.props.explore.exDetail.out_raties.map((item, index) => {
+                                return (<BoxUserReview key={index} data={item}/>)
+                              })
+                          : null
+                        }
+                        <Button 
+                            onPress={() => this.setState({openModal: true})}
+                            containerStyle={{marginRight: 15,marginBottom: 15, backgroundColor:"rgb(254, 117, 53)", marginTop: 13, borderRadius:2, height: 48, justifyContent: 'center', alignItems: 'center'}}
+                            style={styles.btnWrite}>
+                          Viết đánh giá sản phẩm
+                        </Button>
+                      </View>
+                  }
+
+                </View>
+              </View>
+
+              <View style={styles.boxRelated}>
+                <Text style={styles.txtRelated}>SẢN PHẨM TƯƠNG TỰ</Text>
+              </View>
+              <View style={styles.boxPostRelated}>
+                {
+                  this.props.explore.exRelate ?
+                    this.props.explore.exRelate.map((item, index) => {
+                      if(index < 7) {
+                        return (<BoxReview key={index} data={item}/>)
+                      }else return null
+                    })
+                  : null
+                }
+              </View>
+            </ScrollView>
+            {
+              this.state.showTip ?
+                <TouchableOpacity onPress={() => this.closeModalTip()} style={{height: 30, flexDirection: 'row',borderWidth: 1, borderColor: '#ccc', alignItems: 'center', padding: 15, justifyContent: 'space-between'}}>
+                  {
+                    this.state.editComment ?
+                      <Text style={{fontSize: 12}}>Bạn đang sửa bình luận </Text>
+                      :
+                      <Text style={{fontSize: 12}}>Bạn đang trả lời  <Text style={{fontSize: 13, fontWeight: 'bold', color: '#000'}}>{this.state.userName}</Text></Text>
+                  }
+                  <Image style={{height: 12, width: 12}} source={require('../../images/icons/ic_close_pink.png')} />
+                </TouchableOpacity>
+                : null
+            }
+            <View style={main.boxChat}>
+              <TouchableOpacity onPress={() => this.pickImages()} style={main.selectImage}>
+                <Image source={require('../../images/icons/ic_camera_pink.png')} style={main.icCamera}/>
+              </TouchableOpacity>
+            
+              <View style={main.mainTxtChat}>
+                {
+                  this.state.images.length > 0 ?
+                  <ScrollView horizontal={true} >
+                    {
+                    this.state.images.map((image, index) => {
+                      return (
+                        <Image source={{uri: 'data:image/jpeg;base64,' + image.data, isStatic: true}} style={{height: 30,marginTop: 5, marginRight: 3, width: 30}}/>
+                      )
+                    })
+                  }
+                  </ScrollView>
+                  : null
+                }
+                <TextInput 
+                    placeholder = "Bình luận về bài viết"
+                    underlineColorAndroid='transparent'
+                    placeholderTextColor={'rgb(194, 197, 208)'}
+                    style={styles.inputChat}
+                    ref='input'
+                    autoGrow={true}
+                    selectionColor='#C2C5D0'
+                    onChangeText={(content) => this.setState({content: content})}
+                    value={this.state.content}
+                    multiline={true}
+                />
+              </View>
+              {
+                this.state.editComment ?
+                  <TouchableOpacity onPress = {() => this.saveComment()}>
+                    <Text style={main.txtSend}>Lưu</Text>
+                  </TouchableOpacity>
+                  :
+                  <TouchableOpacity onPress = {() => this.sendComment()}>
+                    <Text style={main.txtSend}>Gửi</Text>
+                  </TouchableOpacity>
+              }
+            </View>
+          </KeyboardAwareScrollView>
+          <Modal 
+            style={styles.modal}
+            isOpen={this.state.openModal}
+            swipeToClose={true}
+            position="center"
+            entry="bottom"
+            animationDuration={200}
+            backdropColor="#000"
+            onClosed={()=> this.setState({openModal: false}) }>
+              <ModalReview closeModal={() => this.setState({openModal: false})} data={this.props.explore.exDetail}/>
+          </Modal>
+          <ShareSheet visible={this.state.visible} onCancel={this.onCancel.bind(this)}>
+            <ButtonShare iconSrc={{ uri: ConstantSystem.FACEBOOK_ICON }}
+                    onPress={()=>{
+                this.onCancel();
+                setTimeout(() => {
+                  Share.shareSingle(Object.assign(shareOptions, {
+                    "social": "facebook"
+                  }));
+                },300);
+              }}><Text><Text style={main.fontSizeMedium}>Chia sẻ lên</Text> <Text>Facebook</Text></Text></ButtonShare>
+            <ButtonShare
+              iconSrc={{ uri: ConstantSystem.CLIPBOARD_ICON }}
+              onPress={()=>{
+                this.onCancel();
+                setTimeout(() => {
+                  if(typeof shareOptions["url"] !== undefined) {
+                    Clipboard.setString(shareOptions["url"]);
+                    Toast.show('Nội dung đã được copy');
+                  }
+                },300);
+              }}><Text><Text style={main.fontSizeMedium}>Copy Link</Text> <Text>Url</Text></Text></ButtonShare>
+          </ShareSheet>
+        </View>
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  modal: {
+    backgroundColor: '#fff',
+    height: deviceHeight - 150,
+    width: deviceWidth - 30
+  },
+  btnWrite: {
+    color: '#fff',
+    fontSize: 14
+  },
+  ctEmpty: {
+    alignItems: 'center', 
+    marginRight: 15,
+    marginTop: 15,
+    marginBottom: 15
+  },
+  ctActive: {
+    borderBottomWidth:2,
+    borderBottomColor: 'rgb(51, 51, 51)',
+    paddingBottom: 17,
+    paddingTop: 5,
+    alignItems: 'center',
+    flex: 1
+  },
+  ctInActive: {
+    paddingBottom: 17,
+    paddingTop: 5,
+    alignItems: 'center',
+    flex: 1
+  },
+  txtActive: {
+    color: 'rgb(51, 51, 51)',
+    fontWeight: 'bold'
+  },
+  txtInActive: {
+    color: 'rgba(0, 0, 0, 0.7)'
+  },
+  boxReview: {
+    borderTopColor: '#F3AEC1',
+    borderTopWidth: 4,
+    paddingLeft: 15,
+  },
+  content: {
+    flex: 1,
+    backgroundColor: '#FFFFFF'
+  },
+  nav: {
+    backgroundColor: '#fff',
+    padding: 0,
+    height: 44,
+    width: windowSize.width,
+    borderBottomColor: "transparent"
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#FFFFFF'
+  },
+  boxHeader: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingBottom: 15
+  },
+  boxProduct: {
+    flexDirection: 'row',
+  },
+  boxTitle: {
+    flex: 1,
+    paddingRight: 10,
+  },
+  txtReview: {
+    color: '#1F2027',
+    fontSize: 24,
+  },
+  txtTitle: {
+    fontSize: 22,
+    color: '#D73554'
+  },
+  image: {
+    width: 128,
+    height: 128,
+    marginTop: 5
+  },
+  boxCategory: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  category: {
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingLeft: 15,
+    paddingRight: 15,
+    backgroundColor: '#F3AEC1',
+    borderRadius: 16,
+    marginRight: 15,
+    marginBottom: 10
+  },
+  txtCategory: {
+    fontSize: 14,
+    color: '#FFFFFF',
+  },
+  boxAction: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  boxLike: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginLeft: 15
+  },
+  icLike: {
+    width: 12,
+    height: 10,
+  },
+  icComment: {
+    width: 10,
+    height: 10
+  },
+  icView: {
+    width: 12,
+    height: 10
+  },
+  txtCount: {
+    color: '#8A8A8F',
+    fontSize: 12,
+    marginLeft: 5
+  },
+  boxEditor: {
+    backgroundColor: '#1F2027',
+    paddingLeft: 15,
+    paddingRight: 15,
+    marginBottom: 20
+  },
+  boxRating: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 40,
+  },
+  txtEditor: {
+    color: '#FFFFFF',
+    fontSize: 14,
+  },
+  rating: {
+    alignItems: "flex-start",
+    flexDirection: 'row'
+  },
+  txtShortContent: {
+    color: '#FFFFFF',
+    fontSize: 17,
+    marginBottom: 15
+  },
+  hr: {
+    width: 69,
+    height: 2,
+    backgroundColor: 'rgba(215,53,84,40)',
+    marginBottom: 15
+  },
+  boxAuthor: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginBottom: 15
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  author: {
+    paddingLeft: 15
+  },
+  authorName: {
+    color: '#FFFFFF',
+    fontSize: 14
+  },
+  authorRole: {
+    fontSize: 12,
+    color: '#8A8A8F'
+  },
+  boxContent: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingBottom: 20
+  },
+  hr2: {
+    borderBottomColor: '#FFB765',
+    borderBottomWidth: 1,
+    alignItems: 'center',
+    marginBottom: 20
+  },
+  boxBuy: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderBottomColor: '#ECEEF0',
+    borderBottomWidth: 1,
+  },
+  txtAuthor: {
+    fontSize: 14,
+    color: '#879BCE'
+  },
+  boxButtonBuy: {
+    paddingTop: 5,
+    paddingBottom: 5,
+    backgroundColor: '#D73554',
+    borderRadius: 4,
+    marginBottom: 10,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  txtBuy: {
+    fontSize: 16,
+    color: '#FFFFFF'
+  },
+  mainContent: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingBottom: 20
+  },
+  txtEditorRating: {
+    color: '#333333',
+    fontSize: 14,
+  },
+  boxCountReview: {
+    paddingRight: 15
+  },
+  txtCountReview: {
+    fontSize: 16,
+    color: '#FE7535',
+    paddingLeft: 10
+  },
+  boxInfoProduct: {
+    paddingTop: 10
+  },
+  info_name: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: -10
+  },
+  info_text: {
+    color: "#292A39",
+    fontSize: 16,
+  },
+  hr3: {
+    borderBottomColor: '#ECEEF0',
+    borderBottomWidth: 1,
+  },
+  info_number: {
+    color: '#8750A1',
+    fontSize: 16,
+    paddingRight: 15
+  },
+  productInfoTitle: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderTopWidth: 1,
+    borderTopColor: '#eaeaea',
+    height: 56,
+    alignItems: 'center',
+    paddingRight: 15,
+    paddingLeft: 15
+  },
+  title: {
+    color: "#292A39",
+    fontSize: 16
+  },
+  navIcon: {
+    width: 10,
+    height: 6
+  },
+  hr4: {
+    height: 4,
+    backgroundColor: '#F3AEC1'
+  },
+  boxRelated: {
+    borderTopColor: '#F3AEC1',
+    borderTopWidth: 4,
+    paddingRight: 15,
+    paddingLeft: 15,
+    height: 40,
+    justifyContent: 'center'
+  },
+  txtRelated: {
+    fontSize: 14,
+    color: '#8750A1'
+  },
+  boxPostRelated: {
+    paddingBottom: 15,
+  },
+});
+let htmlStyles = StyleSheet.create({
+  body: {
+    fontSize: 14,
+  },
+  a: {
+    fontSize: 14,
+  },
+  p: {
+    fontSize: 14,
+    fontFamily: 'SanFranciscoText-Medium',
+    color: '#505050'
+  }
+});
+let main = require('../../styles/Main');
+export default connect(mapStateToProps, mapDispatchToProps)(ExploreReview);

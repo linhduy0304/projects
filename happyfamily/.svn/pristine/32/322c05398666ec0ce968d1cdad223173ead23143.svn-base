@@ -1,0 +1,18 @@
+
+
+import React from 'react';
+
+let HTTP = require('./HTTP');
+let URL = require('./URL');
+
+//load
+export function individual() {
+    return HTTP.get(URL.individual);
+}
+
+//add
+export function addIndividual(body) {
+    return HTTP.postWithAuth(URL.individual, body);
+}
+
+

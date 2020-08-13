@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/24x24_plus_o</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M13.5,10.5 L22.5,10.5 C23.3284271,10.5 24,11.171573 24,12 C24,12.828427 23.3284271,13.5 22.5,13.5 L13.5,13.5 L13.5,22.5 C13.5,23.3284271 12.828427,24 12,24 C11.171573,24 10.5,23.3284271 10.5,22.5 L10.5,13.5 L1.5,13.5 C0.671572875,13.5 0,12.828427 0,12 C0,11.171573 0.671572875,10.5 1.5,10.5 L10.5,10.5 L10.5,1.5 C10.5,0.671572875 11.171573,0 12,0 C12.828427,0 13.5,0.671572875 13.5,1.5 L13.5,10.5 Z" id="path-1"></path>
+    </defs>
+    <g id="icon/24x24_plus_o" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="24x24_plus_o" fill-rule="nonzero"></g>
+        <g id="COLOR/JJ_4.black" mask="url(#mask-2)" fill="#0F0A0A">
+            <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        </g>
+    </g>
+</svg>

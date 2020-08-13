@@ -1,0 +1,11 @@
+import React from 'react';
+
+let HTTP = require('./HTTP');
+let URL = require('./URL');
+
+//feedBack
+export function feedBack(body){
+  return HTTP.postWithAuth(URL.feedBack, body);
+}
+
+

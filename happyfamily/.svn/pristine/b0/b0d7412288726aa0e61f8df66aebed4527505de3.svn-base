@@ -1,0 +1,185 @@
+
+'use strict'
+import { Alert } from 'react-native';
+import {Actions} from 'react-native-router-flux'
+import SimpleToast from 'react-native-simple-toast';
+const {
+  CATEGORY_REQUEST,
+  CATEGORY_SUCCESS,
+  CATEGORY_FAIL,
+  CATEGORY_LV2_SUCCESS,
+  POST_CATE_REQUEST,
+  POST_CATE_SUCCESS,
+  POST_CATE_FAIL,
+  POST_DETAIL_REQUEST,
+  POST_DETAIL_SUCCESS,
+  POST_DETAIL_FAIL,
+
+} = require('../config/actionTypes');
+const Post = require('../services/Post');
+
+//post detail
+export function postDetailRequest() {
+  return {
+    type: POST_DETAIL_REQUEST,
+  }
+}
+
+export function postDetailSuccess(data) {
+  return {
+    type: POST_DETAIL_SUCCESS,
+    data: data
+  }
+}
+
+export function postDetailFail() {
+  return {
+    type: POST_DETAIL_FAIL,
+  }
+}
+
+export function postDetail(slug) {
+  return dispatch => {
+    dispatch(postDetailRequest());
+    return Post.postDetail(slug).then(res => {
+      console.log(res)
+      switch(res.status) {
+        case 200:
+          dispatch(postDetailSuccess(res.data))
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(postDetailFail())
+          return;
+        default:
+          dispatch(postDetailFail());
+          return;
+      }
+    })
+  }
+}
+
+//post category
+export function postCateRequest() {
+  return {
+    type: POST_CATE_REQUEST,
+  }
+}
+
+export function postCateSuccess(data) {
+  return {
+    type: POST_CATE_SUCCESS,
+    data: data
+  }
+}
+
+export function postCateFail() {
+  return {
+    type: POST_CATE_FAIL,
+  }
+}
+
+export function postCategory(slug) {
+  return dispatch => {
+    dispatch(postCateRequest());
+    return Post.postCategory(slug).then(res => {
+      console.log(res)
+      switch(res.status) {
+        case 200:
+          dispatch(postCateSuccess(res.data))
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(postCateFail())
+          return;
+        default:
+          dispatch(postCateFail());
+          return;
+      }
+    })
+  }
+}
+
+//category LV 2
+export function categoryLv2Success(data) {
+  return {
+    type: CATEGORY_LV2_SUCCESS,
+    data: data
+  }
+}
+
+export function categoryLv2(id) {
+  return dispatch => {
+    dispatch(categoryRequest());
+    return Post.categoryLv2(id).then(res => {
+      switch(res.status) {
+        case 200:
+          dispatch(categoryLv2Success(res.data))
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(categoryFail())
+          return;
+        default:
+          dispatch(categoryFail());
+          return;
+      }
+    })
+  }
+}
+
+//category Lv1
+export function categoryRequest() {
+  return {
+    type: CATEGORY_REQUEST,
+  }
+}
+
+export function categorySuccess(data) {
+  return {
+    type: CATEGORY_SUCCESS,
+    data: data
+  }
+}
+
+export function categoryFail() {
+  return {
+    type: CATEGORY_FAIL,
+  }
+}
+
+export function category() {
+  return dispatch => {
+    dispatch(categoryRequest());
+    return Post.category().then(res => {
+      switch(res.status) {
+        case 200:
+          dispatch(categorySuccess(res.data))
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(categoryFail())
+          return;
+        default:
+          dispatch(categoryFail());
+          return;
+      }
+    })
+  }
+}

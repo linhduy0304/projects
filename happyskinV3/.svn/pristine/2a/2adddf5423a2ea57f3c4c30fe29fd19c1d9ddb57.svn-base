@@ -1,0 +1,579 @@
+/**
+ * Created by Mrbacdoan on 18/07/2016.
+ */
+
+const {
+  COMMUNITY_LOAD_REQUEST,
+  COMMUNITY_LOAD_SUCCESS,
+  COMMUNITY_LOAD_FAILURE,
+  ON_QUESTION_FORM_FIELD_CHANGE,
+  SUBMIT_QUESTION_REQUEST,
+  SUBMIT_QUESTION_SUCCESS,
+  SUBMIT_QUESTION_FAILURE,
+  SUBMIT_TIP_REQUEST,
+  SUBMIT_TIP_SUCCESS,
+  SUBMIT_TIP_FAILURE,
+  COMMUNITY_GROUP_REQUEST,
+  COMMUNITY_GROUP_SUCCESS,
+  COMMUNITY_GROUP_FAILURE,
+  COMMUNITY_TAB_GROUP_REQUEST,
+  COMMUNITY_TAB_GROUP_SUCCESS,
+  COMMUNITY_TAB_GROUP_FAILURE,
+  JOIN_GROUP_REQUEST,
+  JOIN_GROUP_SUCCESS,
+  JOIN_GROUP_FAILURE,
+  COMMUNITY_CREATE_OPTIONS,
+  COMMUNITY_TAB_LOAD_MORE_REQUEST,
+  COMMUNITY_TAB_LOAD_MORE_SUCCESS,
+  COMMUNITY_TAB_LOAD_MORE_FAILURE,
+  ON_TIP_FORM_FIELD_CHANGE,
+  COMMUNITY_SEARCH_PRODUCT_LOAD_REQUEST,
+  COMMUNITY_SEARCH_PRODUCT_LOAD_SUCCESS,
+  COMMUNITY_SEARCH_PRODUCT_LOAD_FAILURE,
+  COMMUNITY_TAB_CHANGE_DATA_SUCCESS,
+  JOIN_GROUP_COMMUNITY_SUCCESS,
+  DELETE_IMAGE_QUESTION,
+  ON_REVIEW_FORM_FIELD_CHANGE,
+  SUBMIT_REVIEW_REQUEST,
+  SUBMIT_REVIEW_SUCCESS,
+  SUBMIT_REVIEW_FAILURE,
+  SUBMIT_LOTD_REQUEST,
+  SUBMIT_LOTD_SUCCESS,
+  SUBMIT_LOTD_FAILURE,
+  UPDATE_LOOK_OF_THE_DAY,
+  DELETE_ITEM_PRODUCT,
+  DATA_SAVE
+  } = require('../libs/actionTypes');
+
+import Constant from '../services/Constant';
+import Toast from 'react-native-simple-toast';
+import React from 'react';
+import {
+  Alert,
+} from "react-native"
+const StoreService = require('../services/StoreService').default;
+
+/**
+ * Project requirements
+ */
+const PostService = require('../services/Community');
+
+import {Actions} from 'react-native-router-flux';
+
+/**
+ * ## Logout actions
+ */
+export function communityLoadRequest() {
+  return {
+    type: COMMUNITY_LOAD_REQUEST
+  };
+}
+
+export function communityLoadSuccess(data) {
+  return {
+    type: COMMUNITY_LOAD_SUCCESS,
+    data: data
+  };
+}
+
+export function communityLoadFailure(error) {
+  return {
+    type: COMMUNITY_LOAD_FAILURE,
+    error: error
+  };
+}
+
+export function submitQuestionRequest() {
+  return {
+    type: SUBMIT_QUESTION_REQUEST
+  };
+}
+export function submitQuestionSuccess(data) {
+  return {
+    type: SUBMIT_QUESTION_SUCCESS,
+    data: data
+  };
+}
+
+export function submitQuestionFailure(error) {
+  return {
+    type: SUBMIT_QUESTION_FAILURE,
+    error: error
+  };
+}
+
+export function submitLOTDRequest() {
+  return {
+    type: SUBMIT_LOTD_REQUEST
+  };
+}
+
+export function submitLOTDSuccess(data) {
+  return {
+    type: SUBMIT_LOTD_SUCCESS,
+    data: data
+  };
+}
+
+export function submitLOTDFailure(error) {
+  return {
+    type: SUBMIT_LOTD_FAILURE,
+    error: error
+  };
+}
+
+export function submitTipRequest() {
+  return {
+    type: SUBMIT_TIP_REQUEST
+  };
+}
+export function submitTipSuccess(data) {
+  return {
+    type: SUBMIT_TIP_SUCCESS,
+    data: data
+  };
+}
+
+export function submitTipFailure(error) {
+  return {
+    type: SUBMIT_TIP_FAILURE,
+    error: error
+  };
+}
+
+export function submitReviewRequest() {
+  return {
+    type: SUBMIT_REVIEW_REQUEST,
+  };
+}
+export function submitReviewSuccess(data) {
+  return {
+    type: SUBMIT_REVIEW_SUCCESS
+  };
+}
+
+export function submitReviewFailure(error) {
+  return {
+    type: SUBMIT_REVIEW_FAILURE,
+    error: error
+  };
+}
+
+export function communityGroupRequest() {
+  return {
+    type: COMMUNITY_GROUP_REQUEST
+  };
+}
+
+export function communityGroupSuccess(data) {
+  return {
+    type: COMMUNITY_GROUP_SUCCESS,
+    data: data
+  };
+}
+
+export function communityGroupFailure(error) {
+  return {
+    type: COMMUNITY_GROUP_FAILURE,
+    error: error
+  };
+}
+
+export function communityTabGroupRequest(page) {
+  return {
+    type: COMMUNITY_TAB_GROUP_REQUEST,
+    currentPage: page
+  };
+}
+
+export function communityTabGroupSuccess(data, currentPage, group_id) {
+  return {
+    type: COMMUNITY_TAB_GROUP_SUCCESS,
+    data: data,
+    currentPage: currentPage,
+    groupId: group_id
+  };
+}
+
+export function communityTabGroupFailure(error) {
+  return {
+    type: COMMUNITY_TAB_GROUP_FAILURE,
+    error: error
+  };
+}
+
+export function communitySearchProductLoadRequest() {
+  return {
+    type: COMMUNITY_SEARCH_PRODUCT_LOAD_REQUEST
+  };
+}
+
+export function communitySearchProductLoadSuccess(data) {
+  return {
+    type: COMMUNITY_SEARCH_PRODUCT_LOAD_SUCCESS,
+    data: data
+  };
+}
+
+export function communitySearchProductLoadFailure(error) {
+  return {
+    type: COMMUNITY_SEARCH_PRODUCT_LOAD_FAILURE,
+    error: error
+  };
+}
+
+export function onQuestionFormFieldChange(field,value) {
+  return {
+    type: ON_QUESTION_FORM_FIELD_CHANGE,
+    payload: {field: field, value: value}
+  };
+}
+
+export function onTipFormFieldChange(field,value) {
+  return {
+    type: ON_TIP_FORM_FIELD_CHANGE,
+    payload: {field: field, value: value}
+  };
+}
+
+export function onReviewFormFieldChange(field,value) {
+  return {
+    type: ON_REVIEW_FORM_FIELD_CHANGE,
+    payload: {field: field, value: value}
+  };
+}
+
+
+export function joinGroupRequest() {
+  return {
+    type: JOIN_GROUP_REQUEST
+  };
+}
+
+export function joinGroupSuccess(data) {
+  return {
+    type: JOIN_GROUP_SUCCESS,
+    data: data
+  };
+}
+
+export function joinGroupCommunitySuccess(data){
+  return {
+    type: JOIN_GROUP_COMMUNITY_SUCCESS,
+    data: data
+  };
+}
+
+export function joinGroupFailure(error) {
+  return {
+    type: JOIN_GROUP_FAILURE,
+    error: error
+  };
+}
+
+export function createOptions(dataOption){
+  return {
+    type: COMMUNITY_CREATE_OPTIONS,
+    options: dataOption
+  }
+}
+
+
+export function communityTabLoadMoreRequest(id) {
+  return {
+    type: COMMUNITY_TAB_LOAD_MORE_REQUEST,
+    id: id
+  };
+}
+
+export function communityTabLoadMoreSuccess(data, group_id) {
+  var dataId = [];
+  data.forEach(function(element) {
+    dataId.push(element.id);
+  });
+  return {
+    type: COMMUNITY_TAB_LOAD_MORE_SUCCESS,
+    dataId: dataId,
+    groupId: group_id
+  };
+}
+
+export function communityTabLoadMoreFailure(error) {
+  return {
+    type: COMMUNITY_TAB_LOAD_MORE_FAILURE,
+    error: error
+  };
+}
+
+export function changeDataSuccess() {
+  return {
+    type: COMMUNITY_TAB_CHANGE_DATA_SUCCESS
+  };
+}
+
+export function deleteImageQuestion(key, type) {
+  return {
+    type: DELETE_IMAGE_QUESTION,
+    key: key,
+    feedtype: type
+  };
+}
+
+export function deleteItemProduct(key){
+  return {
+    type: DELETE_ITEM_PRODUCT,
+    key: key
+  };
+}
+
+export function searchProduct(txtSearch) {
+  return dispatch => {
+    dispatch(communitySearchProductLoadRequest());
+    PostService.searchProduct(txtSearch)
+      .then((res) => {
+        if (res.status == 200){
+          dispatch(communitySearchProductLoadSuccess(res.data));
+        } else {
+          dispatch(communitySearchProductLoadFailure(res.errors));
+        }
+      })
+      .catch((error) => {
+        dispatch(communitySearchProductLoadFailure(error));
+      });
+  };
+}
+
+export function joinGroup(dataGroup) {
+  return dispatch => {
+    dispatch(joinGroupRequest());
+    PostService.joinGroup(dataGroup.id)
+      .then((res) => {
+        if (res.status == 200){
+          dispatch(joinGroupSuccess({group_id: dataGroup.id}));
+          dispatch(joinGroupCommunitySuccess({dataGroup: res.data}));
+        } else {
+          dispatch(joinGroupFailure(error));
+        }
+      })
+      .catch((error) => {
+        dispatch(joinGroupFailure(error));
+      });
+  };
+}
+
+export function loading(page){
+  return dispatch => {
+    dispatch(communityTabGroupRequest(page));
+  };
+}
+
+export function loadingGroup(){
+  return dispatch => {
+    dispatch(communityGroupRequest());
+  };
+}
+
+export function changeDataFinish(){
+  return dispatch => {
+    dispatch(changeDataSuccess());
+  };
+}
+
+export function loadMoreTabCommunity(group_id, page){
+  return dispatch => {
+    dispatch(communityTabLoadMoreRequest(group_id));
+    PostService.communityTabGroup(group_id, page)
+      .then((res) => {
+        if (res.status == 200){
+          dispatch(updatePostData(res.data));
+          dispatch(communityTabLoadMoreSuccess(res.data, group_id));
+        } else {
+          dispatch(communityTabLoadMoreFailure(res.error));
+        }
+      })
+      .catch((error) => {
+        dispatch(communityTabLoadMoreFailure(error));
+      });
+  };
+}
+
+export function loadTabCommunity(group_id, currentPage) {
+  return dispatch => {
+    dispatch(communityTabGroupRequest(currentPage));
+    PostService.communityTabGroup(group_id)
+      .then((res) => {
+        if (res.status == 200){
+          dispatch(communityTabGroupSuccess(res.data, currentPage, group_id));
+        } else {
+          dispatch(communityTabGroupFailure(res.error));
+        }
+      })
+      .catch((error) => {
+        dispatch(communityTabGroupFailure(error));
+      });
+  };
+}
+
+export function loadDataCommunity() {
+  return dispatch => {
+    dispatch(communityGroupRequest());
+    PostService.communityGroup().then((resGroup) => {
+      if(resGroup.status == 200){
+        dispatch(communityGroupSuccess(resGroup.data));
+      }else{
+        dispatch(communityGroupFailure(resGroup.error));
+      }
+    });
+  };
+}
+
+export function submitQuestion(group_id, content, image) {
+  return dispatch => {
+    dispatch(submitQuestionRequest());
+    PostService.sendQuestion(group_id, content, image)
+      .then((res) => {
+        if (res.status == 200){
+          Toast.show('Gửi câu hỏi thành công!');
+          Actions.tab({ page: 'community' });
+          dispatch(submitQuestionSuccess(res.data));
+        } else {
+          Toast.show(res.errors);
+          dispatch(submitQuestionFailure(res.errors));
+        }
+      })
+      .catch((error) => {
+        dispatch(submitQuestionFailure(error));
+      });
+  };
+}
+
+export function submitLOTD(group_id, content, product_ids, image, product_name) {
+  return dispatch => {
+    dispatch(submitLOTDRequest());
+    PostService.sendLookOfTheDay(group_id, content, product_ids, image, product_name)
+      .then((res) => {
+        if (res.status == 200){
+          Toast.show('Gửi ảnh thành công!');
+          Actions.tab({ page: 'community' });
+          dispatch(submitLOTDSuccess(res.data));
+        } else {
+          Toast.show(res.errors);
+          dispatch(submitLOTDFailure(res.errors));
+        }
+      })
+      .catch((error) => {
+        dispatch(submitLOTDFailure(error));
+      });
+  };
+}
+
+export function submitTip(group_id, content, image) {
+  return dispatch => {
+    dispatch(submitTipRequest());
+    PostService.sendTip(group_id, content, image)
+      .then((res) => {
+        if (res.status == 200){
+          Toast.show('Gửi mẹo thành công!');
+          Actions.tab({ page: 'community' });
+          dispatch(submitTipSuccess(res.data));
+        } else {
+          Toast.show(res.errors);
+          dispatch(submitTipFailure(res.errors));
+        }
+      })
+      .catch((error) => {
+        dispatch(submitTipFailure(error));
+      });
+  };
+}
+
+export function submitReview(group_id, content, product_id, raty_score, image, name = '') {
+  return dispatch => {
+    dispatch(submitReviewRequest());
+    PostService.sendReview(group_id, content, product_id, raty_score, image, name)
+      .then((res) => {
+        if (res.status == 200){
+          Toast.show('Gửi Review thành công!');
+          Actions.tab({ page: 'community' });
+          dispatch(submitReviewSuccess());
+        } else {
+          Toast.show(res.errors);
+          dispatch(submitReviewFailure(res.errors));
+        }
+      })
+      .catch((error) => {
+        dispatch(submitReviewFailure(error));
+      });
+  };
+}
+
+export function submitReviewOnProduct(content, product_id, raty_score, image, name = '') {
+
+  return dispatch => {
+    dispatch(submitReviewRequest());
+    PostService.sendReviewOnProduct(content, product_id, raty_score, image, name)
+      .then((res) => {
+        if (res.status == 200){
+          Alert.alert(
+            'Thông báo',
+            res.messages,
+            [
+              {text: 'Ok!', onPress: () => console.log('Huỷ bỏ')}
+            ]
+          );
+          Actions.tab({ page: 'community' });
+          dispatch(submitReviewSuccess());
+        } else {
+          Toast.show(res.errors);
+          dispatch(submitReviewFailure(res.errors));
+        }
+      })
+      .catch((error) => {
+        dispatch(submitReviewFailure(error));
+      });
+  };
+}
+
+export function createTabOptions(dataGroup){
+  for(var i = 0; i < dataGroup.length; i++){
+    dataGroup[i].loadMore = true;
+    dataGroup[i].page = 1;
+    dataGroup[i].posts = [];
+  }
+  return dispatch => {
+    dispatch(createOptions(dataGroup));
+  };
+}
+
+export function updateLookOfTheDay(field,value) {
+  return {
+    type: UPDATE_LOOK_OF_THE_DAY,
+    payload: {field: field, value: value}
+  };
+}
+
+export function deleteFeed(id){
+  return dispatch => {
+    PostService.deleteFeed(id)
+      .then((res) => {
+        if (res.status == 200){
+          Toast.show(res.message);
+        } else {
+          Toast.show(res.errors);
+        }
+      })
+      .catch((error) => {
+      });
+  };
+}
+
+// update data
+
+export function updatePostData(data){
+  return {
+    type: DATA_SAVE, 
+    data: data
+  };
+}
+
+

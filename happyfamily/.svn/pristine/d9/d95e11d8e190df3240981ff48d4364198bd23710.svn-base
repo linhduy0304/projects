@@ -1,0 +1,237 @@
+
+'use strict'
+import { Alert } from 'react-native';
+import {Actions} from 'react-native-router-flux'
+import SimpleToast from 'react-native-simple-toast';
+const {
+  CHATS_REQUEST,
+  CHATS_SUCCESS,
+  CHATS_FAIL,
+  CHAT_DETAIL_REQUEST,
+  CHAT_DETAIL_SUCCESS,
+  CHAT_DETAIL_FAIL,
+  FRIEND_LIST_REQUEST,
+  FRIEND_LIST_SUCCESS,
+  FRIEND_LIST_FAIL,
+  CREATE_GROUP_REQUEST,
+  CREATE_GROUP_SUCCESS,
+  CREATE_GROUP_FAIL,
+  SEND_SUCCESS,
+  SEND_FAIL,
+} = require('../config/actionTypes');
+const Chat = require('../services/Chat');
+
+//send message
+
+export function sendSuccess() {
+  return {
+    type: SEND_SUCCESS,
+  }
+}
+
+export function sendFail() {
+  return {
+    type: SEND_FAIL,
+  }
+}
+
+export function send(body) {
+  return dispatch => {
+    return Chat.send(body).then(res => {
+      switch(res.status) {
+        case 200:
+          dispatch(sendSuccess());
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            [{text: 'Ok', style: 'cancel'}],
+          );
+          dispatch(sendFail())
+          return;
+        default:
+          dispatch(sendFail());
+          return;
+      }
+    })
+  }
+}
+
+//createGroup
+export function createGroupRequest() {
+  return {
+    type: CREATE_GROUP_REQUEST,
+  }
+}
+
+export function createGroupSuccess(data) {
+  return {
+    type: CREATE_GROUP_SUCCESS,
+    data: data
+  }
+}
+
+export function createGroupFail() {
+  return {
+    type: CREATE_GROUP_FAIL,
+  }
+}
+
+export function createGroup(body) {
+  return dispatch => {
+    dispatch(createGroupRequest());
+    return Chat.createGroup(body).then(res => {
+      switch(res.status) {
+        case 200:
+          dispatch(createGroupSuccess(res.data));
+          Actions.pop()
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            [{text: 'Ok', style: 'cancel'}],
+          );
+          dispatch(createGroupFail())
+          return;
+        default:
+          SimpleToast.show(res.errors)
+          dispatch(createGroupFail());
+          return;
+      }
+    })
+  }
+}
+
+//friendList
+export function friendListRequest() {
+  return {
+    type: FRIEND_LIST_REQUEST,
+  }
+}
+
+export function friendListSuccess(data) {
+  return {
+    type: FRIEND_LIST_SUCCESS,
+    data: data
+  }
+}
+
+export function friendListFail() {
+  return {
+    type: FRIEND_LIST_FAIL,
+  }
+}
+
+export function friendList() {
+  return dispatch => {
+    dispatch(friendListRequest());
+    return Chat.friendList().then(res => {
+      switch(res.status) {
+        case 200:
+          dispatch(friendListSuccess(res.data.users))
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            [{text: 'Ok', style: 'cancel'}],
+          );
+          dispatch(friendListFail())
+          return;
+        default:
+          dispatch(friendListFail());
+          return;
+      }
+    })
+  }
+}
+
+//chat detail
+export function chatDetailRequest() {
+  return {
+    type: CHAT_DETAIL_REQUEST,
+  }
+}
+
+export function chatDetailSuccess(data) {
+  return {
+    type: CHAT_DETAIL_SUCCESS,
+    data: data
+  }
+}
+
+export function chatDetailFail() {
+  return {
+    type: CHAT_DETAIL_FAIL,
+  }
+}
+
+export function chatDetail(id) {
+  return dispatch => {
+    dispatch(chatDetailRequest());
+    return Chat.chatDetail(id).then(res => {
+      switch(res.status) {
+        case 200:
+          dispatch(chatDetailSuccess(res.data))
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            [{text: 'Ok', style: 'cancel'}],
+          );  
+          dispatch(chatDetailFail())
+          return;
+        default:
+          dispatch(chatDetailFail());
+          return;
+      }
+    })
+  }
+}
+
+//chat list
+export function chatRequest() {
+  return {
+    type: CHATS_REQUEST,
+  }
+}
+
+export function chatsSuccess(data) {
+  return {
+    type: CHATS_SUCCESS,
+    data: data
+  }
+}
+
+export function chatsFail() {
+  return {
+    type: CHATS_FAIL,
+  }
+}
+
+export function chats() {
+  return dispatch => {
+    dispatch(chatRequest());
+    return Chat.chats().then(res => {
+      switch(res.status) {
+        case 200:
+          dispatch(chatsSuccess(res.data.conversations))
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            [{text: 'Ok', style: 'cancel'}],
+          );
+          dispatch(chatsFail())
+          return;
+        default:
+          dispatch(chatsFail());
+          return;
+      }
+    })
+  }
+}

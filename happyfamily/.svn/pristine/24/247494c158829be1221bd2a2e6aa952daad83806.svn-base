@@ -1,0 +1,42 @@
+
+
+import {
+  StyleSheet,
+  Platform,
+  Dimensions,
+  StatusBar,
+} from "react-native";
+const window = Dimensions.get('window');
+
+module.exports = StyleSheet.create({
+  container: {
+    flex: 1,
+		backgroundColor: '#fff',
+  },
+  statusBar: {
+		backgroundColor: '#fff',
+		height: Platform.Version < 21 ? 0 : StatusBar.currentHeight
+  },
+  mainSpin: {
+		width: window.width,
+		height: window.height,
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'rgba(0, 0, 0, 0.3)',
+		zIndex: 99
+	},
+	
+	ctNoti: {
+    marginTop: window.height/3,
+    alignItems: 'center',
+    justifyContent: 'center',
+	},
+	txtNoti: {
+		fontSize: 15,
+		color: '#287FC9',
+		marginTop: 5
+	},
+});

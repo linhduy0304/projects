@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.jamjavn.jamja">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <permission
+        android:name="${applicationId}.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <uses-feature android:name="android.hardware.location.gps" />
+
+    <application
+        android:name="com.jamjavn.jamja.MainApplication"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name="com.jamjavn.jamja.MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:theme="@style/SplashTheme"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <data android:scheme="amp7c25076fa43845b9c892b0a-193b81c4-8588-11e6-ab27-0098ae15fcaa" />
+
+                <!--Deeplink scheme-->
+                <data
+                    android:host="dealdetail"
+                    android:scheme="jamjalinks" />
+                <data
+                    android:host="coupon"
+                    android:scheme="jamjalinks" />
+                <data
+                    android:host="collection"
+                    android:scheme="jamjalinks" />
+
+                <data
+                    android:host="category-page"
+                    android:scheme="jamjalinks" />
+
+                <data
+                    android:host="game"
+                    android:scheme="jamjalinks" />
+
+                <!--end of Deeplink scheme-->
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <intent-filter>
+                <data android:scheme="amp7c25076fa43845b9c892b0a-193b81c4-8588-11e6-ab27-0098ae15fcaa" />
+
+                <!--weblink url-->
+                <data
+                    android:host="${firebase_page_link}"
+                    android:scheme="http" />
+
+                <data
+                    android:host="${firebase_page_link}"
+                    android:scheme="https" />
+
+                <data
+                    android:host="app.jamja.vn"
+                    android:scheme="http" />
+
+                <data
+                    android:host="app.jamja.vn"
+                    android:scheme="https" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <intent-filter>
+                <data android:scheme="amp7c25076fa43845b9c892b0a-193b81c4-8588-11e6-ab27-0098ae15fcaa" />
+
+                <!--handle from web page-->
+                <data
+                    android:host="${jamja_home_page}"
+                    android:pathPrefix="/khuyen-mai"
+                    android:scheme="http" />
+
+                <data
+                    android:host="${jamja_home_page}"
+                    android:pathPrefix="/doc-quyen"
+                    android:scheme="http" />
+
+                <data
+                    android:host="${jamja_home_page}"
+                    android:pathPrefix="/ma-giam-gia"
+                    android:scheme="http" />
+
+                <data
+                    android:host="${jamja_home_page}"
+                    android:pathPrefix="/bo-suu-tap"
+                    android:scheme="http" />
+
+                <data
+                    android:host="${jamja_home_page}"
+                    android:pathPrefix="/khuyen-mai"
+                    android:scheme="https" />
+
+                <data
+                    android:host="${jamja_home_page}"
+                    android:pathPrefix="/doc-quyen"
+                    android:scheme="https" />
+
+                <data
+                    android:host="${jamja_home_page}"
+                    android:pathPrefix="/ma-giam-gia"
+                    android:scheme="https" />
+
+                <data
+                    android:host="${jamja_home_page}"
+                    android:pathPrefix="/bo-suu-tap"
+                    android:scheme="https" />
+
+                <data
+                    android:host="${jamja_home_page}"
+                    android:pathPrefix="/deeplink"
+                    android:scheme="https" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+        </activity>
+
+        <activity
+                android:name=".module.manager.youtube.YoutubePlayerActivity" />
+
+        <activity
+            android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+
+        <activity
+            android:name=".screen.image.ImagePreviewActivity"
+            android:theme="@style/FullScreenActivityStyle"/>
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDtd31DD4JMJ1ckHlaPIbWwU_ET2OuW7tU" />
+        <meta-data
+            android:name="com.onesignal.NotificationAccentColor.DEFAULT"
+            android:value="e73a4b" />
+
+        <meta-data
+            android:name="onesignal_app_id"
+            android:value="@string/one_signal_app_id"
+            tools:replace="android:value" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/app_name" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification_icon" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorAccent" />
+
+        <service
+            android:name="com.jamjavn.jamja.services.JJFirebaseMessagingService"
+            android:stopWithTask="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!--<service android:name="io.invertase.firebase.messaging.RNFirebaseBackgroundMessagingService" />-->
+        <!--<service android:name="io.invertase.firebase.messaging.RNFirebaseMessagingService">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="com.google.firebase.MESSAGING_EVENT" />-->
+            <!--</intent-filter>-->
+        <!--</service>-->
+
+        <service android:name="io.invertase.firebase.messaging.RNFirebaseInstanceIdService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+
+        <receiver android:name="io.invertase.firebase.notifications.RNFirebaseNotificationReceiver" />
+        <receiver
+            android:name="io.invertase.firebase.notifications.RNFirebaseNotificationsRebootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="${fabric_api_key}" />
+    </application>
+
+</manifest>

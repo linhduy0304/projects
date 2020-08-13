@@ -1,0 +1,38 @@
+
+'use strict';
+
+const InitialState = require('./state').default;
+
+const {
+  EVENT_REQUEST,
+  EVENT_SUCCESS,
+  EVENT_FAIL,
+  ADD_EVENT_REQUEST,
+  ADD_EVENT_SUCCESS,
+  ADD_EVENT_FAIL,
+  } = require('../../config/actionTypes');
+
+const initialState = new InitialState;
+
+export default function reducer(state = initialState, action) {
+
+  switch (action.type) {
+    //add event
+    case ADD_EVENT_REQUEST:
+      return state.setIn(['loading'], true);
+    case ADD_EVENT_SUCCESS:
+      return state.setIn(['loading'], null);
+    case ADD_EVENT_FAIL:
+      return state.setIn(['loading'], null);
+
+    //load event
+    case EVENT_REQUEST:
+      return state.setIn(['loading'], true);
+    case EVENT_SUCCESS:
+      return state.setIn(['loading'], null).setIn(['event'], action.data);
+    case EVENT_FAIL:
+      return state.setIn(['loading'], null);
+  }
+ 
+  return state;
+}

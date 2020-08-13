@@ -1,0 +1,183 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  FlatList,
+  Dimensions,
+  Animated,
+  ScrollView,
+  Platform
+} from 'react-native';
+
+const window = Dimensions.get('window');
+
+import {Actions} from 'react-native-router-flux'
+import NavBar, { NavButton, NavGroup, NavTitle } from 'react-native-nav';
+import css from '../../Css'
+import Loading from '../../components/Loading';
+import {renderTime} from '../../components/Functions'
+import Swiper from 'react-native-swiper';
+
+import {postDetail} from '../../actions/post'
+import { connect } from 'react-redux'
+
+class HomeDetail extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: null,
+      scrollY: new Animated.Value(0),
+    }
+  }
+
+  componentWillMount() {
+    this.props.postDetail(this.props.slug)
+  } 
+  
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.post.postDetail  ) {
+      this.setState({
+        data: nextProps.post.postDetail
+      })
+    }
+  }
+
+  renderLoading() {
+    return (
+      <Loading />
+    )
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={{height: Platform.OS === 'ios' ? 20 : 0, backgroundColor: '#C6247D'}}></View>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'light-content', backgroundColor: '#C6247D'}} >
+          <NavButton/>
+          {/* <NavTitle style={css.navTitle}>
+            <Text style={css.txtTitle}>{this.props.title}</Text>
+          </NavTitle> */}
+          <NavButton/>
+          <TouchableOpacity onPress={() => Actions.pop()} style={{position: 'absolute', left: 0, padding: 15}}>
+            <Image source={require('../../images/icons/ic_back.png')} />
+          </TouchableOpacity>
+        </NavBar>
+
+        <ScrollView style={{flex: 1}}>
+          <View style={styles.ctHeader}>
+            <Image style={styles.avatar} source={this.props.data.user.avatar ? {uri: this.props.data.user.avatar+'.png'} : require('../../images/avatar_default.png')} />
+            <View style={styles.ctName}>
+              <Text style={styles.fullName}>{this.props.data.user.full_name}<Text style={styles.des}> {this.props.data.des}</Text></Text>
+              <Text style={styles.time}>{renderTime(this.props.data.created_at)}</Text>
+            </View>
+          </View>
+          {
+            this.props.data.type === 'image' ?
+              <View>
+                <Text style={styles.content}>{this.props.data.content}</Text>
+                <View style={{marginTop: 15, height: 200}}>
+                  <Swiper 
+                      style={{height: 200, width: window.width,}}
+                      loop={true}
+                      paginationStyle={{height: 30, top: 0, right: 25, justifyContent: 'flex-end'}}
+                      dot={<View style={{backgroundColor:'rgba(255,255,255,0.5)', width: 8, height: 8,borderRadius: 4, marginLeft: 3, marginRight: 3, marginTop: 3, marginBottom: 3,}} />}
+                      activeDot={<View style={{backgroundColor: '#fff', width: 8, height: 8, borderRadius: 4, marginLeft: 3, marginRight: 3, marginTop: 3, marginBottom: 3,}} />}
+                      >
+                    {
+                      this.props.data.images.map((item, index) => {
+                        return (
+                          <View style={{ height: 200, width: window.width,backgroundColor: '#000'}} key={index}>
+                            <Image  style={{height: (window.width)*170/300, resizeMode: 'contain'}} source={{uri: item + '.png'}} />
+                          </View>
+                        )
+                      })
+                    }
+                  </Swiper>
+                </View>
+              </View>
+                
+              : 
+              <View>
+                  <View style={styles.ctContent}>
+                    <Text style={styles.contentText}>{this.props.data.content}</Text>
+                  </View>
+                
+              </View>
+          }
+         
+        </ScrollView>
+        
+       
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  contentText: {
+    color: '#fff',
+    fontSize: 30,
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  ctContent: {
+    backgroundColor: '#c6247d',
+    padding: 15,
+    paddingTop: 30,
+    paddingBottom: 30
+  },
+  content: {
+    color: '#0d0e15',
+    // fontSize: 30,
+    margin: 15,
+    marginTop: 5
+  },
+  time: {
+    color: '#768196',
+    fontSize: 12,
+    marginTop: 5
+  },
+  ctName: {
+    marginLeft: 10,
+    marginRight: 10,
+    flex: 1
+  },
+  des: {
+    fontWeight: '400',
+  },
+  fullName: {
+    color: '#0d0e15',
+    fontSize: 16,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  ctHeader: {
+    flexDirection: 'row',
+    padding: 15
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  }
+})
+
+const mapStateToProps = (state) => {
+  return {
+    post: state.post,
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    postDetail: (slug) => dispatch(postDetail(slug)),
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(HomeDetail);

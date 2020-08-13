@@ -1,0 +1,56 @@
+
+
+import React from 'react'
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image
+} from 'react-native';
+
+const ItemIndividual = ({
+  onPress,
+  data
+}) => (
+  <View style={styles.ctItem}>
+  <Image source={data.avatar ? {uri: data.avatar+ '.png'} : require('../../images/avatar_default.png')} style={styles.avatar} />
+  <View style={styles.ctInfo}>
+    <Text style={styles.fullName}>{data.individual.full_name}</Text>
+    <Text style={styles.relation}>{data.relationship_type.description} của bạn.</Text>
+  </View>
+</View>
+)
+
+const styles = StyleSheet.create({
+  relation: {
+    fontSize: 13,
+    color: '#90949c',
+    fontWeight: '300'
+  },
+  fullName: {
+    fontSize: 17,
+    color: '#000',
+    fontWeight: '500'
+  },
+  ctInfo: {
+    marginLeft: 10,
+    flex: 1,
+  },
+  ctItem: {
+    flexDirection: 'row',
+    paddingBottom: 5,
+    paddingTop: 5,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e5e5',
+    alignItems: 'center'
+  },
+  avatar: {
+    width: 60,
+    height: 60
+  }
+})
+
+export default ItemIndividual;
+  

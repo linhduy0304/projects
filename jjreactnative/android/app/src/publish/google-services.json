@@ -1,0 +1,102 @@
+{
+  "project_info": {
+    "project_number": "416976341183",
+    "firebase_url": "https://jamja-ios.firebaseio.com",
+    "project_id": "jamja-ios",
+    "storage_bucket": "jamja-ios.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:416976341183:android:1780fa882db09054",
+        "android_client_info": {
+          "package_name": "com.jamja.utilities"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "416976341183-kjfq87tooai2cmpmimd4b0hnrp131b8j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jamja.utilities",
+            "certificate_hash": "74192a8a00c57f8a65d2e173f328a378fc515442"
+          }
+        },
+        {
+          "client_id": "416976341183-k9rvfm44rpoue2fe0e02ru8mh4g4grlj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgNPmTbhndMq5FfpzrQk5h2Rpdn4nP98E"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "416976341183-f2gsg0bnt34tmnvgv7fnmqorf6vvbjrk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "416976341183-087o0r1r9k688oa9uib0ifmmladofpj6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "vn.jamja.ios.JAMJA",
+                "app_store_id": "980165889"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:416976341183:android:bfe95a57538861ef",
+        "android_client_info": {
+          "package_name": "com.jamjavn.jamja"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "416976341183-tffr1a9dquusgji10lco5bvk7c6007i3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jamjavn.jamja",
+            "certificate_hash": "c5b394cff1f0dc28d54fbdc79573bc093fadc69b"
+          }
+        },
+        {
+          "client_id": "416976341183-k9rvfm44rpoue2fe0e02ru8mh4g4grlj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgNPmTbhndMq5FfpzrQk5h2Rpdn4nP98E"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

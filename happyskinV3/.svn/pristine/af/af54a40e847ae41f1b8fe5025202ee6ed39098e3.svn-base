@@ -1,0 +1,95 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  Dimensions,
+  StyleSheet,
+  Image,
+  TouchableOpacity
+} from 'react-native'
+const window = Dimensions.get('window');
+
+const Category = ({
+  source,
+  backgroundColor,
+  title,
+  sub,
+  type,
+  onPress
+}) => (
+  <TouchableOpacity onPress = {onPress} style={[css.container, {backgroundColor}]}>
+    {
+      type === 1 ?
+        <View style={css.ctImg}>
+          <Image source={source} />   
+        </View>
+      : 
+        type === 2 ?
+          <View style={css.ctImg}>
+            <View style={css.ctImg1}>
+              <Image source={source} />
+            </View>
+          </View>
+          :
+          <View style={css.ctImg}>
+            <View style={css.ctAvatar}>
+              <Image style={css.img} source={{uri: source+'.png'}} />   
+            </View>
+          </View>
+    }
+    <View>
+      <Text style={css.title}>{title}</Text>
+      <Text style={css.sub}>{sub}</Text>
+    </View>
+  </TouchableOpacity>
+)
+
+const css = StyleSheet.create({
+  ctAvatar: {
+    height: 52,
+    width: 52,
+    borderRadius: 26,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  img:{
+    height: 48,
+    width: 48,
+    borderRadius: 24
+  },
+  container: {
+    width: window.width - 20,
+    borderRadius: 7,
+    height: 100,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 15
+  },
+  title: {
+    color: '#FFF',
+    fontSize: 18,
+  },
+  sub: {
+    color: '#FFF',
+    fontSize: 14,
+  },
+  ctImg: {
+    alignItems: 'center',
+    width: 60,
+    margin: 15,
+  },
+  ctImg1: {
+    backgroundColor: '#1dc1a7',
+    height: 60,
+    width: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
+  
+})
+
+export default Category;

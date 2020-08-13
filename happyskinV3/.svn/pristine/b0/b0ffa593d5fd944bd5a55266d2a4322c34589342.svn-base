@@ -1,0 +1,164 @@
+
+'use strict';
+const InitialState = require('./cosmeticsInitialState').default;
+
+const {
+  COSMETICS_SEARCH_REQUEST,
+  COSMETICS_SEARCH_SUCCESS,
+  COSMETICS_SEARCH_FAIL,
+  ADD_PRODUCT_REQUEST,
+  ADD_PRODUCT_SUCCESS,
+  ADD_PRODUCT_FAIL,
+  COSMETICS_PRODUCT_REQUEST,
+  COSMETICS_PRODUCT_SUCCESS,
+  COSMETICS_PRODUCT_FAIL,
+  COSMETICS_PRODUCT_SUGGEST_REQUEST,
+  COSMETICS_PRODUCT_SUGGEST_SUCCESS,
+  COSMETICS_PRODUCT_SUGGEST_FAIL,
+  CM_PRODUCT_DELETE_REQUEST,
+  CM_PRODUCT_DELETE_SUCCESS,
+  CM_PRODUCT_DELETE_FAIL,
+  CM_DETAIL_REQUEST,
+  CM_DETAIL_SUCCESS,
+  CM_DETAIL_FAIL,
+  CM_PRODUCT_UPDATE_REQUEST,
+  CM_PRODUCT_UPDATE_SUCCESS,
+  CM_PRODUCT_UPDATE_FAIL,
+  CM_REVIEW_DELETE_REQUEST,
+  CM_REVIEW_DELETE_SUCCESS,
+  CM_REVIEW_DELETE_FAIL,
+  CM_REVIEW_UPDATE_REQUEST,
+  CM_REVIEW_UPDATE_SUCCESS,
+  CM_REVIEW_UPDATE_FAIL,
+  CM_REVIEW_REQUEST,
+  CM_REVIEW_SUCCESS,
+  CM_REVIEW_FAIL,
+} = require('../../libs/actionTypes');
+
+const initialState = new InitialState;
+export default function cosmeticsReducer(state = initialState, action) {
+  if (!(state instanceof InitialState)) return initialState.mergeDeep(state);
+  switch (action.type) {
+
+    case CM_REVIEW_REQUEST:
+      return state.setIn(['fetchingModal'], true);
+
+    case CM_REVIEW_SUCCESS:
+      var data = state.getIn(['cmDetail']);
+      data.user_raty = action.data;
+      return state.removeIn(['cmDetail']).setIn(['cmDetail'], data).setIn(['fetchingModal'], null).setIn(['closeModal'], true);
+
+    case CM_REVIEW_FAIL:
+      return state.setIn(['fetchingModal'], null);
+
+    //update review
+    case CM_REVIEW_UPDATE_REQUEST:
+      return state.setIn(['fetchingModal'], true);
+
+    case CM_REVIEW_UPDATE_SUCCESS:
+      var cmDetail = state.getIn(['cmDetail']);
+      cmDetail.user_raty = action.data;
+      return state.setIn(['fetchingModal'], null).removeIn(['cmDetail']).setIn(['cmDetail'],cmDetail).setIn(['closeModal'], true);
+
+    case CM_REVIEW_UPDATE_FAIL:
+      return state.setIn(['fetchingModal'], null);
+
+    //delete review
+    case CM_REVIEW_DELETE_REQUEST:
+      return state.setIn(['reviewDelete'], true);
+
+    case CM_REVIEW_DELETE_SUCCESS:
+      var cmDetail = state.getIn(['cmDetail']);
+      cmDetail.user_raty = '';
+      return state.setIn(['reviewDelete'], null).removeIn(['cmDetail']).setIn(['cmDetail'],cmDetail);
+
+    case CM_REVIEW_DELETE_FAIL:
+      return state.setIn(['reviewDelete'], null);
+
+    //;load detail
+    case CM_PRODUCT_UPDATE_REQUEST:
+      return state.setIn(['fetchingUpdate'], true);
+
+    case CM_PRODUCT_UPDATE_SUCCESS:
+      var producted = state.getIn(['producted']);
+      var producting = state.getIn(['producting']);
+      producted.unshift(action.data);
+      var newPro = producting.filter(aa =>aa.product.id != action.id);
+      return state.setIn(['fetchingUpdate'], false).removeIn(['producted']).setIn(['producted'], producted).removeIn(['producting']).setIn(['producting'],newPro);
+
+    case CM_PRODUCT_UPDATE_FAIL:
+      return state.setIn(['fetchingUpdate'], false);
+
+    //;load detail
+    case CM_DETAIL_REQUEST:
+      return state.setIn(['isFetching'], true);
+
+    case CM_DETAIL_SUCCESS:
+      return state.setIn(['isFetching'], false).setIn(['cmDetail'], action.data);
+
+    case CM_DETAIL_FAIL:
+      return state.setIn(['isFetching'], false);
+
+    //delete product
+    case CM_PRODUCT_DELETE_REQUEST:
+      return state.setIn(['fetchingDelete'], true);
+
+    case CM_PRODUCT_DELETE_SUCCESS:
+      var producting = state.getIn(['producting']);
+      producting = producting.filter(bb =>bb.product.id != action.id);
+      var producted = state.getIn(['producted']);
+      var newProducted = producted.filter(aa =>aa.product.id != action.id);
+      // console.log(newProducting)
+      return state.setIn(['fetchingDelete'], false).removeIn(['producting']).setIn(['producting'],producting).removeIn(['producted']).setIn(['producted'],newProducted);
+
+    case CM_PRODUCT_DELETE_FAIL:
+      return state.setIn(['fetchingDelete'], false);
+
+    //load product suggest
+    case COSMETICS_PRODUCT_SUGGEST_REQUEST:
+      return state.setIn(['isFetching'], true);
+
+    case COSMETICS_PRODUCT_SUGGEST_SUCCESS:
+      return state.setIn(['isFetching'], false).setIn(['productSuggest'],action.action == 'LM' ? state.getIn(['productSuggest']).concat(action.data) : action.data).setIn(['loadMore'], action.data.length >= 15 ? true : false);
+
+    case COSMETICS_PRODUCT_SUGGEST_FAIL:
+      return state.setIn(['isFetching'], false);
+
+      //load porducting
+    case COSMETICS_PRODUCT_REQUEST:
+      return state.setIn(['isFetching'], true);
+
+    case COSMETICS_PRODUCT_SUCCESS:
+      switch(action.direct) {
+        case 'producting':
+          return state.setIn(['isFetching'], false).setIn(['producting'],action.action == 'LM' ? state.getIn(['producting']).concat(action.data) : action.data).setIn(['loadMore'], action.data.length >= 15 ? true : false);
+        case 'producted':
+          return state.setIn(['isFetching'], false).setIn(['producted'],action.action == 'LM' ? state.getIn(['producted']).concat(action.data) : action.data).setIn(['loadMore'], action.data.length >= 15 ? true : false);
+        }
+
+    case COSMETICS_PRODUCT_FAIL:
+      return state.setIn(['isFetching'], false);
+
+    case ADD_PRODUCT_REQUEST:
+      return state.setIn(['isFetching'], true);
+    
+    case ADD_PRODUCT_SUCCESS:
+      var producting = state.getIn(['producting']);
+      producting.unshift(action.data);
+      return state.setIn(['isFetching'], false).removeIn(['producting']).setIn(['producting'], producting);
+    
+    case ADD_PRODUCT_FAIL: 
+      return state.setIn(['isFetching'], false)
+
+    //searchn product
+    case COSMETICS_SEARCH_REQUEST:
+      return state.setIn(['isFetching'], true).setIn(['searchProduct'], []);
+    
+    case COSMETICS_SEARCH_SUCCESS:
+      return state.setIn(['isFetching'], false).setIn(['searchProduct'], action.data);
+    
+    case COSMETICS_SEARCH_FAIL: 
+      return state.setIn(['isFetching'], false)
+  }
+  return state;
+}

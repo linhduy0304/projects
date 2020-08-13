@@ -1,0 +1,283 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+
+import {Actions} from 'react-native-router-flux';
+import NavBar, { NavButton, NavTitle } from 'react-native-nav';
+import dismissKeyboard from 'react-native/Libraries/Utilities/dismissKeyboard'
+import css from '../../Css'
+import Input from '../../components/Input';
+import Button from '../../components/Button';
+
+import {addEvent} from '../../actions/calendar';
+import { connect } from 'react-redux';
+
+import ModalTypeEvent from '../../components/calendar/ModalTypeEvent';
+import ModalTypeRemind from '../../components/calendar/ModalTypeRemind';
+import ButtonTypeCalendar from '../../components/calendar/ButtonTypeCalendar';
+import SimpleToast from 'react-native-simple-toast';
+import Loading from '../../components/Loading';
+
+class AddEvent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: '',
+      openTypeEvent: false,
+      openTypeRemind: false,
+      typeEvent: '',
+      typeRemind: [],
+      arrType: [],
+      typeCalendar: 0,  //0: âm, 1: dương
+    }
+  }
+
+  setTypeEvent(data) {
+    this.setState({
+      openTypeEvent: false, 
+      typeEvent: data,
+    })
+  }
+
+  setTypeRemind(data) {
+    var remind = this.state.typeRemind;
+    var arrType = this.state.arrType;
+    for(const i= 0; i < remind.length ; i++ ){
+      if(remind[i].type === data.type){
+        remind.splice(i, 1);
+        arrType.splice(i, 1);
+        this.setState({
+          typeRemind: remind,
+          arrType: arrType
+        })
+        return ;
+      }
+    }
+
+    //chọn không nhắc
+    if(data.type === 0) {
+      this.setState({
+        typeRemind: [data],
+        arrType: [0]
+      })
+      return;
+    }
+
+    //chọn '"không nhắc"' xong chọn cái khác
+    for(const i= 0; i < remind.length ; i++ ){
+      if(remind[i].type === 0){
+        remind.splice(i, 1);
+        arrType.splice(i, 1);
+        this.setState({
+          typeRemind: remind,
+          arrType: arrType
+        })
+      }
+    }
+    remind.unshift(data);
+    arrType.unshift(data.type)
+    this.setState({
+      typeRemind: remind,
+      arrType: arrType
+    })
+  }
+
+  addEvent() {
+    dismissKeyboard();
+    if(this.state.name === '') {
+      SimpleToast.show('Bạn phải nhập tên sự kiện');
+      return;
+    }
+    if(this.state.typeEvent === '') {
+      SimpleToast.show('Bạn phải chọn loại sự kiện');
+      return;
+    }
+    var body = {
+      name: this.state.name,
+      type_event: this.state.typeEvent.type,
+      type_time: this.state.typeCalendar,
+      time_start: this.props.date,
+      time_reminds: this.state.arrType,
+    };
+    this.props.addEvent(body);
+  }
+
+  pickEvent() {
+    dismissKeyboard();
+    this.setState({openTypeEvent: true})
+  }
+
+  pickRemind() {
+    dismissKeyboard();
+    this.setState({openTypeRemind: true})
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={{height: Platform.OS === 'ios' ? 20 : 0, backgroundColor: '#C6247D'}}></View>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'light-content', backgroundColor: '#C6247D'}} >
+          <NavButton/>
+          <NavTitle style={css.navTitle}>
+            <Text style={css.txtTitle}>{this.props.date}</Text>
+          </NavTitle>
+          <NavButton/>
+          <TouchableOpacity onPress={() => Actions.pop()} style={{position: 'absolute', left: 0, padding: 15}}>
+            <Image source={require('../../images/icons/ic_back.png')} />
+          </TouchableOpacity>
+          {/* <TouchableOpacity onPress={() => this.addEvent()} style={{position: 'absolute', right: 0, padding: 15}}>
+            <Image style={{width: 20, height: 20}} source={require('../../images/icons/ic_check_white.png')} />
+          </TouchableOpacity> */}
+        </NavBar>
+        
+        <ScrollView keyboardShouldPersistTaps={'always'}>
+          <View style={styles.content}>
+            <View style={styles.ctEvent}>
+              <Image source={require('../../images/icons/ic_event.png')} />
+              <Input 
+                title='Tên sự kiện'
+                value ={this.state.name}
+                marginLeft = {10}
+                onChange={(name) => this.setState({name})}
+              />
+            </View>
+            <TouchableOpacity onPress={() => this.pickEvent()} style={styles.ctEvent}>
+              <Image source={require('../../images/icons/ic_event.png')} />
+              <Input 
+                title='Loại sự kiện'
+                value ={this.state.typeEvent.title}
+                marginLeft = {10}
+                editable = {false}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => this.pickRemind()} style={styles.ctEvent}>
+              <Image source={require('../../images/icons/ic_remind.png')} />
+              
+              {
+                this.state.typeRemind.length === 0 ?
+                  <Input 
+                    title='Nhắc nhở'
+                    value ={''}
+                    marginLeft = {10}
+                    editable = {false}
+                  />
+                  : 
+                  <View>
+                  {
+                    this.state.typeRemind ?
+                    this.state.typeRemind.map((item, index) => {
+                      return (
+                        <Text style={{marginLeft: 10, color: '#141823'}}>{item.title}</Text>
+                      )
+                    })
+                    : null
+                  }
+                  </View>
+              }
+              
+            </TouchableOpacity>
+            
+            <View style={styles.ctCalendar}>
+              <ButtonTypeCalendar
+                title = 'Âm lịch'
+                check={this.state.typeCalendar}
+                source = {require('../../images/icons/ic_facebook.png')}
+                color = '#C6247D'
+                check = {this.state.typeCalendar === 0 ? true : null}
+                onPress = {() => this.setState({typeCalendar: 0})}
+                fontSize = {16}
+                borderWidth = {this.state.typeCalendar === 0 ? 0 : 1}
+                fontWeight = '400'
+              />
+              <ButtonTypeCalendar
+                title = 'Dương lịch'
+                source = {require('../../images/icons/ic_facebook.png')}
+                color = '#C6247D'
+                onPress = {() => this.setState({typeCalendar: 1})}
+                fontSize = {16}
+                check = {this.state.typeCalendar === 1 ? true : null}
+                borderWidth = {this.state.typeCalendar === 1 ? 0 : 1}
+                // backgroundColor = {this.state.typeCalendar === 1 ? 'rgb(38, 114, 203)' : '#fff'}
+                fontWeight = '400'
+              />
+            </View>
+            {
+              this.props.calendar.loading ?
+              <Loading title={'Đang tạo mới'}/>
+              :
+              <Button
+                title = 'Tạo mới sự kiện'
+                color = 'white'
+                onPress = {() => this.addEvent()}
+                fontSize = {16}
+                fontWeight = '500'
+                backgroundColor = '#c6247d'
+              />
+            }
+            
+          </View>
+        </ScrollView>
+        <ModalTypeEvent 
+          isOpen = {this.state.openTypeEvent}
+          onPress ={(data) => this.setTypeEvent(data)}
+          close = {() => this.setState({openTypeEvent: false})}
+          // data = {this.state.data}
+        />
+        <ModalTypeRemind 
+          data={this.state.arrType}
+          isOpen = {this.state.openTypeRemind}
+          onPress ={(data) => this.setTypeRemind(data)}
+          close = {() => this.setState({openTypeRemind: false})}
+        />
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  ctCalendar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  ctEvent: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgb(194, 196, 202)',
+    // height: 60,
+    paddingLeft: 15,
+    padding: 10,
+    marginTop: 15,
+    alignItems: 'center',
+  },
+  content: {
+    padding: 15
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  }
+})
+
+const mapStateToProps = (state) => {
+  return {
+    calendar: state.calendar,
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addEvent: (body) => dispatch(addEvent(body)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddEvent);

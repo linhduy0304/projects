@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">IPICK</string>
+    <string name="fb_app_id">119669352024584</string>
+    <string name="fb_login_protocol_scheme">fb119669352024584</string>
+</resources>

@@ -1,0 +1,174 @@
+import React, { Component } from 'react';
+import {
+    AppRegistry,
+    StyleSheet,
+    Text,
+    View,
+    ScrollView,
+    Image,
+    Dimensions,
+    TouchableOpacity,
+    TextInput,
+    Platform
+} from 'react-native';
+let deviceWidth = Dimensions.get('window').width;
+import { Actions } from "react-native-router-flux";
+import Button from "react-native-button";
+import ModalSearch from '../components/ModalSearch'
+
+var DeviceInfo = require('react-native-device-info');
+var Modal = require('react-native-modalbox');
+
+
+class ChatEmpty extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+					openModal: false,
+            data:  {
+							"id": "5a4bd399e138232e6d269ce4",
+							"username": "ashley",
+							"full_name": "ashley",
+							"first_name": "",
+							"last_name": "",
+							"coach_name": "Happy Skin's Coach",
+							"count_follow": 192,
+							"count_like": 173,
+							"avatar": "https://statics.happyskin.vn/images/avatars/bfa4db0fec0e968e3a4a778ef34d237b/bg-profile5_AnGk9j",
+							"coach_description": "LÀ MỘT BLOGGER nổi tiếng được nhiều bạn trẻ yêu thích. Là một người yêu mỹ phẩm và làm đẹp.",
+							"is_chat": 1
+					},
+        }
+    }
+
+    render() {
+        return (
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <View style={styles.nav}>
+                        <TouchableOpacity onPress={() => Actions.pop()} style={{flexDirection: 'row', alignItems: 'center'}}>
+                            <Image style={{height: 17, width: 16}} source={require('../images/icons/ic_back_white.png')}/>
+                            <Text style={styles.txtChat}>Chat</Text>
+                        </TouchableOpacity>
+												<TouchableOpacity onPress={() => this.setState({openModal: true})} style={{padding: 7}}>
+                        	<Image style={{height: 16, width: 16}} source={require('../images/icons/ic_search_white.png')} />
+												</TouchableOpacity>
+										</View>
+                    <View style={styles.boxMessage}>
+                        <Image style={{height: 69, width: 85, marginRight: 15, marginLeft: 15}} source={require('../images/icons/ic_message_white.png')} />
+                        <Text style={styles.txtMessage}>{'Tính năng Chat dành cho việc trao đổi giữa bạn và Coach.\n\n' + 'Bạn cần tham gia liệu trình để có thể sử dụng tính năng này.'}</Text>
+                    </View>
+                </View>
+                <View style={styles.content}>
+                    <Text style={styles.txtNoti}>Hiện bạn chưa tham gia liệu trình nào, hãy thử tham gia liệu trình Chat 15 phút với Coach nhé.</Text>
+                    <View style={{flexDirection: 'row',borderRadius: 5, marginTop: 10,backgroundColor: '#fff', padding: 18,flex: 1, paddingLeft: 15, paddingRight: 15, borderBottomWidth: 1, borderBottomColor: 'rgb(236, 238, 240)'}}>
+											<Image source={{uri: this.state.data.avatar+ '_100x100.png'}} style={styles.avatarCoach}/>
+											<View style={{flex: 1, marginLeft: 20}}>
+												<View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+													<View>
+														<Text style={{fontSize: 17, color: 'rgb(68, 110, 182)'}}>{this.state.data.full_name}</Text>
+														<Text style={{color: 'rgb(215, 53, 84)'}}>{this.state.data.coach_name}</Text>
+													</View>
+													<Button 
+														onPress={()=> Actions.chatBox({data: this.state.data})}
+															containerStyle={{paddingLeft: 13, paddingRight: 13, backgroundColor:"rgb(254, 117, 53)", borderRadius: 20, height: 28, justifyContent: 'center', alignItems: 'center'}}
+															style={{color: '#fff', fontSize: 14}}>
+														Hẹn lịch
+													</Button>
+												</View>
+												<Text numberOfLines={4} style={{color: 'rgb(51, 51, 51)', marginTop: 6}}>{this.state.data.coach_description}</Text>
+											</View>
+										</View>
+                </View>
+                <View style={styles.bottom}>
+                    <Text style={styles.txtNoti}>Hoặc có thể tìm kiếm liệu trình phù hợp với mình tại đây.</Text>
+                    <Image source={require('../images/icons/ic_suggest_routine.png')} style={styles.icSuggest} />
+                </View>
+								<Modal 
+									style={main.modal}
+									isOpen={this.state.openModal}
+									swipeToClose={true}
+									position="top"
+									entry="bottom"
+									animationDuration={200}
+									backdropColor="#000"
+									onClosed={()=> this.setState({openModal: false}) }>
+									<ModalSearch closeModal={() => this.setState({openModal: false})}/>
+								</Modal>
+            </View>
+        );
+    }
+}
+
+let main = require('../styles/Main');
+
+const styles = StyleSheet.create({
+	avatarCoach: {
+		height: 50,
+		width: 50,
+		borderRadius: 25,
+		borderWidth: 2,
+		borderColor: '#fff'
+	},
+    container: {
+        flex: 1,
+        backgroundColor: '#D73554',
+        paddingTop: Platform.OS === 'ios' ? 20 : DeviceInfo.getSystemVersion().slice(0, 1) != 4 ? 20 : 0,
+        paddingLeft: 15,
+        paddingRight: 15
+    },
+    header: {
+        flex:0.4,
+    },
+    content: {
+        flex:0.4,
+    },
+    bottom: {
+        flex: 0.2
+    },
+    nav: {
+        height: 44,
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    txtChat: {
+        fontSize: 32,
+        color: '#FFFFFF',
+        marginLeft: 5
+    },
+    boxMessage: {
+        flexDirection: 'row',
+        flex: 1,
+        alignItems: 'center',
+    },
+    txtMessage: {
+        flex: 1,
+        color: '#FFFFFF',
+        fontSize: 16,
+    },
+    boxSugest: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 2,
+        flexDirection: 'row',
+        padding: 15
+    },
+    txtNoti: {
+        fontSize: 14,
+        color: '#FFFFFF'
+    },
+    bottom: {
+        paddingLeft: 50,
+        width: 245,
+        justifyContent: 'flex-end',
+        flex: 0.2
+    },
+    icSuggest: {
+        width: 104,
+        height: 40,
+        paddingLeft: 15,
+        marginTop: 10
+    },
+});
+
+export default ChatEmpty;

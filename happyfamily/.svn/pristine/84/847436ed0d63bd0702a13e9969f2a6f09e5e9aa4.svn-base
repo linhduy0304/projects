@@ -1,0 +1,39 @@
+
+
+import React from 'react';
+
+let HTTP = require('./HTTP');
+let URL = require('./URL');
+
+//like
+export function like(is_like, id){
+  var body = {
+    id: id,
+  }
+  if(is_like == 1) {
+    return HTTP.postWithAuth(URL.post+'/unPick', body);
+  }else {
+    return HTTP.postWithAuth(URL.post+'/pick', body);
+  }
+}
+
+//postDetail
+export function postDetail(slug) {
+  return HTTP.get(`${URL.url}post/${slug}`);
+}
+
+//postCategory
+export function postCategory(slug) {
+  return HTTP.get(`${URL.url}category/${slug}`);
+}
+
+//category
+export function categoryLv2(id) {
+  return HTTP.get(`${URL.url}categories?category_id=${id}`);
+}
+
+//category
+export function category() {
+  return HTTP.get(`${URL.url}categories`);
+}
+

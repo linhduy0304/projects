@@ -1,0 +1,244 @@
+import React, { Component, PureComponent } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  FlatList,
+  Image,
+  Dimensions,
+  TouchableOpacity,
+  InteractionManager,
+  RefreshControl
+} from 'react-native';
+
+import { Actions } from "react-native-router-flux";
+import PostItem from '../../components/PostItem';
+import TimeAgo from "react-native-timeago";
+
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+let css = require('../../Css');
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { Map } from 'immutable';
+import * as activityActions from '../../actions/activityActions';
+
+const actions = [
+  activityActions,
+];
+function mapStateToProps(state) {
+  return {
+    activity: state.activity,
+    profile: state.profile,
+    tab: state.tab
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class FriendFeed extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isRefreshing: false,
+      page: 1,
+    }
+  }
+
+  componentWillMount() {
+    this.props.actions.friendFeedRequest();
+  }
+
+  componentDidMount() {
+    this.props.actions.friendFeed();
+    // timeout = setTimeout( () => {
+    // }, 1000);
+    // InteractionManager.runAfterInteractions(()=> {
+    //   this.props.actions.home();
+    // })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.tab.activity && nextProps.activity.friendFeed && nextProps.activity.friendFeed.length !== 0) {
+      setTimeout( () => {
+        this.refs.list.scrollToOffset({x: 0, y: 0, animated: true})
+      }, 10);
+    }
+  }
+
+  _onRefresh() {
+    this.setState({
+      isRefreshing: true,
+      page: 1
+    });
+    this.props.actions.friendFeed('RF');
+    this.setState({
+      isRefreshing: false,
+    })
+  }
+
+  loadMore() {
+    if (!this.props.activity.loadMoreFr) {
+        return;
+    }
+    this.props.actions.friendFeed('LM', this.state.page + 1);
+    this.setState({
+        page: this.state.page + 1,
+    });
+  }
+
+  _renderFooter() {
+    if(this.props.activity.loadMoreFr) {
+      return (
+        <View style={{width: deviceWidth, marginTop:20,marginBottom: 10,alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
+          <Image style={{height: 30, width: 30}} source={require('../../images/load_more.gif')} />
+          <Text style={{color: 'rgb(0, 139, 125)', fontSize: 12, marginLeft: 8}}>Đang tải</Text>
+        </View>)
+    }else return null;
+  }
+
+  profile(id) {
+    if(this.props.profile.currentUser.id == id) {
+      return null
+    }else {
+      Actions.otherProfile({id: id})
+    }
+  }
+
+  renderTime(time) {
+    var new1 = time.split(" ");
+    new2 = new1[0].split("-");
+    new3 = new2[2]+'-'+new2[1]+'-'+new2[0]+' '+new1[1]
+    return (<TimeAgo time={new3}/>)
+  }
+
+  renderItem(item) {
+    switch(item.type) {
+      case 'follow':
+        return (
+          <View style={{flexDirection: 'row', margin: 15, marginBottom: 0}} >
+            <TouchableOpacity onPress={() => this.profile(item.user_from.id)}>
+              <Image style={{height: 50, width: 50, borderRadius: 4}} source={item.user_from.avatar ? {uri: item.user_from.avatar+'_100x100.png'} : require('../../images/avatar_default.png')} />
+            </TouchableOpacity>
+            <View style={{marginLeft: 15, flex: 1, justifyContent: 'space-between'}}>
+              <Text style={styles.txtSub}><Text style={styles.txtName} onPress={() => this.profile(item.user_from.id)}>{item.user_from.full_name}</Text> vừa follow <Text style={styles.txtName} onPress={() => this.profile(item.user_to.id)}>{item.user_to.full_name}</Text></Text>
+              <Text style={styles.txtTime}>{this.renderTime(item.created_at)}</Text>
+            </View>
+            {/* <View style={styles.ctFollow}>
+              <Image style={styles.ic_follow} source={require('../../images/icons/ic_pick_plus.png')} />
+              <Text style={styles.txtPick}>Pick</Text>
+            </View> */}
+          </View>
+        );
+      case 'comment':
+        return (
+          <View style={{flexDirection: 'row', margin: 15, marginBottom: 0}} >
+            <TouchableOpacity onPress={() => this.profile(item.user_from.id)}>
+              <Image style={{height: 50, width: 50, borderRadius: 4}} source={item.user_from.avatar ? {uri: item.user_from.avatar+'_100x100.png'} : require('../../images/avatar_default.png')} />
+            </TouchableOpacity>
+            <View style={{marginLeft: 15, flex: 1, justifyContent: 'space-between'}}>
+              <Text style={styles.txtSub}><Text style={styles.txtName} onPress={() => this.profile(item.user_from.id)}>{item.user_from.full_name}</Text> vừa bình luận vào bài <Text style={styles.txtName} onPress={() => Actions.postDetail({slug: item.objects.slug})}>{item.objects.object_name}</Text></Text>
+              <Text style={styles.txtTime}>{this.renderTime(item.created_at)}</Text>
+              {/* <Text style={{fontStyle: 'italic'}} numberOfLines={2} >{item.objects.content}</Text> */}
+            </View>
+         </View>
+        );
+      case 'like':
+        return (
+          <View style={{flexDirection: 'row', margin: 15, marginBottom: 0}} >
+            <TouchableOpacity onPress={() => this.profile(item.user_from.id)}>
+              <Image style={{height: 50, width: 50, borderRadius: 4}} source={item.user_from.avatar ? {uri: item.user_from.avatar+'_100x100.png'} : require('../../images/avatar_default.png')} />
+            </TouchableOpacity>
+            <View style={{marginLeft: 15, flex: 1, justifyContent: 'space-between'}}>
+              <Text style={styles.txtSub}><Text style={styles.txtName} onPress={() => this.profile(item.user_from.id)}>{item.user_from.full_name} </Text>vừa pick bài <Text style={styles.txtName} onPress={() => Actions.postDetail({slug: item.objects.slug})}>{item.objects.object_name}</Text></Text>
+              <Text style={styles.txtTime}>{this.renderTime(item.created_at)}</Text>
+            </View>
+         </View>
+        );
+    }
+  }
+
+  render() {
+    return (
+      <View style={css.container}>
+        {
+          this.props.activity.loading ?
+            <View style={css.mainSpinTop}>
+              <Image style={{width: 50, height: 50}} source={require('../../images/loading.gif')} />
+            </View>
+          :
+          this.props.activity.friendFeed ?
+            this.props.activity.friendFeed.length == 0 ?
+              <View style={css.ctLoading}>
+                <Text>Chưa có hoạt động nào.</Text>
+              </View>
+            : 
+            <FlatList
+              ref="list"
+              contentContainerStyle={{paddingBottom: 15}}
+              onEndReached={() => this.loadMore()}
+              ListFooterComponent={() => this._renderFooter()}
+              data={this.props.activity.friendFeed}
+              onScroll= {this.props.onScroll}
+              onScrollEndDrag={(e) => this.props.scrollEnd(e)}
+              refreshControl={
+                <RefreshControl
+                    refreshing={this.state.isRefreshing}
+                    onRefresh={() => this._onRefresh()}
+                />
+              }
+              removeClippedSubviews 
+              keyExtractor={(item, index) => index.toString()}
+              onEndReachedThreshold={0.2}
+              renderItem={(data) => this.renderItem(data.item)} 
+            />
+          : null
+        }
+      </View>
+    )
+  }
+}
+
+const styles= StyleSheet.create({
+  txtSub: {
+    color: 'rgba(0, 0, 0, 0.7)',
+    fontStyle: 'italic'
+  },
+  txtName: {
+    fontWeight: 'bold',
+    fontStyle: 'normal'
+  },
+  txtTime: {
+    fontSize: 13,
+    color: 'rgb(176, 184, 198)'
+  },
+  ctFollow: {
+    flexDirection: 'row',
+    borderRadius: 12,
+    borderColor: 'rgb(176, 184, 198)',
+    borderWidth: 1,
+    height: 24,
+    paddingLeft: 5,
+    paddingRight: 12,
+    alignItems: 'center'
+  },
+  txtPick: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: 'rgb(0, 139, 125)'
+  },
+  ic_follow: {
+    marginRight: 6
+  },
+});
+export default connect(mapStateToProps, mapDispatchToProps)(FriendFeed);

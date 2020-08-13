@@ -1,0 +1,25 @@
+import React from 'react';
+
+let HTTP = require('./HTTP');
+let URL = require('./URL');
+
+//search
+export function search(typeLoad, keyword, page){
+  if(typeLoad == 'post') {
+    return HTTP.get(URL.post+ '/search?keyword='+keyword+ '&page=' +page);
+  }else {
+    return HTTP.get(URL.user+ '/search?keyword='+keyword+ '&page=' +page);
+  }
+}
+
+//
+export function popular(page){
+  return HTTP.get(URL.post+ '/popular?page='+page);
+}
+
+
+export function home(page){
+  return HTTP.get(URL.home+ '?page='+page);
+}
+
+

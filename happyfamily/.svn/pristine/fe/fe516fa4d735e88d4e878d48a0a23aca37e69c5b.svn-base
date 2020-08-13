@@ -1,0 +1,370 @@
+'use strict'
+const {
+  LOGIN_REQUEST,
+  LOGIN_SUCCESS,
+  LOGIN_FAIL,
+  REGISTER_REQUEST,
+  REGISTER_SUCCESS,
+  REGISTER_FAIL,
+  CHECK_LOGIN_SUCCESS,
+  PROFILE_SUCCESS,
+  FORGOT_PASS_REQUEST,
+  FORGOT_PASS_SUCCESS,
+  FORGOT_PASS_FAIL,
+} = require('../config/actionTypes');
+
+import {
+  Alert,
+} from 'react-native';
+
+import { Actions } from "react-native-router-flux";
+import Constant from '../services/Constant';
+import Toast from 'react-native-simple-toast';
+
+const Store = require('../services/Store').default;
+const Auth = require('../services/Auth');
+
+var buffer = require('buffer');
+
+export function logout() {
+  return dispatch => {
+    // Profile.updateStatus(notipush_key)
+    new Store().deleteSessionToken(Constant.HF_HEADER_REQUEST);
+    new Store().deleteSessionToken(Constant.HF_IS_LOGIN);
+    new Store().deleteSessionToken(Constant.HF_IS_PASS);
+    // emptyDataUser();
+    Actions.login({type: 'reset'});
+  };
+}
+
+//push noti
+export function pushNoti(token, deviceType) {
+  return dispatch => {
+    Auth.pushNoti(token, deviceType).then(res => {
+      return;
+    })
+    .catch((err) => {
+      return ;
+    })
+  }
+}
+
+//forgotPass
+export function forgotPassRequest() {
+  return {
+    type: FORGOT_PASS_REQUEST
+  };
+}
+
+export function forgotPassSuccess() {
+  return {
+    type: FORGOT_PASS_SUCCESS,
+  };
+}
+export function forgotPassFail() {
+  return {
+    type: FORGOT_PASS_FAIL,
+  };
+}
+
+export function forgotPass(email) {
+  return dispatch => {
+    dispatch(forgotPassRequest())
+    Auth.forgotPass(email).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(forgotPassFail());
+          return;
+        case 200:
+          Alert.alert(
+            'Thông báo',
+            res.message,
+            [
+              {text: 'OK', onPress: () => Actions.pop(), style: 'cancel'},
+            ]
+          )
+            dispatch(forgotPassSuccess(category))
+          return;
+        default: 
+          Toast.show(res.errors)
+          dispatch(forgotPassFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(forgotPassFail())
+    })
+  }
+}
+
+
+//loginfacebook 
+export function loginFacebook(token) {
+  return dispatch => {
+    dispatch(loginRequest());
+    return Auth.loginFacebook(token)
+    .then(function (res) {
+      switch(res.status) {
+        case 200:
+          var headers = {
+            'Authorization': '',
+            'Fbtoken': token,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          };
+          new Store().storeSession(Constant.HF_HEADER_REQUEST, headers);
+          new Store().storeSession(Constant.HF_IS_LOGIN, true);
+          // new Store().storeSession(Constant.HF_IS_PASS, true);
+          if(res.data.is_password == 1) {
+            Actions.createPass({type: 'reset'})
+            dispatch(profileUserSuccess(res.data));
+            dispatch(loginSuccess());
+          }else {
+            new Store().storeSession(Constant.HF_IS_PASS, true);
+            Actions.tab({type: 'reset'});
+            dispatch(profileUserSuccess(res.data));
+            dispatch(loginSuccess());
+          }
+          return;
+        case 500:
+          dispatch(loginFail());
+          return;
+        default:
+          dispatch(loginFail(res.errors));
+          return;
+      }
+    })
+    .catch((error) => {
+      dispatch(loginFail(error));
+    });
+  };
+}
+//check login
+
+export function checkLoginSuccess() {
+  return {
+    type: CHECK_LOGIN_SUCCESS
+  };
+}
+
+
+export function dataUser() {
+  return dispatch => {
+    new Store().getSession(Constant.HF_HEADER_REQUEST).then(headers => {
+      return Auth.checkLogin(headers).then(res => {
+        switch(res.status) {
+          case 200:
+            dispatch(profileUserSuccess(res.data));
+            return;
+          default: 
+            Alert.alert(
+              'Thông báo!',
+              'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+              {text: 'Ok', style: 'cancel'},
+            );
+            return;
+        }
+      })
+    })
+  }
+}
+
+
+export function checkLogin() {
+  return dispatch => {
+    new Store().getSession(Constant.HF_IS_LOGIN).then((is_login) => {
+      if(is_login) {
+        new Store().getSession(Constant.HF_IS_PASS).then(is_pass => {
+          if(is_pass) {
+            new Store().getSession(Constant.HF_HEADER_REQUEST).then(headers => {
+              return Auth.checkLogin(headers).then(res => {
+                switch(res.status) {
+                  case 200:
+                     new Store().storeSession(Constant.HF_DATA_USER, res.data);
+                    dispatch(profileUserSuccess(res.data));
+                    Actions.tab({type: 'reset'});
+                    return;
+                  default: 
+                    Alert.alert(
+                      'Thông báo!',
+                      'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+                      {text: 'Ok', style: 'cancel'},
+                    );
+                    return;
+                }
+              })
+            })
+          }else {
+            new Store().getSession(Constant.HF_HEADER_REQUEST).then(headers => {
+              return Auth.checkLogin(headers).then(res => {
+                switch(res.status) {
+                  case 200:
+                     new Store().storeSession(Constant.HF_DATA_USER, res.data);
+                    dispatch(profileUserSuccess(res.data));
+                    Actions.createPass({type: 'reset'});
+                    return;
+                  default: 
+                    Alert.alert(
+                      'Thông báo!',
+                      'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+                      [
+                        {text: 'Ok', style: 'cancel'},
+                      ]
+                    );
+                    return;
+                }
+              })
+            })
+          }
+        });
+        
+      }else {
+        new Store().getSession(Constant.HF_IS_FIRST).then((is_first) => {
+          if(is_first) {
+            Actions.login({type: 'reset'})
+          }else {
+            Actions.welcome({type: 'reset'})
+          }
+        })
+      }
+    })
+  };
+}
+
+//Login
+export function loginRequest() {
+  return {
+    type: LOGIN_REQUEST
+  };
+} 
+
+export function loginSuccess() {
+  return {
+    type: LOGIN_SUCCESS
+  };
+} 
+
+export function loginFail(error) {
+  return {
+    type: LOGIN_FAIL,
+    error: error
+  };
+}
+
+export function profileUserSuccess(data) {
+  return {
+    type: PROFILE_SUCCESS,
+    data: data
+  };
+}
+
+export function login(username, password) {
+  return dispatch => {
+    dispatch(loginRequest());
+    return Auth.submitLogin(username, password)
+      .then(function (res) {
+        switch(res.status) {
+          case 200:
+            var b = new buffer.Buffer(username + ':' + password);
+            var auth = 'Basic ' + b.toString('base64');
+            var headers = {
+              'Authorization': auth,
+              'Fbtoken': '',
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            };
+            new Store().storeSession(Constant.HF_HEADER_REQUEST, headers);
+            new Store().storeSession(Constant.HF_IS_LOGIN, true);
+            new Store().storeSession(Constant.HF_IS_PASS, true);
+            Actions.tab({type: 'reset'});
+            dispatch(profileUserSuccess(res.data));
+            dispatch(loginSuccess());
+            return;
+          case 500:
+            Alert.alert(
+              'Thông báo!',
+              'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+              [
+                {text: 'Ok', style: 'cancel'},
+              ]
+            );
+            dispatch(loginFail(res.errors));
+            return;
+          default:
+            dispatch(loginFail(res.errors));
+            return;
+        }
+      })
+      .catch((error) => {
+        dispatch(loginFail(error));
+      });
+  };
+}
+
+//Register
+export function registerRequest() {
+  return {
+    type: REGISTER_REQUEST
+  };
+}
+
+export function registerSuccess() {
+  return {
+    type: REGISTER_SUCCESS
+  };
+}
+export function registerFail(error) {
+  return {
+    type: REGISTER_FAIL,
+    error: error
+  };
+}
+
+export function submitRegister(dataUser) {
+  return dispatch => {
+    dispatch(registerRequest());
+    return Auth.submitRegister(dataUser)
+      .then(function (res) {
+        switch(res.status) {
+          case 200:
+            var b = new buffer.Buffer(dataUser.username + ':' + dataUser.password);
+            var auth = 'Basic ' + b.toString('base64');
+            var headers = {
+              'Authorization': auth,
+              'Fbtoken': '',
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            };
+            new Store().storeSession(Constant.HF_HEADER_REQUEST, headers);
+            new Store().storeSession(Constant.HF_IS_LOGIN, true);
+            new Store().storeSession(Constant.HF_IS_PASS, true);
+            dispatch(registerSuccess());
+            // Actions.app({'type': 'reset'});
+            dispatch(profileUserSuccess(res.data));
+            Actions.tab({type: 'reset'})
+            return;
+          case 500: 
+            Alert.alert(
+              'Thông báo!',
+              'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+              [
+                {text: 'Ok', style: 'cancel'},
+              ]
+            );
+            dispatch(registerFail(res.errors));  
+            return;
+          default:
+            Toast.show(res.errors)
+            dispatch(registerFail(res.errors));  
+            return;
+        }
+      })
+      .catch((error) => {
+        dispatch(registerFail(error));
+      });
+  };
+}

@@ -1,0 +1,288 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ * @flow
+ */
+
+import React, { Component } from 'react';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView
+} from 'react-native';
+
+import NavBar, { NavButton, NavGroup, NavTitle } from 'react-native-nav';
+import { Actions } from "react-native-router-flux";
+import { TextField } from 'react-native-material-textfield';
+import Button from "react-native-button";
+import dismissKeyboard from 'react-native/Libraries/Utilities/dismissKeyboard'
+import {validateEmail} from '../components/Functions'
+import Spinner from "react-native-spinkit";
+import NoInternet from '../components/NoInternet'
+//import RNFirebase from 'react-native-firebase';
+import RNFirebase from 'react-native-firebase';
+
+var {FBLogin, FBLoginManager} = require('react-native-facebook-login');
+let css = require('../Css');
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import {Map} from 'immutable';
+import * as authActions from '../actions/authActions';
+const actions = [
+  authActions
+];
+
+function mapStateToProps(state) {
+  return {
+    auth: state.auth
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class Register extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      full_name: '',
+      user_name: '',
+      email: '',
+      password: '',
+      confirm_password: '',
+      error: '',
+    }
+  }
+
+  componentWillMount() {
+    var firebase = RNFirebase.initializeApp({ debug: false });
+    firebase.analytics().logEvent("Register_Screen");
+  }
+
+  loginWithFacebook() {
+    var _this = this;
+    if(Platform.OS == 'android') {
+      FBLoginManager.loginWithPermissions(["email","user_friends"], function(error, data){
+        
+        if(data){
+          var token = data.credentials.token;
+          _this.props.actions.loginFacebook(token);
+        }
+      });
+    }else {
+      FBLoginManager.getCredentials(function(error, data){
+        if (error) {
+          FBLoginManager.loginWithPermissions(["email","user_friends"],function (error, data) {
+            if (!error) {
+              var token = data.credentials.token;
+              _this.props.actions.loginFacebook(token);
+            }
+          })
+        } else {
+          var token = data.credentials.token;
+              _this.props.actions.loginFacebook(token);
+        }
+      });
+    }
+  }
+
+  submitRegister() {
+    this.setState({error: ''});
+    dismissKeyboard();
+    if(this.state.full_name == '' || this.state.user_name == '' || this.state.confirm_password == '' || this.state.email == '' || this.state.password == '') {
+      this.setState({
+        error: 'Các trường không được để trống!'
+      });
+      return ;
+    };
+    if(!validateEmail(this.state.email)) {
+      this.setState({
+        error: 'Email không đúng định dạng.'
+      });
+      return
+    };
+    if(this.state.password.length < 6 || this.state.confirm_password.length < 6) {
+      this.setState({
+        error: 'Mật khẩu không được nhỏ hơn 6 ký tự.'
+      })
+      return;
+    };
+    if(this.state.password.length != this.state.confirm_password.length) {
+      this.setState({
+        error: 'Mật khẩu không khớp nhau.'
+      })
+      return;
+    }
+    var body = {
+      full_name: this.state.full_name,
+      username: this.state.user_name,
+      email: this.state.email,
+      password: this.state.password,
+      password_confirmation: this.state.confirm_password,
+    };
+    this.props.actions.submitRegister(body);
+  }
+
+  render() {
+    return (
+      <View style={css.container}>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'dark-content', backgroundColor: '#fff'}} >
+          <NavGroup>
+            <NavButton onPress={() => Actions.pop()} style={css.navBack}  >
+              <Image style={{height: 12, width: 13}} source={require('../images/icons/ic_back.png')} />
+            </NavButton>
+            <View style={{marginLeft: 9,justifyContent: 'center'}}>
+              <Text style={css.txtTitle}>Đăng ký tài khoản</Text>
+            </View>
+          </NavGroup>
+        </NavBar>
+        <NoInternet />
+        
+        <ScrollView
+        bounces={false}
+        keyboardShouldPersistTaps={'always'}>
+          <View style={styles.body}>
+            <TextField
+              label='Tên hiển thị'
+              autoCorrect={false}
+              onChangeText={(full_name) => this.setState({full_name: full_name})}
+              onSubmitEditing={() => this.refs.username.focus()}
+              tintColor="rgb(194, 196, 202)"
+              textColor="rgb(31, 42, 53)"
+              baseColor="rgb(194, 197, 208)"
+              autoCapitalize="none"
+              selectionColor="rgb(41, 162, 104)"
+              value={this.state.full_name}
+            />
+            <TextField
+              label='Tên đăng nhập'
+              ref="username"
+              autoCorrect={false}
+              onChangeText={(user_name) => this.setState({user_name: user_name})}
+              onSubmitEditing={() => this.refs.email.focus()}
+              tintColor="rgb(194, 196, 202)"
+              textColor="rgb(31, 42, 53)"
+              baseColor="rgb(194, 197, 208)"
+              autoCapitalize="none"
+              selectionColor="rgb(41, 162, 104)"
+              value={this.state.user_name}
+            />
+            <TextField
+              label='Email'
+              ref="email"
+              autoCorrect={false}
+              onChangeText={(email) => this.setState({email: email})}
+              onSubmitEditing={() => this.refs.password.focus()}
+              tintColor="rgb(194, 196, 202)"
+              textColor="rgb(31, 42, 53)"
+              baseColor="rgb(194, 197, 208)"
+              autoCapitalize="none"
+              selectionColor="rgb(41, 162, 104)"
+              value={this.state.email}
+            />
+            <TextField
+              ref="password"
+              label='Mật khẩu'
+              onChangeText={(password) => this.setState({password: password})}
+              onSubmitEditing={ () => this.refs.confirm_password.focus()}
+              tintColor="rgb(194, 196, 202)"
+              textColor="rgb(31, 42, 53)"
+              baseColor="rgb(194, 196, 202)"
+              autoCapitalize="none"
+              selectionColor="rgb(41, 162, 104)"
+              secureTextEntry={true}
+              value={this.state.password}
+            />
+            <TextField
+              ref="confirm_password"
+              label='Xác nhận mật khẩu'
+              onChangeText={(confirm_password) => this.setState({confirm_password: confirm_password})}
+              onSubmitEditing={ () => this.submitRegister() }
+              tintColor="rgb(194, 196, 202)"
+              textColor="rgb(31, 42, 53)"
+              baseColor="rgb(194, 196, 202)"
+              autoCapitalize="none"
+              selectionColor="rgb(41, 162, 104)"
+              secureTextEntry={true}
+              value={this.state.confirm_password}
+            />
+            {
+              this.state.error == '' ? null :
+                <Text style={{marginTop: 10, color: 'red'}}>{this.state.error}</Text>
+            }
+            <Button 
+              containerStyle={styles.btnRegister}
+              style={styles.txtRegister}
+              onPress={() => this.submitRegister()}
+              >
+              Đăng ký tài khoản
+            </Button>
+            <Text style={styles.txtOr}>Hoặc, bạn có thể đăng ký qua Facebook</Text>
+            <Button 
+              containerStyle={styles.btnFb}
+              style={styles.txtRegister}
+              onPress={() => this.loginWithFacebook()}
+              >
+              <Image style={{marginRight: 24}} source={require('../images/icons/ic_facebook.png')} />
+              Đăng nhập qua Facebook
+            </Button>
+          </View>
+        </ScrollView>
+        {
+          this.props.auth.isFetching ? 
+            <View style={css.mainSpin}>
+              <Spinner isFullScreen={true} isVisible={true} size={50} type={'Circle'} color={'#FFFFFF'}/>
+            </View> : null
+        }
+      </View>
+    )
+  }
+}
+
+const styles= StyleSheet.create({
+  txtOr: {
+    fontSize: 16,
+    color: 'rgb(31, 42, 53)',
+    marginTop: 20
+  },
+  btnFb: {
+    marginTop: 16,
+    marginBottom: 20,
+    height: 48,
+    backgroundColor:"rgb(38, 114, 203)", 
+    borderRadius: 4, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+  },
+  txtRegister: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  btnRegister: {
+    marginTop: 30,
+    height: 48,
+    backgroundColor:"rgb(48, 88, 154)", 
+    borderRadius: 4, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+  },
+  body: {
+    padding: 15,
+    paddingTop: 5
+  }
+});
+export default connect(mapStateToProps, mapDispatchToProps)(Register);
+
+

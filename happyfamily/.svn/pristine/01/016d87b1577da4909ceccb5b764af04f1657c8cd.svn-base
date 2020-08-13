@@ -1,0 +1,24 @@
+
+
+const {Record} = require('immutable');
+const {
+  POST
+} = require('../../config/actionTypes');
+
+var InitialState = Record({
+  state: POST,
+  loading: null,
+  loadMore: null,
+  category: null,
+  categoryLv2: null,
+  postCategory: null,
+  postDetail: null,
+
+  loadComment: null,
+  comments: null,
+  loadMoreComment: null,
+
+});
+
+export default InitialState;
+

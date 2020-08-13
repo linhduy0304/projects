@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/24x24_mall_o</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M20,6 C21.654,6 23,7.346 23,9 C23,10.654 21.654,12 20,12 L18.242,12 L9.121,21.121 C8.555,21.688 7.801,22 7,22 L4,22 C2.346,22 1,20.654 1,19 C1,17.346 2.346,16 4,16 L5.758,16 L8,13.758 L8,9 C8,7.9 8.9,7 10,7 C11.1,7 12,7.9 12,9 L12,9.758 L14.879,6.879 C15.445,6.312 16.199,6 17,6 L20,6 Z M20,10 C20.553,10 21,9.553 21,9 C21,8.447 20.553,8 20,8 L17,8 C16.734,8 16.48,8.105 16.293,8.293 L12,12.586 L8.913,15.673 L6.586,18 L4,18 C3.447,18 3,18.447 3,19 C3,19.553 3.447,20 4,20 L7,20 C7.266,20 7.52,19.895 7.707,19.707 L17.414,10 L20,10 Z M10,6 C8.896,6 8,5.104 8,4 C8,2.896 8.896,2 10,2 C11.104,2 12,2.896 12,4 C12,5.104 11.104,6 10,6 Z" id="path-1"></path>
+    </defs>
+    <g id="icon/24x24_mall_o" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="24x24_mall_o" fill-rule="nonzero"></g>
+        <g id="COLOR/JJ_4.black" mask="url(#mask-2)" fill="#0F0A0A">
+            <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        </g>
+    </g>
+</svg>

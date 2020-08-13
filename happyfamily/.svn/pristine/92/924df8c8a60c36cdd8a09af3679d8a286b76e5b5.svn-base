@@ -1,0 +1,158 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity
+} from 'react-native';
+import css from '../../Css';
+import {Actions} from 'react-native-router-flux';
+import MyMessage from '../../components/chat/MyMessage';
+import OtherMessage from '../../components/chat/OtherMessage';
+import ButtonInput from '../../components/chat/ButtonInput';
+import Toast from 'react-native-simple-toast';
+import NavBar, { NavButton, NavGroup, NavTitle } from 'react-native-nav';
+// import io from 'socket.io-client';
+
+import {chatDetail} from '../../actions/chat'
+import { connect } from 'react-redux'
+import io from 'socket.io-client';
+
+const socket = io('http://42.112.20.90:4001/', { transports: ['websocket'] });
+
+class ChatOne extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      message: '',
+      data: [
+        {
+          id: 1,
+          content: 'alo'
+        },
+        {
+          id: 2,
+          content: 'Far from the countries vokaloa and'
+        },
+        {
+          id: 1,
+          content: 'there live the blind'
+        },{
+          id: 2,
+          content: 'there live the blind'
+        },{
+          id: 1,
+          content: 'there live the blind'
+        },{
+          id: 2,
+          content: 'there live the blind'
+        },{
+          id: 1,
+          content: 'there live the blind'
+        }
+      ]
+    }
+  }
+
+  componentWillMount() {
+    this.props.chatDetail(this.props.id)
+  }
+
+  renderChat(data, index) {
+    switch(data.id) {
+      case 1:
+        return <MyMessage key={index} data={data}/>
+      default:
+        return <OtherMessage key={index} data={data}/>
+    }
+  }
+
+  send() {
+    if(this.state.message === '') {
+      Toast.show('You must enter characters');
+      return;
+    }
+    var arr = this.state.data;
+    var message = {
+      id: 1,
+      content: this.state.message
+    };
+    arr.push(message)
+    this.setState({
+      data: arr,
+      message: ''
+    })
+    setTimeout(() => {
+      this.refs.scroll.scrollToEnd({animated: true});
+    }, 100)
+  }
+
+  render() {
+    console.log(this.props.chat.chatDetail)
+    return (
+      <View style={{flex: 1}}>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'light-content', backgroundColor: '#297FCA'}} >
+          <NavButton/>
+          <NavTitle style={css.navTitle}>
+            <Text style={[css.txtTitle, {fontWeight: '400'}]}>{this.props.title}</Text>
+          </NavTitle>
+          <NavButton/>
+          <TouchableOpacity onPress={() => Actions.pop()} style={{position: 'absolute', left: 0, padding: 15}}>
+            <Image source={require('../../images/icons/ic_back.png')} />
+          </TouchableOpacity>
+          <TouchableOpacity style={{position: 'absolute', right: 0, padding: 15}}>
+            <Image source={require('../../images/icons/ic_user.png')} />
+          </TouchableOpacity>
+        </NavBar>
+
+        <ScrollView ref='scroll' style={styles.container}>
+          {
+            this.props.chat.chatDetail ?
+              this.props.chat.chatDetail.messages.length === 0 ?
+              <View style={css.ctNoti}>
+                <Image source={require('../../images/icons/ic_message.png')} />
+                <Text style={css.txtNoti}>No message here yet</Text>
+              </View>
+              :
+              this.props.chat.chatDetail.messages.map((data, index) => {
+                return this.renderChat(data, index)
+              })
+            : null
+          }
+        </ScrollView>
+        <ButtonInput
+          value = {this.state.message}
+          onChange={(message) => this.setState({message: message})}
+          send = {() => this.send()}
+        />
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  
+  container: {
+    flex: 1,
+    // backgroundColor: '#E3F1FD'
+    backgroundColor: '#F7FCFE'
+  }
+})
+
+const mapStateToProps = (state) => {
+  return {
+    chat: state.chat
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    chatDetail: (id) => dispatch(chatDetail(id)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ChatOne);

@@ -1,0 +1,26 @@
+
+'use strict';
+
+const InitialState = require('./state').default;
+
+const {
+  HOME_REQUEST,
+  HOME_SUCCESS,
+  HOME_FAIL,
+  } = require('../../config/actionTypes');
+
+const initialState = new InitialState;
+
+export default function reducer(state = initialState, action) {
+
+  switch (action.type) {
+    case HOME_REQUEST:
+      return state.setIn(['loading'], true);
+    case HOME_SUCCESS:
+      return state.setIn(['loading'], null).setIn(['home'], action.data);
+    case HOME_FAIL:
+      return state.setIn(['loading'], null);
+  }
+ 
+  return state;
+}

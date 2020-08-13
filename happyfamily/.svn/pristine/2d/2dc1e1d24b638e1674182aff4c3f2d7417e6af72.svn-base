@@ -1,0 +1,160 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ * @flow
+ */
+
+import React, { Component } from 'react';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  BackHandler,
+  AppRegistry
+} from 'react-native';
+
+import TabNavigator from 'react-native-tab-navigator';
+import { Actions } from "react-native-router-flux";
+import Chat from './chat/Chat'
+import Setting from './setting/Setting'
+import Category from './posts/Category';
+import Calendar from './calendar/Calendar';
+import Home from './home/Home';
+import RNFirebase from 'react-native-firebase';
+
+import Constant from '../services/Constant';
+let css = require('../Css');
+const Store = require('../services/Store').default;
+
+import {dataUser} from '../actions/auth'
+import { connect } from 'react-redux'
+
+class Tab extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      page: this.props.page ? this.props.page : 'home',
+    }
+  }
+
+  componentWillMount() {
+    if(this.props.profile.currentUser === null) {
+      this.props.dataUser()
+    }
+    new Store().getSession(Constant.HF_DATA_USER).then(data => {
+      var data = {
+        client: data.id
+      }
+      this.props.socket.emit('online', data)
+      this.props.socket.on('connect', () => {
+        this.props.socket.emit('online', data)
+      });
+    })
+
+    RNFirebase.messaging().getToken()
+    .then(token => {
+      // if (token) {
+      //   // user has a device token
+      //   this.props.actions.pushNoti(token, Platform.OS === 'android' ? 'ipickAndroid' : 'ipickIOS')
+      // } else {
+      //   // user doesn't have a device token yet
+      // } 
+    });
+  }
+  
+
+  changeTab(page) {
+    // if(!this.props.home.isFetching) {
+    //   if(this.state.page == page){
+    //     this.props.actions.scrollToTop(page);
+    //   }
+    // }
+    this.setState({page: page});
+  }
+
+  render() {
+    return (
+        <TabNavigator tabBarStyle={styles.tabNavigator}>
+        <TabNavigator.Item
+          selected={this.state.page === 'home'}
+          renderIcon={() => <Image source={require('../images/icons/ic_home.png')} />}
+          renderSelectedIcon={() => <Image source={require('../images/icons/ic_home_active.png')} />}
+          tabStyle={styles.tabStyle}
+          onPress={() => this.changeTab('home')}>
+          <Home/>
+        </TabNavigator.Item>
+        <TabNavigator.Item
+          selected={this.state.page === 'post'}
+          renderIcon={() => <Image source={require('../images/icons/ic_post.png')} />}
+          renderSelectedIcon={() => <Image source={require('../images/icons/ic_post_active.png')} />}
+          tabStyle={styles.tabStyle}
+          onPress={() => this.changeTab('post')}>
+          <Category/>
+        </TabNavigator.Item>
+        <TabNavigator.Item
+          selected={this.state.page === 'chat'}
+          renderIcon={() => <Image source={require('../images/icons/ic_chat_1.png')} />}
+          renderSelectedIcon={() => <Image source={require('../images/icons/ic_chat_active.png')} />}
+          tabStyle={styles.tabStyle}
+          onPress={() => this.changeTab('chat')}>
+          <Chat socket = {this.props.socket}/>
+        </TabNavigator.Item>
+        <TabNavigator.Item
+          selected={this.state.page === 'calendar'}
+          renderIcon={() => <Image source={require('../images/icons/ic_calendar.png')} />}
+          renderSelectedIcon={() => <Image source={require('../images/icons/ic_calendar_active.png')} />}
+          tabStyle={styles.tabStyle}
+          onPress={() => this.changeTab('calendar')}>
+          <Calendar/>
+        </TabNavigator.Item>
+        <TabNavigator.Item
+          selected={this.state.page === 'setting'}
+          renderIcon={() => <Image source={require('../images/icons/ic_profile.png')} />}
+          renderSelectedIcon={() => <Image source={require('../images/icons/ic_profile_active.png')} />}
+          tabStyle={styles.tabStyle}
+          onPress={() => this.changeTab('setting')}>
+          <Setting/>
+        </TabNavigator.Item>
+        
+      </TabNavigator>
+    )
+  }
+}
+
+const styles= StyleSheet.create({
+
+  tabTitle: {
+    backgroundColor: 'red'
+  },
+  tabNavigator: {
+    backgroundColor: "#FFFFFF",
+    justifyContent: 'center',
+    flex: 1,
+    height: 49,
+    borderTopColor: 'rgb(236, 238, 240)',
+    borderTopWidth: 1,
+  },
+  tabStyle: {
+    paddingBottom: 0,
+    justifyContent: 'center'
+  }
+});
+
+const mapStateToProps = (state) => {
+  return {
+    chat: state.chat,
+    profile: state.profile
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dataUser: () => dispatch(dataUser()),
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(Tab);
+
+

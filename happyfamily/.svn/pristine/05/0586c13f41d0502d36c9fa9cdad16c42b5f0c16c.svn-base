@@ -1,0 +1,64 @@
+
+import React from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  TextInput
+} from 'react-native';
+
+const ButtonInput = ({
+  onChange = message,
+  send,
+  value,
+}) => (
+  <View style={styles.container}>
+    <Image source={require('../../images/icons/ic_camera_blue.png')} />
+    <View style={styles.ctInput}>
+      <TextInput
+        value={value}
+        onChangeText={(message) => onChange(message)}
+        underlineColorAndroid='transparent'
+        placeholder='Message'
+        placeholderTextColor='#287FC9'
+        style={styles.input}
+      />
+      <Image source={require('../../images/icons/ic_icons.png')} />
+    </View>
+    <TouchableOpacity style={{padding: 10}} onPress={send}>
+      <Image style={{height: 25, width: 25}} source={require('../../images/icons/ic_send.png')} />
+    </TouchableOpacity>
+  </View>
+)
+
+const styles = StyleSheet.create({
+  input: {
+    flex: 1,
+    padding: 0,
+    paddingLeft: 10
+  },
+  ctInput: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    marginLeft: 15,
+    marginRight: 5,
+    alignItems: 'center',
+    paddingRight: 10
+  },
+  container: {
+    height: 50,
+    backgroundColor: '#E3F1FD',
+    flexDirection: 'row',
+    padding: 8,
+    paddingLeft: 15,
+    paddingRight: 15,
+    alignItems: 'center'
+  },
+})
+
+export default ButtonInput;
+  

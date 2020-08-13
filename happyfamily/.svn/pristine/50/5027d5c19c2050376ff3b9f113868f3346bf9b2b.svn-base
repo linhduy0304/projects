@@ -1,0 +1,139 @@
+
+
+import React from 'react';
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Image,
+  Text,
+  Dimensions,
+} from 'react-native';
+import {Actions} from 'react-native-router-flux'
+import Carousel from 'react-native-snap-carousel';
+import Button from '../components/Button'
+import Constant from '../services/Constant';
+
+const size = Dimensions.get('window')
+const Store = require('../services/Store').default;
+
+class Welcome extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      currentIndex: 0,
+      slide: [
+        {
+          title: 'Mẹo vặt cuộc sống',
+          content: 'Tại Happy Family, tin tức được tổng hợp và chọn lọc bởi cộng đồng và công nghệ xử lý dữ liệu nhằm đem tới cho độc giả những nội dung chất lượng nhất.',
+          image_thumb: require('../images/intro1.png'),
+        },
+        {
+          title: 'Kết nối gia đình, chia sẻ khoảnh khắc đáng nhớ',
+          content: 'Cả gia đình luôn luôn giữ được kết nối bất cứ khi nào, chia sẻ được những khoảnh khắc đáng nhớ cùng nhau.',
+          image_thumb: require('../images/intro2.png'),
+        },
+        {
+          title: 'Cân bằng cuộc sống và công việc một cách hợp lý',
+          content: 'Theo dõi, nhận thông báo nhắc nhở về các sự kiện trong gia đình, công việc để cân bằng hơn trong cuộc sống.',
+          image_thumb: require('../images/intro3.png'),
+        },
+      ]
+    }
+  }
+
+  start() {
+    new Store().storeSession(Constant.HF_IS_FIRST, true);
+    Actions.login({type: 'reset'});
+  }
+
+
+  _renderItem ({item, index}) {
+    return (
+      <View style={{alignItems: 'center',marginTop: 15, width:size.width - 100}}>
+        <Image style={{width: size.width - 100, height: (size.width-100)*450/650, borderRadius: 10}} source={item.image_thumb} />
+        <Text style={{marginTop: 20, fontSize: 20, textAlign: 'center', color: '#c6247d', maxWidth: size.width-150}}>{item.title}</Text>
+        <Text style={{fontSize: 16, color: 'rgb(78, 83, 93)', marginTop: 10, textAlign: 'center'}}>{item.content}</Text>
+      </View>
+    )
+  }
+
+  changeIndex = (currentIndex) => {
+    this.setState({
+      currentIndex: currentIndex
+    })
+  }
+
+  render() {
+    return(
+      <View style={[styles.container]}>
+        <ScrollView style={{flex: 1}}>
+          <View style={{alignItems: 'center', paddingBottom: 20}}>
+            <Image source={require('../images/logo.png')} style={styles.logo}/>
+            <Carousel
+              ref={'carousel'}
+              data={this.state.slide}
+              onSnapToItem={this.changeIndex}
+              renderItem={this._renderItem.bind(this)}
+              sliderWidth={size.width}
+              itemWidth={size.width-100}
+              inactiveSlideScale={0.7}
+              inactiveSlideOpacity={0.5}
+            />
+            {
+              this.state.currentIndex == 2 ?
+                <TouchableOpacity onPress={() => this.start()} style={styles.btnRegister}>
+                  <Text style={styles.txtRegister}>Bắt đầu</Text>
+                </TouchableOpacity>
+                
+              :
+                <TouchableOpacity onPress={() => { this.refs.carousel.snapToNext()}} style={styles.ctGo}>
+                  <Text style={styles.txtGo}>Tiếp tục</Text>
+                  <Image source={require('../images/icons/ic_arrow_next.png')} />
+                </TouchableOpacity>
+            }
+          </View>
+        </ScrollView>
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+		backgroundColor: '#fff',
+  },
+  txtRegister: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  btnRegister: {
+    marginTop: 20,
+    height: 48,
+    paddingLeft: 40,
+    paddingRight: 40,
+    backgroundColor:"#c6247d", 
+    borderRadius: 4, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+  },
+  ctGo: {
+    flexDirection: 'row', 
+    padding: 5, 
+    alignItems: 'center',
+    marginTop: 20
+  },
+  txtGo: {
+    fontSize: 16,
+    color: '#c6247d',
+    fontWeight: 'bold',
+    marginRight: 12
+  },
+  logo: {
+    marginTop: 15
+  },
+})
+
+export default Welcome;

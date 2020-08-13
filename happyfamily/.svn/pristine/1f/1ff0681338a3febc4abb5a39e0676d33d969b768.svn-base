@@ -1,0 +1,330 @@
+
+'use strict'
+import { Alert } from 'react-native';
+import {Actions} from 'react-native-router-flux'
+import SimpleToast from 'react-native-simple-toast';
+const {
+  CATEGORY_REQUEST,
+  CATEGORY_SUCCESS,
+  CATEGORY_FAIL,
+  CATEGORY_LV2_SUCCESS,
+  POST_CATE_REQUEST,
+  POST_CATE_SUCCESS,
+  POST_CATE_FAIL,
+  POST_DETAIL_REQUEST,
+  POST_DETAIL_SUCCESS,
+  POST_DETAIL_FAIL,
+  LIKE_REQUEST,
+  LIKE_SUCCESS,
+  LIKE_FAIL,
+  LOAD_COMMENT_REQUEST,
+  LOAD_COMMENT_SUCCESS,
+  LOAD_COMMENT_FAIL,
+  COMMENT_REQUEST,
+  COMMENT_SUCCESS,
+  COMMENT_FAIL,
+
+} = require('../config/actionTypes');
+const Post = require('../services/Post');
+
+// comment
+export function commentRequest() {
+  return {
+    type: COMMENT_REQUEST
+  };
+}
+
+export function commentSuccess(data) {
+  return {
+    type: COMMENT_SUCCESS,
+    data: data,
+  };
+}
+export function commentFail() {
+  return {
+    type: COMMENT_FAIL,
+  };
+}
+
+export function sendComment(body) {
+  return dispatch => {
+    dispatch(commentRequest())
+    Post.sendComment(body).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            [{text: 'Ok', style: 'cancel'}],
+          );
+          dispatch(commentFail());
+          return;
+        case 200:
+          dispatch(commentSuccess(res.data))
+          return;
+        default: 
+          dispatch(commentFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(commentFail())
+    })
+  }
+}
+
+//load comment
+export function loadCommentRequest(action) {
+  return {
+    type: LOAD_COMMENT_REQUEST, 
+    action: action,
+  };
+}
+
+export function loadCommentSuccess(data, action) {
+  return {
+    type: LOAD_COMMENT_SUCCESS,
+    data: data,
+    action: action,
+  };
+}
+export function loadCommentFail() {
+  return {
+    type: LOAD_COMMENT_FAIL,
+  };
+}
+
+export function loadComment(id, type = 'feed', action = 'L', page = 1) {
+  return dispatch => {
+    dispatch(loadCommentRequest(action))
+    Post.loadComment(id, page, type).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            [{text: 'Ok', style: 'cancel'}],
+          );
+          dispatch(loadCommentFail());
+          return;
+        case 200:
+            dispatch(loadCommentSuccess(res.data, action))
+          return;
+        default: 
+          dispatch(loadCommentFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(loadCommentFail())
+    })
+  }
+}
+
+// /like
+export function likeRequest() {
+  return {
+    type: LIKE_REQUEST
+  };
+}
+
+export function likeSuccess() {
+  return {
+    type: LIKE_SUCCESS,
+  };
+}
+export function likeFail() {
+  return {
+    type: LIKE_FAIL,
+  };
+}
+
+export function like(type, id) {
+  return dispatch => {
+    dispatch(likeRequest())
+    Post.like(type, id).then((res) => {
+      switch(res.status) {
+        case 500:
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            [{text: 'Ok', style: 'cancel'}],
+          );
+          dispatch(likeFail());
+          return;
+        case 200:
+          dispatch(likeSuccess())
+          return;
+        default: 
+          dispatch(likeFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(likeFail())
+    })
+  }
+}
+
+//post detail
+export function postDetailRequest() {
+  return {
+    type: POST_DETAIL_REQUEST,
+  }
+}
+
+export function postDetailSuccess(data) {
+  return {
+    type: POST_DETAIL_SUCCESS,
+    data: data
+  }
+}
+
+export function postDetailFail() {
+  return {
+    type: POST_DETAIL_FAIL,
+  }
+}
+
+export function postDetail(slug) {
+  return dispatch => {
+    dispatch(postDetailRequest());
+    return Post.postDetail(slug).then(res => {
+      switch(res.status) {
+        case 200:
+          dispatch(postDetailSuccess(res.data))
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            [{text: 'Ok', style: 'cancel'}],
+          );
+          dispatch(postDetailFail())
+          return;
+        default:
+          dispatch(postDetailFail());
+          return;
+      }
+    })
+  }
+}
+
+//post category
+export function postCateRequest() {
+  return {
+    type: POST_CATE_REQUEST,
+  }
+}
+
+export function postCateSuccess(data) {
+  return {
+    type: POST_CATE_SUCCESS,
+    data: data
+  }
+}
+
+export function postCateFail() {
+  return {
+    type: POST_CATE_FAIL,
+  }
+}
+
+export function postCategory(slug) {
+  return dispatch => {
+    dispatch(postCateRequest());
+    return Post.postCategory(slug).then(res => {
+      switch(res.status) {
+        case 200:
+          dispatch(postCateSuccess(res.data))
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            [{text: 'Ok', style: 'cancel'}],
+          );
+          dispatch(postCateFail())
+          return;
+        default:
+          dispatch(postCateFail());
+          return;
+      }
+    })
+  }
+}
+
+//category LV 2
+export function categoryLv2Success(data) {
+  return {
+    type: CATEGORY_LV2_SUCCESS,
+    data: data
+  }
+}
+
+export function categoryLv2(id, action = 'L') {
+  return dispatch => {
+    dispatch(categoryRequest(action));
+    return Post.categoryLv2(id).then(res => {
+      switch(res.status) {
+        case 200:
+          dispatch(categoryLv2Success(res.data))
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            [{text: 'Ok', style: 'cancel'}],
+          );
+          dispatch(categoryFail())
+          return;
+        default:
+          dispatch(categoryFail());
+          return;
+      }
+    })
+  }
+}
+
+//category Lv1
+export function categoryRequest(action) {
+  return {
+    type: CATEGORY_REQUEST,
+    action,
+  }
+}
+
+export function categorySuccess(data, action) {
+  return {
+    type: CATEGORY_SUCCESS,
+    data,
+    action
+  }
+}
+
+export function categoryFail() {
+  return {
+    type: CATEGORY_FAIL,
+  }
+}
+
+export function category(action = 'L', page = 1) {
+  return dispatch => {
+    dispatch(categoryRequest(action));
+    return Post.category().then(res => {
+      switch(res.status) {
+        case 200:
+          dispatch(categorySuccess(res.data, action))
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            [{text: 'Ok', style: 'cancel'}],
+          );
+          dispatch(categoryFail())
+          return;
+        default:
+          dispatch(categoryFail());
+          return;
+      }
+    })
+  }
+}

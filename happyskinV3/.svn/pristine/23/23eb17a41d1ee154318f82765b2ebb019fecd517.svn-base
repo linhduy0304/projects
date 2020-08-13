@@ -1,0 +1,294 @@
+import {
+    StyleSheet,
+    Platform,
+    Dimensions
+} from "react-native";
+var DeviceInfo = require('react-native-device-info');
+windowSize = Dimensions.get('window');
+
+module.exports = StyleSheet.create({
+	content: {
+		flex: 1,
+		backgroundColor: '#FFFFFF'
+	},
+	navBarHome: {
+		backgroundColor: '#fe7263',
+		padding: 0,
+		height: 44,
+		width: windowSize.width,
+		borderBottomColor: "transparent"
+	},
+  navBarCoachProfile: {
+		backgroundColor: '#fff',
+		padding: 0,
+		height: 44,
+		width: windowSize.width,
+		borderBottomColor: "transparent"
+  },
+  navBarProfile: {
+		backgroundColor: 'rgb(255, 183, 101)',
+		padding: 0,
+		height: 44,
+		width: windowSize.width,
+		borderBottomColor: "transparent"
+	},
+	navBarSearch: {
+		backgroundColor: '#fff',
+		padding: 0,
+		paddingLeft: 15,
+		paddingRight: 7,
+		height: 44,
+		width: windowSize.width,
+	},
+	navBarRed: {
+		backgroundColor: '#d73554',
+		padding: 0,
+		height: 44,
+		width: windowSize.width,
+		borderBottomColor: "transparent"
+	},
+	navBarBlack: {
+		backgroundColor: '#000',
+		padding: 0,
+		height: 44,
+		width: windowSize.width,
+		borderBottomColor: "transparent"
+  },
+  navBarWhite: {
+		backgroundColor: '#fff',
+		padding: 0,
+		height: 44,
+		width: windowSize.width,
+		borderBottomColor: "transparent"
+  },
+  navBarCoach: {
+		backgroundColor: '#e1ebe6',
+		padding: 0,
+		borderBottomWidth: 0,
+		width: windowSize.width,
+    },
+  navBarExplore: {
+		backgroundColor: '#fff',
+		padding: 0,
+		height: 44,
+		borderBottomWidth: 0,
+		width: windowSize.width,
+    },
+  navSave: {
+		padding: 7,
+		marginRight: 8,
+  },
+  navAdd: {
+		marginRight: 10,
+		flexDirection: 'row',
+		alignItems: 'center',
+		padding: 5
+  },
+  header: {
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		overflow: 'hidden',
+  },
+  navBack: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginLeft: 0,
+		padding: 15,
+  },
+  navTitle: {
+		color: '#000', 
+		fontSize: 20,
+		marginTop: 6,
+	},
+	navTitleMore: {
+		marginLeft: 15,
+		color: 'rgb(215, 53, 84)',
+		fontSize: 32,
+		fontWeight: '400',
+	},
+  navExplore: {
+		color: 'rgb(215,53,84)', 
+		fontSize: 32,
+		marginLeft: 0,
+		fontWeight: '400',
+		paddingLeft: Platform.OS == 'ios' ? 7 : 15,
+	},
+	mainSpin1: {
+		width: windowSize.width,
+		height: windowSize.height,
+		position: 'absolute',
+		left: 0,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: '#fff',
+		zIndex: 99,
+		top: 44
+  },
+
+  mainSpin: {
+		width: windowSize.width,
+		height: windowSize.height,
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'rgba(0, 0, 0, 0.3)',
+		zIndex: 99
+  },
+  headerWhite: {
+		backgroundColor: '#FFFFFF',
+		width: windowSize.width,
+		borderBottomColor: "transparent",
+		padding: 0
+	},
+  icCloseBlack: {
+		width: 16,
+		height: 16,
+		marginTop: 20,
+		marginBottom: 20,
+		marginRight: 10
+  },
+  txtSave: {
+		marginTop: 20,
+		marginBottom: 20,
+		marginLeft: 20,
+		marginRight: 20,
+		color: '#007aff',
+		fontSize: 17
+	},
+	navButton: {
+		flexDirection: 'row',
+		marginLeft: Platform.OS == 'ios' ? 0 : 8,
+		padding: 7,  
+		alignItems: 'center',
+	},
+  statusBar: {
+		backgroundColor: '#FFFFFF',
+		height: 0
+	},
+	navScroll: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+	},
+	ctNoInternet: {
+		marginTop: Platform.OS === 'ios' ? 20 : DeviceInfo.getSystemVersion().slice(0, 1) != 4 ? 20 : 0,
+	},
+	container: {
+		flex: 1,
+		backgroundColor: '#fff',
+		marginTop: Platform.OS === 'ios' ? 0 : DeviceInfo.getSystemVersion().slice(0, 1) != 4 ? 20 : 0,
+	},
+	footer:{
+		flex: 1,
+		alignItems: 'center',
+		paddingTop: 20
+	},
+	imgLoading: {
+		width: 75,
+		height: 75,
+		marginBottom: 100
+	},
+	mainSpinTop: {
+		width: windowSize.width,
+		alignItems: 'center',
+		backgroundColor: '#fff',
+		top: 44
+	},
+	modal: {
+		height: Platform.OS === 'ios' ? 44 : 44,
+		backgroundColor: '#eeeeee',
+		marginTop: Platform.OS === 'ios' ? 0 : DeviceInfo.getSystemVersion().slice(0, 1) != 4 ? 20 : 0,
+	},
+	txtTitle: {
+    fontSize: 32,
+    marginLeft: 15,
+    color: 'rgb(215, 53, 84)'
+	},
+	txtTitleWhite: {
+		color: '#fff',
+		// fontSize: 24,
+	},
+	count: {
+		fontSize: 32,
+		marginRight: 15,
+		color: 'rgb(41, 42, 57)'
+	},
+	mainPicker: {
+		width: windowSize.width - 60,
+    borderColor: '#d5d5d5',
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 30,
+    marginTop: 5,
+    marginBottom: 10,
+    marginLeft: 30
+	},
+
+	//style container box chat
+	boxChat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+    bottom: 0,
+  },
+  selectImage: {
+    width: 45,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  icCamera: {
+    width: 20,
+    height: 18
+  },
+  mainTxtChat: {
+		flex: 1,
+  },
+  inputChat: {
+    height: 45,
+    color: '#000',
+	},
+	txtSend: {
+		color: '#446EB6',
+		padding: 15,
+	},
+	txtBack: {
+    fontSize: 14,
+    color: '#446EB6',
+    paddingLeft: 7,
+	},
+	fontSizeMedium: {
+    fontWeight: '100'
+	},
+	buttonScroll: {
+    backgroundColor: '#fff',
+		position: 'absolute',
+		bottom: 0,
+		left: 0,
+		right: 0,
+	},
+
+	//load
+	loading: {
+		width: windowSize.width,
+		height: 50,
+		position: 'absolute',
+		flexDirection: 'row',
+		left: 0,
+		// paddingTop: 100,
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: '#fff',
+		zIndex: 99,
+		top: 44
+  },
+  	logo: {
+		  height: 40,
+		  resizeMode: 'contain',
+		  marginTop: 4
+	  }
+});

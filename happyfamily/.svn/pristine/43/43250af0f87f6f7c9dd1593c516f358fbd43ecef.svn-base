@@ -1,0 +1,216 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TextInput,
+  TouchableOpacity
+} from 'react-native';
+import ListUserGroup from '../../components/chat/ListUserGroup';
+
+class ChatGroup extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      group_name: '',
+      arrUser: [],
+      data: [
+        {
+          label: 'A',
+          users: [
+            {
+              id: 1,
+              avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+              full_name: 'User One',
+              user_name: 'userone'
+            },
+            {
+              id: 2,
+              avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+              full_name: 'User Two',
+              user_name: 'userone'
+            },
+            {
+              id: 3,
+              avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+              full_name: 'User Three',
+              user_name: 'userone'
+            }
+
+          ]
+        },
+        {
+          label: 'B',
+          users: [
+            {
+              id: 4,
+              avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+              full_name: 'User Four',
+              user_name: 'userone'
+            },
+            {
+              id: 5,
+              avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+              full_name: 'User Five',
+              user_name: 'userone'
+            },
+            {
+              id: 6,
+              avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+              full_name: 'User Six',
+              user_name: 'userone'
+            },
+            {
+              id: 7,
+              avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+              full_name: 'User Seven',
+              user_name: 'userone'
+            },
+            {
+              id: 8,
+              avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+              full_name: 'User Eight',
+              user_name: 'userone'
+            }
+
+          ]
+        }
+      ],
+    }
+  }
+  
+  addUser(user) {
+    var arrUser  = this.state.arrUser;
+    if(arrUser.length == 0) {
+      arrUser: arrUser.unshift(user);
+      this.setState({
+        arrUser
+      })
+    }else {
+      for(const i=0; i< arrUser.length; i++) {
+        if(arrUser[i].id == user.id) {
+          arrUser: arrUser.splice(i, 1);
+          this.setState({
+            arrUser,
+          })
+          return;
+        }
+      }
+      arrUser: arrUser.unshift(user);
+      this.setState({
+        arrUser
+      })
+    }
+  }
+
+  renderTo() {
+    var arrUser = ''
+    this.state.arrUser.map((user, index) => {
+      return arrUser = ' '+user.full_name+ ',' + arrUser 
+    })
+    return arrUser
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={styles.ctHeader}>
+          <View style={styles.ctCamera}>
+            <Image source={require('../../images/icons/ic_camera.png')} />
+          </View>
+          <TextInput
+            value={this.state.group_name}
+            placeholder='Group name'
+            placeholderTextColor='#287FC9'
+            onChangeText={(group_name) => this.setState({group_name: group_name})}
+            style={styles.txtInput}
+            underlineColorAndroid='transparent'
+          />
+        </View>
+
+        <View style={styles.ctTo}>
+          <Text style={styles.txtTo}>To:
+            <Text>{this.renderTo()}</Text>
+          </Text>
+        </View>
+
+        <ScrollView>
+        {
+          this.state.data.map((item, index) => {
+            return (
+              <View key={index}>
+                <View style={styles.ctLabel}>
+                  <Text style={styles.txtLabel}>{item.label}</Text>
+                </View>
+                {
+                  item.users.map((user, index1) => {
+                    return <ListUserGroup 
+                              arrUser={this.state.arrUser}
+                              key={index1}
+                              user={user} 
+                              onPress={() => this.addUser(user)}
+                            />
+                  })
+                }
+              </View>
+            )
+          })
+        }
+        </ScrollView>
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  txtLabel: {
+    color: '#287FC9',
+    fontSize: 15
+  },
+  ctLabel: {
+    backgroundColor: '#F7FCFE',
+    paddingLeft: 15,
+    padding: 5
+  },
+  txtTo: {
+    color: '#287FC9',
+    fontSize: 17
+  },
+  ctTo: {
+    marginTop: 15,
+    padding: 10,
+    paddingLeft: 15,
+    backgroundColor: '#fff',
+    borderBottomColor: '#E3F1FD',
+    borderBottomWidth: 1
+  },
+  txtInput: {
+    flex: 1,
+    fontSize: 17,
+    color: '#287FC9'
+  },
+  ctCamera: {
+    backgroundColor: '#E3F1FD',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+  },
+  ctHeader: {
+    padding: 15,
+    backgroundColor: '#fff',
+    flexDirection: 'row'
+  },
+  container: {
+    flex: 1,
+    // backgroundColor: '#E3F1FD'
+    backgroundColor: '#E3F1FD'
+  }
+})
+
+export default (ChatGroup);

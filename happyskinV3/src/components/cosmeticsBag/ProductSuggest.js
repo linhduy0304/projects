@@ -1,0 +1,239 @@
+import React from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+  StatusBar,
+  Platform,
+  Alert,
+  FlatList,
+  RefreshControl,
+  InteractionManager
+} from "react-native";
+
+import Button from "react-native-button";
+import {Actions} from "react-native-router-flux";
+import StarRating from 'react-native-star-rating';
+
+let main = require('../../styles/Main');
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { Map } from 'immutable';
+import * as cosmeticsActions from '../../actions/cosmeticsActions';
+
+const actions = [
+  cosmeticsActions
+];
+function mapStateToProps(state) {
+  return {
+    cosmetics: state.cosmetics,
+    profile: state.profile
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+class ProductSuggest extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      page: 1,
+      isRefreshing: false
+    }
+  }
+  componentWillMount() {
+    this.props.actions.productRequest();
+  }
+
+  componentDidMount() {
+    timeout = setTimeout( () => {
+    }, 12000);
+    InteractionManager.runAfterInteractions(()=> {
+      this.props.actions.productSuggest(this.props.profile.currentUser.skintest);
+    })
+  }
+
+  refresh() {
+    this.setState({
+      isRefreshing: true,
+      page: 1
+    });
+    this.props.actions.productSuggest(this.props.profile.currentUser.skintest);
+    this.setState({
+      isRefreshing: false,
+    })
+  }
+
+  loadMore() {
+    if (!this.props.cosmetics.loadMore) {
+        return;
+    }
+    this.props.actions.productSuggest(this.props.profile.currentUser.skintest,'LM', this.state.page + 1);
+    this.setState({
+        page: this.state.page + 1,
+    });
+  }
+
+
+  _renderFooter() {
+    if(this.props.cosmetics.loadMore) {
+      return (
+        <View style={{width: deviceWidth, marginTop:20,marginBottom: 10,alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
+          <Image style={{height: 10, width: 10}} source={require('../../images/load_more.gif')} />
+          <Text style={{color: 'rgb(197, 172, 211)', fontSize: 12, marginLeft: 8}}>Đang tải</Text>
+        </View>)
+    }
+    if(this.props.cosmetics.productSuggest){
+      if (this.props.cosmetics.productSuggest.length == 0 ) {
+        return (
+          <View style = {main.footer}>
+            <Text>Bạn chưa có sản phẩm nào</Text>
+          </View>
+        )
+      }else return null
+    }else return null;
+  }
+
+  renderProduct(data) {
+      return(
+        <TouchableOpacity onPress={() => Actions.cosmeticsDetail({id: data.id})} style={{flexDirection: 'row', marginTop: 16, alignItems: 'center'}}>
+          <Image style={{width: 100, height: 100}} source={{uri: data.image_thumb+ '_100x100.png'}} />
+          <View style={styles.ctRight}>
+            <Text style={{color: 'rgb(31, 32, 39)', fontSize: 12}}>Happy Skin gợi ý sử dụng</Text>
+            <Text style={styles.titleCoach}>{data.name} </Text>
+            <View style={styles.rating}>
+              <StarRating
+                disabled={true}
+                emptyStar={require('../../images/icons/ic_start_old.png')}
+                fullStar={require('../../images/icons/ic_star_ok.png')}
+                halfStar={require('../../images/icons/ic_star_half.png')}
+                selectedStar={(rating) => this.onStarRatingPress(rating)}
+                maxStars={5}
+                rating={data.raty_score}
+                starSize={13}
+                margin={2}
+                starStyle={{marginRight: 2}}
+              />
+            </View>
+            {
+              data.skinstore_product_id == '' ? null
+              :
+              <View style={{flexDirection: 'row'}}>
+                <Button 
+                  onPress={() => this.props.openModalBuy(data)}
+                    containerStyle={{backgroundColor:"rgb(227, 0, 82)",paddingLeft: 20, paddingRight: 20, marginTop: 14, borderRadius:4, height: 32,justifyContent: 'center', alignItems: 'center'}}
+                    style={styles.btnCart}>
+                  <Image style={styles.icCart} source={require('../../images/icons/ic_cart_white.png')}/>
+                  Đặt mua
+                </Button>
+              </View>
+            }
+            
+          </View>
+        </TouchableOpacity>
+      );
+  }
+
+ 
+  render(){
+    return (
+      <View style={styles.container}>
+       {
+        this.props.cosmetics.isFetching ?
+          <View style={main.mainSpinTop}>
+            <Image style={main.imgLoading} source={require('../../images/spinner.gif')} />
+          </View>
+          :
+        <FlatList
+          contentContainerStyle={styles.list}
+          ListFooterComponent={() => this._renderFooter()}
+          data={this.props.cosmetics.productSuggest}
+          refreshControl={
+            <RefreshControl
+                refreshing={this.state.isRefreshing}
+                onRefresh={() => this.refresh()}
+            />
+          }
+          onEndReached={() => this.loadMore()}
+          onEndReachedThreshold={0.2}
+          renderItem={(data) => this.renderProduct(data.item)}
+        /> 
+       }
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  list: {
+    paddingBottom: 30
+  },
+  rating: {
+    marginTop: 10,
+    alignItems: "flex-start",
+    flexDirection: 'row'
+  },
+  btnCart: {
+    fontWeight: '500',
+    color: '#fff',
+    fontSize: 14
+  },
+  icCart: {
+    height: 16, 
+    width: 16,
+    marginRight: 17,
+  },
+  titleCoach: {
+    fontSize: 17,
+    color: 'rgb(41, 42, 57)',
+    marginTop: 5,
+    fontWeight: 'bold'
+  },
+  container: {
+    flex: 1,
+  },
+  ctRight: {
+    flex: 1,
+    borderBottomColor: 'rgb(236, 238, 240)',
+    borderBottomWidth: 1,
+    paddingBottom: 28,
+    marginLeft: 10
+  },
+  coachSuggest: {
+    fontWeight: '500',
+    color: 'rgb(68, 110, 182)'
+  },
+  title: {
+    fontSize: 17,
+    color: 'rgb(78, 118, 162)'
+  },
+  txtBegin: {
+    flex: 1,
+    fontSize: 13,
+    marginTop: 3,
+    color: 'rgb(133, 142, 152)'
+  },
+  numBegin: {
+    color: 'rgb(51,51, 51)',
+    marginRight: 20,
+    fontSize: 13
+  },
+});
+export default connect(mapStateToProps, mapDispatchToProps)(ProductSuggest);
+

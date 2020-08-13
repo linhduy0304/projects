@@ -1,0 +1,70 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  Dimensions,
+  StyleSheet,
+  Image,
+  TouchableOpacity
+} from 'react-native'
+const window = Dimensions.get('window');
+
+const HotDeal = () => (
+  <View>
+    <Image style={css.img} source={require('../../images/bg_hotdeal.png')} />
+    <Text style={css.txtHotDeal}>HOT DEAL</Text>
+    <View style={css.ctBottom}>
+      <Text style={css.txt1}>BEUINS</Text>
+      <Text style={css.txt2}>GIẢM GIÁ TỚI 30%</Text>
+      <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity style={css.ctBuy}>
+          <Text style={css.txtBuy}>Xem & Mua ngay</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+    
+  </View>
+)
+
+const css = StyleSheet.create({
+  txtBuy: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  ctBuy: {
+    backgroundColor: '#446DB6',
+    borderRadius: 4,
+    padding: 15,
+    paddingTop: 10,
+    paddingBottom: 10,
+    marginTop: 10
+  },
+  txt2: {
+    color: '#fff',
+    fontSize: 18,
+  },
+  txt1: {
+    color: '#fff',
+    fontSize: 32,
+    fontWeight: '500',
+  },
+  txtHotDeal: {
+    color: '#8650A0',
+    position: 'absolute',
+    left: 10,
+    top: 15
+  },
+  ctBottom: {
+    position: 'absolute',
+    left: 10,
+    bottom: 15
+  },
+  img: {
+    width: window.width
+  },
+})
+
+export default HotDeal;

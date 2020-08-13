@@ -1,0 +1,153 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Platform,
+  Dimensions,
+} from 'react-native';
+
+const window = Dimensions.get('window');
+
+import NavBar, { NavButton, NavGroup, NavTitle } from 'react-native-nav';
+import css from '../../Css';
+import Loading from '../../components/Loading';
+import {Actions} from 'react-native-router-flux';
+import {loadIndividual, deleteIndividual} from '../../actions/individual'
+import { connect } from 'react-redux'
+var Modal = require('react-native-modalbox');
+import ItemIndividual from '../../components/individual/ItemIndividual';
+import AddIndividualStep1 from './AddIndividualStep1';
+
+class Individual extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+          modalSelectRelationship: false,
+        }
+    }
+
+    componentWillMount() {
+      this.props.loadIndividual()
+    }
+
+    renderHeader() {
+      
+    }
+
+    deleteIndividual(id) {
+      this.props.deleteIndividual(id);
+    }
+
+    render() {
+        return (
+          <View style={styles.container}>
+            <View style={{height: Platform.OS === 'ios' ? 20 : 0, backgroundColor: '#C6247D'}}></View>
+            <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'light-content', backgroundColor: '#C6247D'}} >
+              <NavButton/>
+              <NavTitle style={css.navTitle}>
+                  <Text style={css.txtTitle}>Danh sách thành viên</Text>
+              </NavTitle>
+              <NavButton/>
+              <TouchableOpacity onPress={() => Actions.tab({page: 'setting'})} style={{position: 'absolute', left: 0, padding: 15}}>
+                <Image source={require('../../images/icons/ic_back.png')} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => this.setState({modalSelectRelationship: true})} style={{position: 'absolute', right: 0, padding: 15}}>
+                <Image source={require('../../images/icons/ic_add_white.png')} />
+              </TouchableOpacity>
+            </NavBar>
+              {
+                this.props.individual.loading ?
+                  <Loading />
+                : 
+                  (!this.props.individual.individual || (this.props.individual.individual && this.props.individual.individual.length === 0)) ?
+                  <View style={styles.content}>
+                    <TouchableOpacity style={styles.btnAdd} onPress={() => this.setState({modalSelectRelationship: true})}>
+                      <Text style={styles.txtAdd}>Thêm thành viên mới</Text>
+                    </TouchableOpacity>
+                  </View>
+                  :
+                  <View style={styles.container}>
+                    <FlatList 
+                      contentContainerStyle={{backgroundColor: '#FFFFFF'}}
+                      // ListHeaderComponent={() => this.renderHeader()}
+                      data = {this.props.individual.individual}
+                      renderItem = {(data) => <ItemIndividual data ={data.item} deleteIndividual={(id) => this.deleteIndividual(id)}/>}
+                      keyExtractor={(item, index) => index.toString()}
+                    />
+                    <View style={styles.content1}>
+                    <TouchableOpacity style={styles.btnAdd} onPress={() => this.setState({modalSelectRelationship: true})}>
+                      <Text style={styles.txtAdd}>Thêm thành viên mới</Text>
+                    </TouchableOpacity>
+                    </View>
+                  </View>
+              }
+              <Modal 
+                isOpen={this.state.modalSelectRelationship}
+                swipeToClose={false}
+                position="bottom"
+                entry="bottom"
+                animationDuration={300}
+                // backdropColor="red"
+                onClosed={()=> this.setState({modalSelectRelationship: false}) }
+                >
+                  <AddIndividualStep1 close={() => this.setState({modalSelectRelationship: false})} />
+              </Modal>
+          </View>
+        )
+    }
+}
+
+const styles = StyleSheet.create({
+  
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF'
+  },
+  content: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
+  content1: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 25,
+    paddingBottom: 25
+  },
+  btnAdd: {
+    backgroundColor: '#C6247D',
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
+  txtAdd: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: 'bold',
+      textAlign: 'center'
+  }
+})
+
+const mapStateToProps = (state) => {
+  return {
+    individual: state.individual,
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    loadIndividual: () => dispatch(loadIndividual()),
+    deleteIndividual: (id) => dispatch(deleteIndividual(id)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Individual);

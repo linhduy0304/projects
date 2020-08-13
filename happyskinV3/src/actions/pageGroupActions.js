@@ -1,0 +1,305 @@
+/**
+ * # authActions.js
+ *
+ * All the request actions have 3 variations, the request, a success
+ * and a failure. They all follow the pattern that the request will
+ * set the ```isFetching``` to true and the whether it's successful or
+ * fails, setting it back to false.
+ *
+ */
+'use strict';
+
+/**
+ * ## Imports
+ *
+ * The actions supported
+ //  */
+const {
+  PAGE_GROUP_LOAD_REQUEST,
+  PAGE_GROUP_LOAD_SUCCESS,
+  PAGE_GROUP_LOAD_FAILURE,
+  PAGE_GROUP_LOAD_MORE_REQUEST,
+  PAGE_GROUP_LOAD_MORE_SUCCESS,
+  PAGE_GROUP_LOAD_MORE_FAILURE,
+  PAGE_GROUP_REFRESH_REQUEST,
+  PAGE_GROUP_REFRESH_SUCCESS,
+  PAGE_GROUP_REFRESH_FAILURE,
+  JOIN_GROUP_REQUEST,
+  JOIN_GROUP_SUCCESS,
+  JOIN_GROUP_FAILURE,
+  JOIN_GROUP_COMMUNITY_SUCCESS,
+  GROUP_DETAIL_REQUEST,
+  GROUP_DETAIL_SUCCESS,
+  GROUP_DETAIL_FAILURE,
+  UPDATE_PAGE_GROUP_POST_ID,
+  UPDATE_PAGE_GROUP_POST_ID_LOAD_MORE,
+  DATA_SAVE
+  } = require('../libs/actionTypes');
+
+import Constant from '../services/Constant';
+const StoreService = require('../services/StoreService').default;
+
+/**
+ * Project requirements
+ */
+const PostService = require('../services/PageGroup');
+
+import {Actions} from 'react-native-router-flux';
+
+/**
+ * ## Logout actions
+ */
+
+export function groupLoadRequest() {
+  return {
+    type: PAGE_GROUP_LOAD_REQUEST
+  };
+}
+
+export function groupLoadSuccess(data) {
+  return {
+    type: PAGE_GROUP_LOAD_SUCCESS,
+    data: data
+  };
+}
+
+export function groupLoadFailure(error) {
+  return {
+    type: PAGE_GROUP_LOAD_FAILURE,
+    error: error
+  };
+}
+
+export function groupLoadMoreRequest() {
+  return {
+    type: PAGE_GROUP_LOAD_MORE_REQUEST
+  };
+}
+
+export function groupLoadMoreSuccess(data) {
+  return {
+    type: PAGE_GROUP_LOAD_MORE_SUCCESS,
+    data: data
+  };
+}
+
+export function groupLoadMoreFailure(error) {
+  return {
+    type: PAGE_GROUP_LOAD_MORE_FAILURE,
+    error: error
+  };
+}
+
+export function pageGroupRefreshRequest(){
+  return {
+    type: PAGE_GROUP_REFRESH_REQUEST
+  };
+}
+
+export function pageGroupRefreshSuccess(data){
+  // update post id
+  var dataId = [];
+  data.forEach(function(element) {
+    dataId.push(element.id);
+  });
+  return {
+    type: PAGE_GROUP_REFRESH_SUCCESS,
+    dataId: dataId
+  };
+}
+
+export function pageGroupRefreshFailure(error){
+  return {
+    type: PAGE_GROUP_REFRESH_FAILURE,
+    error: error
+  };
+}
+
+export function joinGroupRequest(data) {
+  return {
+    type: JOIN_GROUP_REQUEST
+  };
+}
+
+export function joinGroupSuccess(data) {
+  return {
+    type: JOIN_GROUP_SUCCESS,
+    data: data
+  };
+}
+
+export function joinGroupFailure(error) {
+  return {
+    type: JOIN_GROUP_FAILURE,
+    error: error
+  };
+}
+
+export function joinGroupCommunitySuccess(data){
+  return {
+    type: JOIN_GROUP_COMMUNITY_SUCCESS,
+    data: data
+  };
+}
+
+export function groupDetailRequest() {
+  return {
+    type: GROUP_DETAIL_REQUEST
+  };
+}
+
+export function groupDetailSuccess(data) {
+  return {
+    type: GROUP_DETAIL_SUCCESS,
+    data: data
+  };
+}
+
+export function groupDetailFailure(error) {
+  return {
+    type: GROUP_DETAIL_FAILURE,
+    error: error
+  };
+}
+
+export function refreshDataPageGroup(groupId , page) {
+  return dispatch => {
+    dispatch(pageGroupRefreshRequest());
+    PostService.listGroupPosts(groupId, page)
+      .then((res) => {
+        if (res.status == 200){
+          dispatch(updatePostData(res.data));
+          dispatch(updatePostId(res.data));
+          dispatch(pageGroupRefreshSuccess(res.data));
+        } else {
+          dispatch(pageGroupRefreshFailure(error));
+        }
+      })
+      .catch((error) => {
+        dispatch(pageGroupRefreshFailure(error));
+      });
+  };
+}
+
+export function loadDataPageGroup(groupId, page) {
+  return dispatch => {
+    dispatch(groupLoadRequest());
+    PostService.listGroupPosts(groupId, page)
+      .then((res) => {
+        if (res.status == 200){
+          dispatch(updatePostData(res.data));
+          dispatch(updatePostId(res.data));
+          dispatch(groupDetailRequest());
+          PostService.groupDetail(groupId)
+            .then((resGroup) => {
+              if (resGroup.status == 200){
+                dispatch(groupDetailSuccess(resGroup.data));
+              } else {
+                dispatch(groupDetailFailure(error));
+              }
+            })
+            .catch((error) => {
+              dispatch(groupDetailFailure(error));
+            });
+          dispatch(groupLoadSuccess(res.data));
+        } else {
+          dispatch(groupLoadFailure(error));
+        }
+      })
+      .catch((error) => {
+        dispatch(groupLoadFailure(error));
+      });
+  };
+}
+
+export function pageGroupLoadMore(groupId, page){
+  return dispatch => {
+    dispatch(groupLoadMoreRequest());
+    PostService.listGroupLoadMore(groupId, page)
+      .then((res) => {
+        if (res.status == 200){
+          dispatch(updatePostData(res.data));
+          dispatch(updatePostIdLoadMore(res.data));
+          dispatch(groupLoadMoreSuccess(res.data));
+        } else {
+          dispatch(groupLoadMoreFailure(error));
+        }
+      })
+      .catch((error) => {
+        dispatch(groupLoadMoreFailure(error));
+      });
+  };
+}
+
+export function joinGroup(group,type) {
+  return dispatch => {
+    dispatch(joinGroupRequest());
+    PostService.joinGroup(group.id)
+      .then((res) => {
+        if (res.status == 200){
+          dispatch(joinGroupSuccess({group_id: group.id}));
+          dispatch(joinGroupCommunitySuccess({dataGroup: res.data}));
+          if(type) {
+            switch(type){
+              case 'question':
+                Actions.question({group_id: group.id});
+                break;
+              case 'lookOfTheDayPage': 
+                Actions.lookOfTheDayPage1({group_id: group.id});
+                break;
+              case 'tips':
+                Actions.tips({group_id: group.id});
+                break;
+              case 'review':
+                Actions.review({group_id: group.id});
+                break;
+            }
+          }
+        } else {
+          dispatch(joinGroupFailure(error));
+        }
+      })
+      .catch((error) => {
+        dispatch(joinGroupFailure(error));
+      });
+  };
+}
+
+export function loading(){
+  return dispatch => {
+    dispatch(groupLoadRequest());
+  }
+}
+
+// update data
+export function updatePostId(data){
+  // update post id
+  var dataId = [];
+  data.forEach(function(element) {
+    dataId.push(element.id);
+  });
+  return {
+    type: UPDATE_PAGE_GROUP_POST_ID, 
+    dataId: dataId
+  };
+}
+
+export function updatePostIdLoadMore(data){
+  // update post id
+  var dataId = [];
+  data.forEach(function(element) {
+    dataId.push(element.id);
+  });
+  return {
+    type: UPDATE_PAGE_GROUP_POST_ID_LOAD_MORE, 
+    dataId: dataId
+  };
+}
+
+export function updatePostData(data){
+  return {
+    type: DATA_SAVE, 
+    data: data
+  };
+}
+

@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "89483501528",
+    "firebase_url": "https://aladin-c4198.firebaseio.com",
+    "project_id": "aladin-c4198",
+    "storage_bucket": "aladin-c4198.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:89483501528:android:9dce95e031229cda",
+        "android_client_info": {
+          "package_name": "vn.aladin.mobiletest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "89483501528-mkvl9bv5r10gmrcd1eflg3ms9sb5k5fo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiM7IqmvuVnLMeGRHSfWQTQMmdXJAVabs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

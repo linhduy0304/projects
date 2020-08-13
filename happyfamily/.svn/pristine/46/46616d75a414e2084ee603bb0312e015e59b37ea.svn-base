@@ -1,0 +1,6 @@
+let URL_PATH = "https://happyapi.techup.vn/api/v1/";
+
+
+module.exports = {
+  user: URL_PATH + 'user',
+}

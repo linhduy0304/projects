@@ -1,0 +1,276 @@
+import React from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableHighlight,
+  ScrollView,
+  Dimensions,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  ActionSheetIOS
+} from "react-native";
+import {Actions} from "react-native-router-flux";
+import BoxAction from '../components/directives/BoxAction';
+import TimeAgo from "react-native-timeago";
+import HTMLView from "react-native-htmlview";
+const StoreService = require('../services/StoreService').default;
+import Constant from '../services/Constant';
+var moment = require('moment');
+require('moment/locale/vi');
+moment.locale('vi');
+
+// import {
+//     LazyloadScrollView,
+//     LazyloadView,
+//     LazyloadImage,
+//     LazyloadListView
+// } from 'react-native-lazyload';
+// connect
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import {Map} from 'immutable';
+import * as communityActions from '../actions/communityActions';
+
+var BUTTONS = [
+  'Xóa bài viết',
+  'Hủy bỏ',
+];
+var CANCEL_INDEX = 1;
+
+const actions = [
+  communityActions
+];
+
+function mapStateToProps(state) {
+  return {
+    // feed: state.feed
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+class BoxNewsThumbLeft extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    this.state={
+      isError: false,
+      showTips: true,
+    };
+  }
+  viewDetail(id, title) {
+    Actions.newsDetail({id: id, title: title})
+  }
+  viewProfile(id){
+    Actions.otherProfile({id: id})
+  }
+  displayTypeDetail(type) {
+    switch(type) {
+      case 'g_question':
+      return <Text>{' đã gửi 1 '}<Text style={styles.bold}>câu hỏi.</Text></Text>;
+      case 'g_tips':
+      return <Text>{' đã chia sẻ 1 '}<Text style={styles.bold}>mẹo.</Text></Text>;
+      default :
+      return '';
+    }
+  }
+  checkOpenModel() {
+    var store = new StoreService();
+    return store.getSession(Constant.HS_DATA_USER).then(res => {
+      if(this.props.feed.user.id == res.id) {
+        ActionSheetIOS.showActionSheetWithOptions({
+          options: BUTTONS,
+          cancelButtonIndex: CANCEL_INDEX
+        },
+        (buttonIndex) => {
+          if(buttonIndex == 0){
+            this.setState({'showTips': false});
+            this.props.actions.deleteFeed(this.props.feed.id);
+          }
+        });
+      } else {
+        return null;
+      }
+    });
+  }
+  render(){
+    return (
+      <View>
+      {(this.state.showTips) ?
+        <View style={styles.boxSimpleNews}>
+          {
+            (this.props.feed.group.name && this.props.feed.group.short_name != "OTHER") ?
+            <TouchableOpacity style={styles.infoNews} onPress= {(this.props.currentUser.skintest == this.props.feed.group.short_name || this.props.feed.group.type == 'public') ? () => Actions.pageGroup({group : this.props.feed.group}) : null}>
+              <Text style={styles.infoNewsGroup}>{this.props.feed.group.name}</Text>
+            </TouchableOpacity>
+            : null
+          }
+          <View style={styles.boxAvatar} >
+          {this.props.feed.user != null ?
+
+            <TouchableOpacity onPress = {() => this.viewProfile(this.props.feed.user.id)} style={styles.boxAvatarLeft} >
+              {
+                  (this.props.feed.user.avatar != '') ?
+                   <Image source = {{uri : this.props.feed.user.avatar + '_100x100.png'}}
+                          style={styles.avatar}
+                     />
+                  : <Image source={require('../images/avatar.png')}
+                           style = {styles.avatar}
+                    />
+              }
+              <View style={styles.contentDetail}>
+                <Text style={[styles.contentColor, styles.textSmall]} >
+                  <Text style={[styles.bold, styles.contentColor, styles.textSmall]} > {this.props.feed.user.full_name}</Text>
+                  { this.displayTypeDetail(this.props.feed.feedtype) }
+                </Text>
+                {
+                  // <Text style={[styles.infoNewsTime, styles.contentColor, styles.textSmall]}><TimeAgo time={this.props.feed.created_at} /></Text>  
+                }
+              </View>
+            </TouchableOpacity>
+          :
+            <View style={styles.boxAvatarLeft}>
+              <Image source={require('../images/avatar.png')}
+                            style = {styles.avatar}
+              />
+              <View style={styles.contentDetail}>
+                <Text style={[styles.contentColor, styles.textSmall]} >
+                  <Text style={[styles.bold, styles.contentColor, styles.textSmall]} > </Text>
+                  { this.displayTypeDetail(this.props.feed.feedtype) }
+                </Text>
+                {
+                  // <Text style={[styles.infoNewsTime, styles.contentColor, styles.textSmall]}><TimeAgo time={this.props.feed.created_at} /></Text>  
+                }
+              </View>
+            
+            </View>
+          }
+          </View>
+          <TouchableWithoutFeedback onPress={() => this.viewDetail(this.props.feed.id, this.props.feed.title) } delayLongPress={1000} onPressIn={() => this.setState({'pressIn': true})} onPressOut={() => this.setState({'pressIn': false})} onLongPress={() => this.checkOpenModel()}>
+            <View>
+              { this.props.feed.title ?
+                  <View>
+                    <Text style={styles.titleNews} numberOfLines={3}>
+                      <HTMLView value={this.props.feed.title}/>
+                    </Text>
+                  </View>
+                  : null
+              }
+
+              <View style={styles.boxContent}>
+                {
+                  (this.props.feed.images != '') ?
+                  <View style={styles.colThumbnail}>
+                    <Image defaultSource={require('../images/image_default.jpg')} host={this.props.listView} source={{ uri: this.props.feed.images[0]+'.png' }} style={styles.thumbnail} onError={(e) => { this.setState({ isError: true}) } }/>
+                  </View>
+                  : null
+                }
+                
+                <View style={styles.colDescription}>
+                  <View style={styles.contentNews}>
+                    <Text numberOfLines={5} style= {styles.contentColor}>
+                      <HTMLView value={this.props.feed.short_content}/>
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+          <BoxAction like={this.props.feed.count_like} comment={this.props.feed.count_comment} isLike={this.props.feed.is_like_by_current_id} itemId={this.props.feed.id} itemType={this.props.feed.type} itemFeedType={(this.props.feed.feedtype) ? this.props.feed.feedtype : null} itemTitle={this.props.feed.title}/>
+        </View>
+        : null
+      }
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  boxSimpleNews: {
+    borderBottomWidth: 15,
+    borderBottomColor: '#eaeaea',
+    marginTop: 10,
+    paddingLeft: 15,
+    paddingRight: 15,
+
+  },
+  titleNews:{
+    fontSize: 17,
+    color: '#D73554',
+    paddingBottom: 5
+  },
+  infoNews: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    paddingBottom: 8,
+  },
+  infoNewsGroup: {
+    fontSize: 16,
+    color: '#577dbd'
+  },
+  infoNewsTime: {
+  },
+  boxAvatar: {
+    flex: 1,
+    paddingBottom: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  boxAvatarLeft: {
+    flexDirection: 'row',
+    flex: 1,
+  },
+  contentDetail: {
+    flex: 1,
+    marginLeft: 6,
+  },
+  boxContent: {
+    justifyContent: 'center',
+    flexDirection: 'row',
+    paddingTop: 10
+  },
+  colThumbnail: {
+    width: 150,
+    height: 100,
+  },
+  thumbnail: {
+    width: 150,
+    height: 100,
+    resizeMode: 'contain',
+  },
+  colDescription: {
+    flex: 0.6,
+    padding: 10,
+    paddingLeft: 0,
+    paddingTop: 0,
+    alignItems: 'flex-start',
+  },
+  avatar :{
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+  },
+  bold: {
+    fontWeight: 'bold'
+  },
+  contentColor: {
+    color: '#333333'
+  },
+  textSmall: {
+    fontSize: 12
+  }
+});
+// module.exports = BoxNewsThumbLeft;
+export default connect(mapStateToProps, mapDispatchToProps)(BoxNewsThumbLeft);

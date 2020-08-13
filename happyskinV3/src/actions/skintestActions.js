@@ -1,0 +1,517 @@
+/**
+ * # authActions.js
+ * 
+ * All the request actions have 3 variations, the request, a success
+ * and a failure. They all follow the pattern that the request will
+ * set the ```isFetching``` to true and the whether it's successful or
+ * fails, setting it back to false.
+ * 
+ */
+'use strict';
+
+import {
+  Alert
+} from "react-native";
+/**
+ * ## Imports
+ * 
+ * The actions supported
+//  */
+const {
+  SKINTEST_LOAD_REQUEST,
+  SKINTEST_LOAD_SUCCESS,
+  SKINTEST_LOAD_FAILURE,
+  SKINTEST_SLIDE_CHANGE,
+  SKINTEST_SLIDE_SELECT_VALUE,
+  SKINTEST_SAVE_REQUEST,
+  SKINTEST_SAVE_SUCCESS,
+  SKINTEST_SAVE_CONTINUE,
+  SKINTEST_SAVE_FAILURE,
+  SKINTEST_UPDATE_CONTINUE_PAGE,
+  SKINRESULT_LOAD_GROUP_SUGGESS,
+  UPDATE_USER_SKINTEST,
+  SKINTEST_PRODUCT_LOAD_REQUEST,
+  SKINTEST_PRODUCT_LOAD_SUCCESS,
+  SKINTEST_PRODUCT_LOAD_FAILURE,
+  SKINTEST_PRODUCT_LOAD_MORE_REQUEST,
+  SKINTEST_PRODUCT_LOAD_MORE_SUCCESS,
+  SKINTEST_PRODUCT_LOAD_MORE_FAILURE,
+  SKINTEST_PRODUCT_REFRESH_REQUEST,
+  SKINTEST_PRODUCT_REFRESH_SUCCESS,
+  SKINTEST_PRODUCT_REFRESH_FAILURE,
+  SKINTEST_OPEN_MODAL_CATEGORY,
+  SKINTEST_OPEN_MODAL_BRAND,
+  SKINTEST_CLOSE_MODAL_CATEGORY,
+  SKINTEST_CLOSE_MODAL_BRAND,
+  SKINTEST_LOAD_CATEGORY_REQUEST,
+  SKINTEST_LOAD_CATEGORY_SUCCESS,
+  SKINTEST_LOAD_CATEGORY_FAILURE,
+  SKINTEST_FILTER_SUCCESS,
+  SKINTEST_FILTER_FAILURE,
+  UPDATE_USER_STORE,
+  UPDATE_DATA_USER_SKINTEST
+
+} = require('../libs/actionTypes');
+
+import Constant from '../services/Constant';
+const StoreService = require('../services/StoreService').default;
+
+/**
+ * Project requirements
+ */
+const SkintestService = require('../services/SkinTest');
+
+import {Actions} from 'react-native-router-flux';
+
+/**
+ * ## Logout actions
+ */
+export function skintestLoadRequest() {
+  return {
+    type: SKINTEST_LOAD_REQUEST
+  };
+}
+
+export function skintestLoadSuccess(data) {
+  return {
+    type: SKINTEST_LOAD_SUCCESS,
+    data: data
+  };
+}
+
+export function skintestLoadFailure(error) {
+  return {
+    type: SKINTEST_LOAD_FAILURE,
+    error: error
+  };
+}
+export function skintestSlideChange(index) {
+  return {
+    type: SKINTEST_SLIDE_CHANGE,
+    index: index
+  };
+}
+
+export function skintestSlideSelectValue(id, value) {
+  return {
+    type: SKINTEST_SLIDE_SELECT_VALUE,
+    id: id,
+    value: value
+  };
+}
+
+export function skintestSaveRequest() {
+  return {
+    type: SKINTEST_SAVE_REQUEST
+  };
+}
+
+export function skintestSaveFinished(data) {
+  return {
+    type: SKINTEST_SAVE_SUCCESS,
+    data: data
+  };
+}
+
+export function skintestSaveContinue(page) {
+  return {
+    type: SKINTEST_SAVE_CONTINUE,
+    page: page
+  };
+}
+
+export function skintestSaveFailure(error) {
+  return {
+    type: SKINTEST_SAVE_FAILURE,
+    error: error
+  };
+}
+
+export function skintestUpdateContinuePage(page) {
+  return {
+    type: SKINTEST_UPDATE_CONTINUE_PAGE,
+    page: page
+  };
+}
+
+export function loadDataSkintest() {
+  return dispatch => {
+      dispatch(skintestLoadRequest());
+      SkintestService.skintestData()
+      .then((res) => {
+        switch(res.status) {
+          case 200:
+            dispatch(skintestLoadSuccess(res.data));
+            return;
+          case 500: 
+            Actions.login({type: 'reset'});
+            return;
+          default:
+            dispatch(skintestLoadFailure(error));
+            return;
+        }
+      })
+      .catch((error) => {
+        dispatch(skintestLoadFailure(error));
+      });
+  };
+}
+
+export function slideChange(index) {
+  return dispatch => {
+      dispatch(skintestSlideChange(index));
+  };
+}
+
+export function slideSelectValue(question_id, value) {
+  return dispatch => {
+      dispatch(skintestSlideSelectValue(question_id, value));
+  };
+}
+export function updateUserStore(user) {
+  return {
+    type: UPDATE_USER_STORE,
+    user: user
+  };
+}
+export function saveResult(questions, birthday, birthday_convert, full_name, gender, job, city) {
+  return dispatch => {
+    var continuePage = -1;
+      //dispatch(skintestSaveRequest());
+      var datas = questions.map((question, index) => {
+        if (question.value == -1 && continuePage == -1) {
+          continuePage = index;
+        }
+        var data = {
+          question_id: question.id,
+          value: question.value
+        };
+        return data;
+      });
+      var string_data = JSON.stringify(datas);
+      SkintestService.saveResult(string_data, birthday, full_name, gender, job, city)
+      .then((res) => {
+        switch(res.status) {
+          case 200:
+            data = {
+              is_finished: res.is_finished
+            }
+
+            if (res.is_finished == 1) {
+              var data = {
+                skinType: res.result_type,
+                skinObject: res.skintest,
+                skinDetail: res.result
+              };
+              dispatch(skintestSaveFinished(data));
+              new StoreService().storeSession(Constant.HS_SKIN_CONTINUE_PAGE, -1);
+              dispatch({type: UPDATE_USER_SKINTEST, skintest: res.result_type});
+              dispatch({type: UPDATE_DATA_USER_SKINTEST, data: {birthday: birthday_convert, full_name: full_name, gender: gender, city: city, job: job}});
+              var store = new StoreService();
+              store.updateSession(Constant.HS_DATA_USER, {skintest: res.result_type, birthday: birthday_convert, full_name: full_name, gender: gender}).then(function(){
+                  store.getSession(Constant.HS_DATA_USER).then(function(data){
+                  dispatch(updateUserStore(data));
+                })
+              })
+              setTimeout(function() {
+                Actions.skinResult({type: 'replace'});
+              }, 1500);
+              
+            } else {
+              Alert.alert(
+                'Happy Skin',
+                'Bạn chưa hoàn thành bài test?',
+                [
+                  {text: 'Ok', onPress: () => {}, style: 'cancel'},
+                ]
+              );
+              // new StoreService().storeSession(Constant.HS_SKIN_CONTINUE_PAGE, continuePage);
+              // dispatch(skintestSaveContinue(continuePage));
+            }
+            return;
+          case 500: 
+            Actions.login({type: 'reset'});
+            return;
+          default:
+            dispatch(skintestSaveFailure(error));
+            return;
+        }
+      })
+      .catch((error) => {
+        dispatch(skintestLoadFailure(error));
+      });
+  };
+}
+
+export function storeLocal(questions, page) {
+  return dispatch => {
+    new StoreService().storeSession(Constant.HS_SKIN_QUESTION, questions);
+    new StoreService().storeSession(Constant.HS_SKIN_CONTINUE_PAGE, page);
+  };
+}
+
+export function loadGroupSuggess(type) {
+  return dispatch => {
+    SkintestService.skinresultGroup(type)
+    .then((res) => {
+      if (res.status == 200){
+        dispatch({type: SKINRESULT_LOAD_GROUP_SUGGESS, groups: res.data});
+      }
+    })
+    .catch((error) => {
+    });
+  };
+}
+
+export function loadDataSkintResult() {
+  return dispatch => {
+      dispatch(skintestLoadRequest());
+       SkintestService.skintestResult()
+       .then((res) => {
+        switch(res.status) {
+          case 200:
+            if (res.is_finished == 1) {
+              var data = {
+                skinType: res.result_type,
+                skinObject: res.skintest,
+                skinDetail: res.result
+              };
+              dispatch(skintestSaveFinished(data));
+              new StoreService().storeSession(Constant.HS_SKIN_CONTINUE_PAGE, -1);
+              dispatch({type: UPDATE_USER_SKINTEST, skintest: res.result_type});
+              var store = new StoreService();
+              store.updateSession(Constant.HS_DATA_USER, { skintest: res.result_type});
+            } else {
+              Actions.skintest();
+            }
+            return;
+          case 500: 
+            Actions.login({type: 'reset'});
+            return;
+          default:
+            dispatch(skintestLoadFailure(error));
+            return;
+        }
+       })
+       .catch((error) => {
+         dispatch(skintestLoadFailure(error));
+       });
+  };
+}
+
+export function skintestProductLoadRequest() {
+  return {
+    type: SKINTEST_PRODUCT_LOAD_REQUEST
+  };
+}
+
+export function skintestProductLoadSuccess(data, dataCategories, dataBrands) {
+  return {
+    type: SKINTEST_PRODUCT_LOAD_SUCCESS,
+    data: data,
+    dataCategories: dataCategories,
+    dataBrands: dataBrands
+  };
+}
+
+export function skintestProductLoadFailure(error) {
+  return {
+    type: SKINTEST_PRODUCT_LOAD_FAILURE,
+    error: error
+  };
+}
+
+export function skintestProductLoadMoreRequest(){
+  return {
+    type: SKINTEST_PRODUCT_LOAD_MORE_REQUEST
+  };
+}
+
+export function skintestProductLoadMoreSuccess(data, page){
+  return {
+    type: SKINTEST_PRODUCT_LOAD_MORE_SUCCESS,
+    data: data,
+    page: page
+  };
+}
+
+export function skintestProductLoadMoreFailure(error){
+  return {
+    type: SKINTEST_PRODUCT_LOAD_MORE_FAILURE,
+    error: error
+  };
+}
+
+export function skintestProductRefreshRequest(){
+  return {
+    type: SKINTEST_PRODUCT_REFRESH_REQUEST
+  };
+}
+
+export function openModalCategory() {
+  return {
+    type: SKINTEST_OPEN_MODAL_CATEGORY
+  };
+}
+
+export function openModalBrand() {
+  return {
+    type: SKINTEST_OPEN_MODAL_BRAND
+  };
+}
+
+export function closeModalCategory() {
+  return {
+    type: SKINTEST_CLOSE_MODAL_CATEGORY
+  };
+}
+
+export function closeModalBrand() {
+  return {
+    type: SKINTEST_CLOSE_MODAL_BRAND
+  };
+}
+
+export function skintestProductRefreshSuccess(data){
+  return {
+    type: SKINTEST_PRODUCT_REFRESH_SUCCESS,
+    data: data
+  };
+}
+export function skintestProductRefreshFailure(error){
+  return {
+    type: SKINTEST_PRODUCT_REFRESH_FAILURE,
+    error: error
+  };
+}
+
+export function refreshDataSkintestProduct(skintype, categoryId='', brandId = ''){
+  return dispatch => {
+    dispatch(skintestProductRefreshRequest());
+    SkintestService.listSkintestProduct(skintype, categoryId, brandId)
+      .then((res) => {
+        switch(res.status) {
+          case 200:
+            dispatch(skintestProductRefreshSuccess(res.data));
+            return;
+          case 500: 
+            Actions.login({type: 'reset'});
+            return;
+          default:
+            dispatch(skintestProductRefreshFailure(error));
+            return;
+        }
+      })
+      .catch((error) => {
+        dispatch(skintestProductRefreshFailure(error));
+      });
+  };
+}
+
+
+export function skintestProductLoadMore(skintype, categoryId='', brandId = '', page){
+  return dispatch => {
+    dispatch(skintestProductLoadMoreRequest());
+    SkintestService.listSkintestProductLoadMore(skintype, categoryId, brandId, page)
+      .then((res) => {
+        switch(res.status) {
+          case 200:
+            dispatch(skintestProductLoadMoreSuccess(res.data, page));
+            return;
+          case 500: 
+            Actions.login({type: 'reset'});
+            return;
+          default:
+            dispatch(skintestProductLoadMoreFailure(error));
+            return;
+        }
+      })
+      .catch((error) => {
+        dispatch(skintestProductLoadMoreFailure(error));
+      });
+  };
+}
+
+export function loadDataSkintestProduct(skintype, categoryId='', brandId = '') {
+  return dispatch => {
+    dispatch(skintestProductLoadRequest());
+      SkintestService.listSkintestProduct(skintype, categoryId, brandId)
+        .then((res) => {
+          console.log(res)
+          switch(res.status) {
+            case 200:
+              dispatch(skintestProductLoadSuccess(res.data, res.categories, res.brands));
+              return;
+            case 500: 
+              Actions.login({type: 'reset'});
+              return;
+            default:
+              dispatch(skintestProductLoadFailure(res.error));
+              return;
+          }
+        })
+        .catch((error) => {
+          return dispatch(skintestProductLoadFailure(error));
+        });
+  };
+}
+
+export function loadDataSkintestCategory() {
+  return dispatch => {
+    dispatch({type: SKINTEST_LOAD_CATEGORY_REQUEST});
+      SkintestService.categories()
+      .then((res) => {
+        switch(res.status) {
+          case 200:
+            dispatch({type: SKINTEST_LOAD_CATEGORY_SUCCESS, data: res.data});
+            return;
+          case 500: 
+            Actions.login({type: 'reset'});
+            return;
+          default:
+            dispatch({type: SKINTEST_LOAD_CATEGORY_FAILURE});
+            return;
+        }
+      })
+      .catch((error) => {
+        dispatch({type: SKINTEST_LOAD_CATEGORY_FAILURE});
+      });
+  };
+}
+
+export function selectFilter(skintype, categoryId, brandId, nameCategory, nameBrand) {
+  return dispatch => {
+    dispatch({type: SKINTEST_LOAD_CATEGORY_REQUEST});
+    SkintestService.listSkintestProduct(skintype, categoryId, brandId)
+      .then((res) => {
+        switch(res.status) {
+          case 200:
+            var data = {
+              filterCategory: categoryId,
+              filterBrand: brandId,
+              nameCategory: nameCategory,
+              nameBrand: nameBrand,
+              products: res.data
+            }
+            dispatch({type: SKINTEST_FILTER_SUCCESS, data: data});
+            return;
+          case 500: 
+            Actions.login({type: 'reset'});
+            return;
+          default:
+            dispatch({type: SKINTEST_FILTER_FAILURE});
+            return;
+        }
+      })
+      .catch((error) => {
+        dispatch({type: SKINTEST_FILTER_FAILURE});
+      });
+  };
+}
+
+export function loading(){
+  return dispatch => {
+    dispatch(skintestProductLoadRequest());
+  }
+}
+

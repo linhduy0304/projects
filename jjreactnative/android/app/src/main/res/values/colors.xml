@@ -1,0 +1,12 @@
+<resources>
+    <color name="gray">#e8e8e8</color>
+    <color name="actionbar_background">#e73a4b</color>
+    <color name="ColorJamja">#e73948</color>
+    <color name="ColorJamjaDark">#cf3340</color>
+    <color name="ColorJamjaLight">#c8e73948</color>
+    <!--<color name="background">#e8e8e8</color>-->
+    <color name="background">#fafafa</color>
+    <color name="background_grey_1">#fafafa</color>
+
+
+</resources>

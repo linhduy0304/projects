@@ -1,0 +1,457 @@
+import React from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  ScrollView,
+  Dimensions,
+  ListView,
+  TouchableOpacity,
+  RefreshControl,
+  Alert,
+  Animated,
+  FlatList
+} from "react-native"
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import {Map} from 'immutable';
+import * as communityActions from '../../actions/communityActions';
+import * as pageGroupActions from '../../actions/pageGroupActions';
+let ConstantSystem = require('../../services/ConstantSystem');
+import ActionButton from 'react-native-action-button';
+var Spinner = require('react-native-spinkit');
+import {Actions} from "react-native-router-flux";
+
+const actions = [
+  communityActions,
+  pageGroupActions
+];
+
+let deviceWidth = Dimensions.get('window').width;
+import BookFeedCommunity from '../BookFeedCommunity';
+
+// import {
+//     LazyloadScrollView,
+//     LazyloadView,
+//     LazyloadImage,
+//     LazyloadListView
+// } from 'react-native-lazyload';
+
+function mapStateToProps(state) {
+  return {
+    scrollToTop: state.scrollToTop,
+    community: state.community,
+    data: state.data,
+    profile: state.profile,
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class CommunityTop extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      isLoadingTail: false,
+      datas: [],
+      page: 1,
+      isHasData: true,
+      isRefreshing: false,
+      isErrorGroup: false,
+      loadData: true,
+      is_join_group: this.props.group.is_join_group,
+      scrollY: new Animated.Value(0),
+    }
+  }
+
+  componentDidMount() {
+    this.props.actions.loadMoreTabCommunity(this.props.id, this.state.page);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.scrollToTop !== this.props.scrollToTop && nextProps.scrollToTop.community){
+      this.refs.listRef.scrollToOffset({x: 0, y: 0, animated: true})
+    }
+    if (nextProps.community.currentTab == this.props.id) {
+      if (nextProps.community.postTabIds.length != 0) {
+        if(this.state.loadData) {
+          var newDatas = this.state.datas.concat(nextProps.community.postTabIds);
+          this.setState({datas: newDatas, loadData: false});
+          if(nextProps.community.postTabIds.length >= 15) {
+            this.setState({isHasData: true});
+          }
+        } else {
+          this.setState({loadData: false});
+        }
+      } else {
+        this.setState({isHasData: false});
+      }
+    }
+  }
+
+  _renderFooter() {
+    if (this.props.community.tabIsFetching) {
+      return (
+        <View style={main.footer}>
+          <Spinner isVisible={this.props.community.tabIsFetching} size={50} type={theme.SpinnerTypeMore} color={theme.SpinnerColorMore} bgStyle={{ backgroundColor: 'transparent' }}/>
+        </View>
+      );
+    }
+    return null;
+  }
+
+  _onRefresh() {
+    this.setState({isRefreshing: true});
+    setTimeout(() => {
+      this.setState({
+        isRefreshing: false
+      });
+    }, 1000);
+  }
+
+  _handleEndReached() {
+    this.setState({loadData: this.state.datas.length % 15 == 0 ? true : false});
+    if (this.state.isHasData) {
+      this.setState({ page: this.state.page + 1 });
+      this.getDataSource(this.state.page + 1);
+    }
+  }
+
+  getDataSource(page) {
+    this.props.actions.loadMoreTabCommunity(this.props.id, page);
+  }
+
+  joinGroup() {
+    if(this.state.is_join_group == 0) {
+      this.setState({is_join_group: 1});
+    } else {
+      this.setState({is_join_group: 0});
+    }
+    this.props.actions.joinGroup(this.props.group);
+  }
+
+  actionPost(type) {
+    if(this.state.is_join_group == 0) {
+      this.setState({is_join_group: 1});
+    } else {
+      this.setState({is_join_group: 0});
+    }
+    this.props.actions.joinGroup(this.props.group, type);
+  }
+
+  actions(type) {
+    if(this.props.group.id == '2' || this.state.is_join_group == 1) {
+      switch(type){
+        case 'question':
+          Actions.question();
+          break;
+        case 'lookOfTheDayPage': 
+          Actions.lookOfTheDayPage1();
+          break;
+        case 'tips':
+          Actions.tips();
+          break;
+        case 'review':
+          Actions.review();
+          break;
+        }
+    } else {
+      Alert.alert(
+        'Thông báo',
+        'Bạn chưa tham gia nhóm, bạn có muốn tham gia không?',
+        [
+          {text: 'Tham gia', onPress: () => this.actionPost(type)},
+          {text: 'Hủy', style: 'cancel'}
+        ] 
+      );
+    }
+  }
+
+  // onScroll(scrollY) {
+  //   this.props.actions.onScroll(scrollY);
+  // }
+  
+  _renderHeader() {
+    return <View style={styles.scrollView}>
+      {
+        (this.props.id != '1' && this.props.id != '2' )
+        ?
+        <View style={{position: 'relative'}}>
+          <Image source={ !this.state.isErrorGroup && this.props.group.image_thumb != '' ? { uri: this.props.group.image_thumb+'_600x400.png' } : require('../../images/group_thumb.png') } style={styles.backgroundImg} onError={(e) => {this.setState({ isErrorGroup: true}) } }>
+          </Image>
+          <View style={styles.blurImage}></View>
+          <View style= {{position: 'absolute', left:0, top: 0, right:0, bottom:0, justifyContent: 'space-around'}}>
+            <TouchableOpacity style={styles.viewGroupName} >
+              <Text style={styles.groupLabel}  numberOfLines={2}>
+                {this.props.group.name}
+              </Text>
+              <Text style={styles.groupShort}>
+                #{this.props.group.short_name}
+              </Text>
+            </TouchableOpacity>
+            <View style={styles.viewGroupInfo} >
+              <View style={styles.colGroupInfo}>
+                <Text style={styles.colNumber}>
+                  {this.props.group.total_members}
+                </Text>
+                <Text style={styles.colText}>
+                  Thành viên
+                </Text>
+              </View>
+              <View style={styles.colGroupInfo}>
+                <Text style={styles.colNumber}>
+                  {this.props.group.total_feeds}
+                </Text>
+                <Text style={styles.colText}>
+                  Bài viết
+                </Text>
+              </View>
+              {(this.props.group.type == 'public' && this.state.is_join_group == 0) ?
+                <View style={styles.colGroupInfo}>
+                  <TouchableOpacity style={styles.buttonFollow} onPress={() => this.joinGroup()}>
+                    <Text style={styles.textButtonJoin}>Tham gia</Text>
+                  </TouchableOpacity>
+                </View>
+                :
+                null
+              }
+            </View>
+          </View>
+        </View>
+          
+            
+        : null
+      }
+      <View style={styles.titleContentNews}>
+        <Text>Bài viết tiêu biểu</Text>
+      </View>
+    </View>
+  }
+
+  _handleOnScroll(e) {
+    if (e.nativeEvent.contentOffset.y > 0) {
+      this.props.onScroll(e);
+    }
+  }
+
+  render(){
+    return (
+      <View style={styles.content}>
+        <View style={[styles.container]}>
+          <FlatList
+                ref='listRef'
+                name={this.props.group.id}
+                onScroll={(position) => this.props.onScroll(position)}
+                ListHeaderComponent={() => this._renderHeader()}
+                ListFooterComponent={() => this._renderFooter()}
+                data={this.state.datas}
+                onEndReached={() => this._handleEndReached()}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={this.state.isRefreshing}
+                        onRefresh={() => this._onRefresh()}
+                    />
+                }
+                renderItem={(data) => this.renderItemListView(data.item)}
+                onEndReachedThreshold={ConstantSystem.PER_PAGE}
+                disableVirtualization={ConstantSystem.FLATLIST_VITUAL}
+                keyExtractor={(data, index) => index}
+            />
+        </View>
+        {/* <ActionButton buttonColor="rgba(231,76,60,1)" size={40} spacing={10} offsetY={25} offsetX={25} bgColor="rgba(0,0,0,0.4)" >
+          <ActionButton.Item buttonColor='#446EB6' title="Hỏi" onPress={() => this.actions('question')}>
+            <Image source={require('../../images/icons/ic_hoi2.png')} style={{width: 22, height: 16.5}}/>
+          </ActionButton.Item>
+          <ActionButton.Item buttonColor='#e9457a' title="Ảnh" onPress={() => this.actions('lookOfTheDayPage')}>
+            <Image source={require('../../images/icons/ic_image2.png')} style={{width: 22, height: 16.5}}/>
+          </ActionButton.Item>
+          <ActionButton.Item buttonColor='#8750A1' title="Mẹo" onPress={() => this.actions('tips')}>
+            <Image source={require('../../images/icons/ic_meo2.png')} style={{width: 22, height: 17}}/>
+          </ActionButton.Item>
+          <ActionButton.Item buttonColor='#FE7535' title="Review" onPress={() => this.actions('review')}>
+            <Image source={require('../../images/icons/ic_review2.png')} style={{width: 17, height: 17}}/>
+          </ActionButton.Item>
+        </ActionButton> */}
+      </View>
+    );
+  }
+
+  renderItemListView(id){
+    return <BookFeedCommunity 
+    feed={this.props.data.posts[id]} 
+    key={id} 
+    currentUser={this.props.profile.currentUser} 
+    listView={this.props.group.id} />;
+  }
+}
+const HEADER_MAX_HEIGHT = 66;
+const HEADER_MIN_HEIGHT = 20;
+const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
+const styles = StyleSheet.create({
+  content: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF"
+  },
+  scrollView:{
+    width: deviceWidth
+  },
+  boxNewsSimple: {
+    marginTop: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eaeaea'
+  },
+  boxInfoUser: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 30
+  },
+  groupSkin: {
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  infoUser: {
+    flexDirection: 'row'
+  },
+  avatar:{
+    width: 20,
+    height: 20
+  },
+  username:{
+
+  },
+  titleNews:{
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  infoNewsTime: {
+    fontSize: 12,
+    color: '#ccc'
+  },
+  boxNewsHaveThumb: {
+    marginTop: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eaeaea'
+  },
+  mainNewsHaveThumb: {
+    flexDirection: 'row',
+    flex: 1
+  },
+  newsThumb: {
+    width: 100,
+    height: 80,
+    marginRight: 10
+  },
+  contentNewsHaveThumb: {
+    flex: 1
+  },
+  rating: {
+    alignItems: "flex-start",
+    flexDirection: 'row'
+  },
+  headerView: {
+    flex: 1,
+    borderWidth: 2
+  },
+  backgroundImg: {
+    width: deviceWidth,
+    height: 200,
+    resizeMode: 'cover',
+    // alignItems: 'center',
+    // justifyContent: 'space-around'
+  },
+  viewGroupName: {
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    // marginTop: 10,
+    // marginBottom: 10,
+    marginLeft: 40,
+    marginRight: 40,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    justifyContent: 'center'
+  },
+  groupLabel: {
+    paddingTop: 10,
+    paddingBottom: 5,
+    fontSize: 22,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  groupShort: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 5,
+    paddingBottom: 5,
+  },
+  viewGroupInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: 'transparent',
+    // marginTop: 5
+  },
+  colGroupInfo: {
+    flex: 0.33,
+    alignItems: 'center'
+  },
+  colNumber: {
+    fontSize: 18,
+    color: '#FFFFFF'
+  },
+  colText: {
+    fontSize: 15,
+    color: '#FFFFFF',
+    fontWeight: '200'
+  },
+  titleContentNews: {
+    height: 42,
+    justifyContent: 'center',
+    paddingLeft: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eaeaea',
+    borderTopWidth: 1,
+    borderTopColor: '#eaeaea'
+  },
+  blurImage: {
+    backgroundColor: '#000',
+    position: 'absolute',
+    width: deviceWidth,
+    height: 200,
+    top: 0,
+    left: 0,
+    opacity: 0.5
+  },
+  buttonFollow: {
+    width: 90,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fe7535',
+    borderRadius: 3,
+    // marginBottom: 10
+  },
+  textButtonJoin: {
+    color: 'white',
+  },
+});
+
+let main = require('../../styles/Main');
+let theme = require('../../services/Theme');
+export default connect(mapStateToProps, mapDispatchToProps)(CommunityTop);

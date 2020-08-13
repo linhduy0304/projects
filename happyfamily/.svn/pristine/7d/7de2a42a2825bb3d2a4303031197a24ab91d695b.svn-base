@@ -1,0 +1,116 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  StatusBar,
+  Platform
+} from 'react-native';
+
+import NavBar, { NavButton, NavTitle } from 'react-native-nav';
+import css from '../Css'
+import Header from '../components/home/Header';
+import ItemPost from '../components/home/ItemPost';
+import ItemImage from '../components/home/ItemImage';
+import Loading from '../components/Loading';
+
+import {loadHome} from '../actions/home'
+import { connect } from 'react-redux'
+
+class Home extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      status: '',
+      
+    }
+  }
+
+  componentWillMount() {
+    this.props.loadHome();
+  }
+
+  renderHeader() {
+    return (
+      <View>
+        <Header 
+          onChange={(status) => this.setState({status})}
+          uri = {this.props.profile.currentUser.avatar}
+          value = {this.state.status}
+        />
+        {
+          this.props.home.loading ?
+          <Loading/>
+          : 
+          null
+        }
+      </View>
+    )
+  }
+
+  renderItem(data) {
+    switch(data.type) {
+      case 'text':
+        return <ItemPost full_name = {this.props.profile.currentUser.full_name} data = {data}/>
+      default:
+        return <ItemImage full_name = {this.props.profile.currentUser.full_name} data = {data}/>
+    }
+  }
+
+  render() {
+    console.log(this.props.home.home)
+    return (
+      <View style={styles.container}>
+        <View style={{height: Platform.OS === 'ios' ? 20 : 0, backgroundColor: '#C6247D'}}></View>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'light-content', backgroundColor: '#297FCA'}} >
+          <NavButton/>
+          <NavTitle style={css.navTitle}>
+            <Text style={css.txtTitle}>Happy Family</Text>
+          </NavTitle>
+          <NavButton/>
+          <TouchableOpacity onPress={() => null} style={{position: 'absolute', left: 0, padding: 15}}>
+            <Image source={require('../images/icons/ic_menu.png')} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => null} style={{position: 'absolute', right: 0, padding: 15}}>
+            <Image source={require('../images/icons/ic_search.png')} />
+          </TouchableOpacity>
+        </NavBar>
+
+        <FlatList 
+          ListHeaderComponent={() => this.renderHeader()}
+          data = {this.props.home.home}
+          renderItem = {(data) => this.renderItem(data.item)}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  }
+})
+
+const mapStateToProps = (state) => {
+  return {
+    home: state.home,
+    profile: state.profile
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    loadHome: () => dispatch(loadHome()),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);

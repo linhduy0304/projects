@@ -1,0 +1,144 @@
+import React from 'react';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Dimensions,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  ImageBackground
+} from 'react-native';
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+
+import { Actions } from "react-native-router-flux";
+
+class ModalUpdate extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+
+    }
+  }
+
+  render(){
+    return (
+      <View style={styles.content}>
+        <ScrollView>
+          <Text style={styles.txtUpdate}>CẬP NHẬT TIẾN TRÌNH</Text>
+          <Text style={styles.txtCheck}>Chọn những sản phẩm bạn đã dùng theo liệu trình ngày hôm nay.</Text>
+          <View style={styles.boxProduct}>
+            <ImageBackground style={styles.icProduct} source={require('../../images/thumb_product_2.png')}>
+              <Image style={styles.icCheck} source={require('../../images/icons/ic_checked.png')}/>
+            </ImageBackground>
+            <ImageBackground style={styles.icProduct} source={require('../../images/thumb_product_2.png')}>
+              <Image style={styles.icCheck} source={require('../../images/icons/ic_checked.png')}/>
+            </ImageBackground>
+            <ImageBackground style={styles.icProduct} source={require('../../images/thumb_product_2.png')}>
+              <Image style={styles.icCheck} source={require('../../images/icons/ic_checked.png')}/>
+            </ImageBackground>
+            <ImageBackground style={styles.icProduct} source={require('../../images/thumb_product_2.png')}>
+              <Image style={styles.icCheck} source={require('../../images/icons/ic_checked.png')}/>
+            </ImageBackground>
+            <ImageBackground style={styles.icProduct} source={require('../../images/thumb_product_2.png')}>
+              <Image style={styles.icCheck} source={require('../../images/icons/ic_checked.png')}/>
+            </ImageBackground>
+            <ImageBackground style={styles.icProduct} source={require('../../images/thumb_product_2.png')}>
+              <Image style={styles.icCheck} source={require('../../images/icons/ic_check.png')}/>
+            </ImageBackground>
+            <ImageBackground style={styles.icProduct} source={require('../../images/thumb_product_2.png')}>
+              <Image style={styles.icCheck} source={require('../../images/icons/ic_checked.png')}/>
+            </ImageBackground>
+            <ImageBackground style={styles.icProduct} source={require('../../images/thumb_product_2.png')}>
+              <Image style={styles.icCheck} source={require('../../images/icons/ic_check.png')}/>
+            </ImageBackground>
+            <ImageBackground style={styles.icProduct} source={require('../../images/thumb_product_2.png')}>
+              <Image style={styles.icCheck} source={require('../../images/icons/ic_checked.png')}/>
+            </ImageBackground>
+            <ImageBackground style={styles.icProduct} source={require('../../images/thumb_product_2.png')}>
+              <Image style={styles.icCheck} source={require('../../images/icons/ic_checked.png')}/>
+            </ImageBackground>
+            <ImageBackground style={styles.icProduct} source={require('../../images/thumb_product_2.png')}>
+              <Image style={styles.icCheck} source={require('../../images/icons/ic_checked.png')}/>
+            </ImageBackground>
+            <ImageBackground style={styles.icProduct} source={require('../../images/thumb_product_2.png')}>
+              <Image style={styles.icCheck} source={require('../../images/icons/ic_check.png')}/>
+            </ImageBackground>
+          </View>
+          <View style={styles.boxButton}>
+            <TouchableOpacity style={styles.buttonUpdate}>
+              <Text style={styles.txtButtonUpdate}>Cập nhật</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonCancel}>
+              <Text style={styles.txtButtonCancel}>Bỏ qua</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  content: {
+    flex: 1,
+    paddingLeft: 20,
+    paddingRight: 20
+  },
+  txtUpdate: {
+    color: '#8750A1',
+    fontSize: 14,
+    paddingTop: 20,
+  },
+  txtCheck: {
+    color: '#1F2027',
+    fontSize: 14,
+    paddingTop: 30
+  },
+  boxProduct: {
+    flexWrap: 'wrap', 
+    flexDirection: 'row', 
+    marginTop: 25
+  },
+  icProduct: {
+    width: 70,
+    height: 70,
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+    marginBottom: 10,
+    marginRight: 5
+  },
+  icCheck: {
+    width: 12,
+    height: 12
+  },
+  boxButton: {
+    flexDirection: 'row',
+    marginTop: 30
+  },
+  buttonUpdate: {
+    width: 105,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    backgroundColor: '#FE7535'
+  },
+  txtButtonUpdate: {
+    fontSize: 14,
+    color: '#FFFFFF',
+  },
+  buttonCancel: {
+    width: 105,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF'
+  },
+  txtButtonCancel: {
+    fontSize: 14,
+    color: '#FE7535'
+  },
+});
+module.exports = ModalUpdate;

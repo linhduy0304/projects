@@ -1,0 +1,231 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  Platform
+} from 'react-native';
+import ListUserGroup from '../../components/chat/ListUserGroup';
+import NavBar, { NavButton, NavGroup, NavTitle } from 'react-native-nav';
+import css from '../../Css';
+import {Actions} from 'react-native-router-flux';
+import Toask from 'react-native-simple-toast';
+import Loading from '../../components/Loading';
+
+import {friendList, createGroup} from '../../actions/chat'
+import { connect } from 'react-redux'
+
+class ChatGroup extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      group_name: '',
+      arrUser: [],
+      arrIdUser: [],
+    }
+  }
+
+  componentWillMount() {
+    this.props.friendList()
+  }
+  
+  addUser(user) {
+    var arrUser  = this.state.arrUser;
+    var arrIdUser = this.state.arrIdUser;
+    if(arrUser.length == 0) {
+      arrUser: arrUser.unshift(user);
+      arrIdUser: arrIdUser.unshift(user.id)
+      this.setState({
+        arrUser,
+        arrIdUser
+      })
+    }else {
+      for(const i=0; i< arrUser.length; i++) {
+        if(arrUser[i].id == user.id) {
+          arrUser: arrUser.splice(i, 1);
+          arrIdUser: arrIdUser.splice(i, 1);
+          this.setState({
+            arrUser,
+            arrIdUser
+          })
+          return;
+        }
+      }
+      arrUser: arrUser.unshift(user);
+      arrIdUser: arrIdUser.unshift(user.id);
+      this.setState({
+        arrUser,
+        arrIdUser
+      })
+    }
+  }
+
+  renderTo() {
+    var arrUser = ''
+    this.state.arrUser.map((user, index) => {
+      return arrUser = ' '+user.full_name+ ',' + arrUser 
+    })
+    return arrUser
+  }
+
+  createGroup() {
+    if(this.state.group_name === '') {
+      Toask.show('Bạn chưa nhập tên nhóm.');
+      return ;
+    }
+    var body = {
+      name: this.state.group_name,
+      user_ids: this.state.arrIdUser
+    };
+    this.props.createGroup(body)
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={{height: Platform.OS === 'ios' ? 20 : 0, backgroundColor: '#C6247D'}}></View>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'light-content', backgroundColor: '#C6247D'}} >
+          <NavButton/>
+          <NavTitle style={css.navTitle}>
+            <Text style={[css.txtTitle, {fontWeight: '400'}]}>Create group</Text>
+          </NavTitle>
+          <NavButton/>
+          <TouchableOpacity onPress={() => Actions.pop()} style={{position: 'absolute', left: 0, padding: 15}}>
+            <Image source={require('../../images/icons/ic_back.png')} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => this.createGroup()} style={{position: 'absolute', right: 0, padding: 15}}>
+            <Text style={[css.txtTitle]}>Done</Text>
+          </TouchableOpacity>
+        </NavBar>
+
+        <View style={styles.ctHeader}>
+          <View style={styles.ctCamera}>
+            <Image source={require('../../images/icons/ic_camera.png')} />
+          </View>
+          <TextInput
+            value={this.state.group_name}
+            placeholder='Group name'
+            placeholderTextColor='#e59dc5'
+            onChangeText={(group_name) => this.setState({group_name: group_name})}
+            style={styles.txtInput}
+            underlineColorAndroid='transparent'
+          />
+        </View>
+
+        <View style={styles.ctTo}>
+          <Text style={styles.txtTo}>To:
+            <Text style={{color: '#c6247d'}}>{this.renderTo()}</Text>
+          </Text>
+        </View>
+
+        <ScrollView
+          keyboardShouldPersistTaps={'always'}>
+          {
+            this.props.chat.loading ? 
+              <Loading />
+            :
+            this.props.chat.friendList ?
+              this.props.chat.friendList.map((item, index) => {
+                return <ListUserGroup 
+                              arrUser={this.state.arrUser}
+                              key={index}
+                              user={item} 
+                              onPress={() => this.addUser(item)}
+                            />
+              })
+            : null
+          }
+        {/* {
+          this.state.data.map((item, index) => {
+            return (
+              <View key={index}>
+                <View style={styles.ctLabel}>
+                  <Text style={styles.txtLabel}>{item.label}</Text>
+                </View>
+                {
+                  item.users.map((user, index1) => {
+                    return <ListUserGroup 
+                              arrUser={this.state.arrUser}
+                              key={index1}
+                              user={user} 
+                              onPress={() => this.addUser(user)}
+                            />
+                  })
+                }
+              </View>
+            )
+          })
+        } */}
+        </ScrollView>
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  txtLabel: {
+    color: '#287FC9',
+    fontSize: 15
+  },
+  ctLabel: {
+    backgroundColor: '#F7FCFE',
+    paddingLeft: 15,
+    padding: 5
+  },
+  txtTo: {
+    color: '#e59dc5',
+    fontSize: 17
+  },
+  ctTo: {
+    marginTop: 15,
+    padding: 10,
+    paddingLeft: 15,
+    backgroundColor: '#fff',
+    borderBottomColor: '#E3F1FD',
+    borderBottomWidth: 1
+  },
+  txtInput: {
+    flex: 1,
+    fontSize: 17,
+    color: '#c6247d'
+  },
+  ctCamera: {
+    backgroundColor: '#e59dc5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+  },
+  ctHeader: {
+    padding: 15,
+    backgroundColor: '#fff',
+    flexDirection: 'row'
+  },
+  container: {
+    flex: 1,
+    // backgroundColor: '#E3F1FD'
+    backgroundColor: '#e59dc5'
+  }
+})
+
+const mapStateToProps = (state) => {
+  return {
+    chat: state.chat
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    friendList: () => dispatch(friendList()),
+    createGroup: (body) => dispatch(createGroup(body))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ChatGroup);

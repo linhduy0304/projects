@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>aps-environment</key>
+	<string>development</string>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:jamja.vn</string>
+		<string>applinks:app.jamja.vn</string>
+		<string>applinks:jjdev.page.link</string>
+		<string>applinks:jamja.page.link</string>
+		<string>applinks:dev.jamja.vn</string>
+	</array>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.vn.jamja.ios.JAMJA</string>
+		<string>group.vn.jamja.ios.JAMJA.onesignal</string>
+	</array>
+</dict>
+</plist>

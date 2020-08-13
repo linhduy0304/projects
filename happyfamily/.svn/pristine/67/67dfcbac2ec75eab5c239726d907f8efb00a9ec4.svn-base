@@ -1,0 +1,202 @@
+
+import React from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Dimensions,
+  TextInput,
+  Platform,
+  StatusBar
+} from 'react-native';
+import Button from '../Button'
+
+var DeviceInfo = require('react-native-device-info');
+var Modal = require('react-native-modalbox');
+const window1 = Dimensions.get('window');
+
+import {postStatus} from '../../actions/home'
+import { connect } from 'react-redux'
+import Loading from '../Loading';
+
+class ModalStatus extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      status: '',
+      active: null
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.home !== this.props.home) {
+      if(nextProps.home.closeModalStatus) {
+        this.props.close()
+        this.setState({
+          status: ''
+        })
+      }
+    }
+  }
+
+  onChange(status) {
+    this.setState({
+      status: status
+    });
+    setTimeout(() => {
+      if(this.state.status !== '') {
+        this.setState({
+          active: true
+        })
+      }else {
+        this.setState({
+          active: null
+        })
+      }
+    }, 100)
+    
+  }
+
+
+
+  postStatus() {
+    if(this.state.active) {
+      var body = {
+        type: 'text',
+        content: this.state.status
+      }
+      this.props.postStatus(body)
+    }
+  }
+
+  render(){
+    return (
+      <Modal
+      style={[css.ctModal]}
+      isOpen={this.props.isOpen}
+      position="top"
+      backdropColor="#292c34"
+      onClosed={this.props.close}
+      >
+        <View>
+          <View style={css.ctInput}>
+            <Image style={css.avatar} source={this.props.profile.currentUser ? this.props.profile.currentUser.avatar ? {uri: this.props.profile.currentUser.avatar+'.png'} : require('../../images/avatar_default.png') : null} />
+            <TextInput 
+              value={this.state.status}
+              style={css.input}
+              autoFocus={true}
+              onChangeText = {(status) => this.onChange(status)}
+              placeholderTextColor = '#768196'
+              placeholder='What do you feel right now?'
+              underlineColorAndroid='transparent'
+            />
+          </View>
+          <View style={css.btn}>
+            <View style={css.ctItem}>
+              <View style={css.ctImg}>
+                <Image source={require('../../images/icons/ic_camera_white.png')} />
+              </View>
+              <Text style={css.txt}>Photo</Text>
+            </View>
+            <View style={css.ctItem}>
+              <View style={css.ctImg}>
+                <Image source={require('../../images/icons/ic_felling.png')} />
+              </View>
+              <Text style={css.txt}>Feeling</Text>
+            </View>
+            <View style={css.ctItem}>
+              <View style={css.ctImg}>
+                <Image source={require('../../images/icons/ic_location.png')} />
+              </View>
+              <Text style={css.txt}>Location</Text>
+            </View>
+          </View>
+
+          {
+            this.props.home.loading ?
+             <Loading 
+              title={'Đang đăng bài'}
+             />
+             : 
+             <Button
+                title = 'Đăng'
+                color = 'white'
+                disabled = {this.state.active ? false : true}
+                marginTop= {20}
+                onPress = {() => this.postStatus()}
+                fontSize = {16}
+                fontWeight = '500'
+                backgroundColor = {this.state.active ? 'rgb(38, 114, 203)' : '#a5bde5'}
+              />
+          }
+          
+          
+        </View>
+    </Modal>
+    )
+  }
+}
+
+const css = StyleSheet.create({
+  ctModal: {
+    marginTop: Platform.OS === 'ios' ? 20 : DeviceInfo.getSystemVersion().slice(0, 1) != 4 ? 44+StatusBar.currentHeight : 44 ,
+    height: window.height,
+    padding: 15,
+    backgroundColor: '#fff',
+    width: window1.width
+  },
+  txt: {
+    fontWeight: 'bold',
+    marginLeft: 10,
+    color: '#0d0e15'
+  },
+  btn: {
+    marginTop: 15,
+    flexDirection: 'row',
+  },
+  ctImg: {
+    backgroundColor: '#fe2042',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ctItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  input: {
+    flex: 1,
+    marginLeft: 15,
+    padding: 0,
+    fontSize: 16,
+  },
+  ctInput: {
+    flexDirection: 'row',
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+})
+
+const mapStateToProps = (state) => {
+  return {
+    home: state.home,
+    profile: state.profile
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    postStatus: (body) => dispatch(postStatus(body)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ModalStatus);
+  

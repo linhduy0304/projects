@@ -1,0 +1,373 @@
+import React from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+  ListView,
+  FlatList,
+  Platform,
+  RefreshControl,
+  StatusBar
+} from "react-native";
+
+import {Actions} from "react-native-router-flux";
+import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav';
+import DefaultTabBar from '../components/inventory/ScrollableTabBar';
+import BoxReview from '../components/magazine/BoxReview'
+import DeviceInfo from 'react-native-device-info'
+import BoxSkinCare from '../components/magazine/BoxSkinCare'
+import BoxCoach from '../components/magazine/BoxCoach'
+import ReviewRoutine from "../components/ReviewRoutine";
+import ModalSearchPost from '../components/search/ModalSearchPost';
+import ItemPost from '../components/search/ItemPost';
+
+var ScrollableTabView = require('react-native-scrollable-tab-view');
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+var Modal = require('react-native-modalbox')
+const margin = StatusBar.currentHeight + 94;
+//connect
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import {Map} from 'immutable';
+
+import * as searchActions from '../actions/searchActions';
+import * as routineActions from '../actions/routineActions';
+const actions = [
+  searchActions,
+  routineActions
+];
+
+function mapStateToProps(state) {
+  return {
+    search: state.search,
+    routine: state.routine
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+
+class Search extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      search: this.props.keyword ? this.props.keyword : '',
+      type: 'product',
+      isRefreshing: false,
+      page: 1,
+      categoryPost: 'Chọn loại tin',
+      modalCategoryPost: false,
+    }
+  }
+
+  componentWillMount() {
+  }
+
+  componentDidMount(){
+    if (this.props.keyword) {
+      this.submitSearch(this.state.search, 'product');
+    }
+  }
+
+  submitSearch(keyword, type) {
+    if (keyword != '') {
+      this.props.actions.search(keyword, type, 'L', 1);
+    }
+  }
+
+  _onRefresh() {
+    this.setState({
+      isRefreshing: true,
+      page: 1
+    });
+    this.props.actions.search(this.state.search, this.state.type, 'RF', 1);
+    this.setState({
+      isRefreshing: false,
+    })
+  }
+
+  loadMore() {
+    if (!this.props.search.loadMore) {
+        return;
+    }
+    this.props.actions.search(this.state.search, this.state.type, 'LM', this.state.page + 1);
+    this.setState({
+        page: this.state.page + 1,
+    });
+  }
+
+  _renderFooter() {
+    if(this.props.search.loadMore) {
+      return (
+        <View style={{width: deviceWidth, marginTop:20,marginBottom: 10,alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
+          <Image style={{height: 10, width: 10}} source={require('../images/load_more.gif')} />
+          <Text style={{color: 'rgb(197, 172, 211)', fontSize: 12, marginLeft: 8}}>Đang tải</Text>
+        </View>
+      )
+    }
+    else return null;
+  }
+
+  changePage(page){
+    let __this = this;
+    switch (page){
+      case 0:
+        this.setState({
+          type: 'product'
+        });
+        if(__this.state.search == '' || this.props.search.kwProduct !== __this.state.search) {
+          __this.props.actions.search(__this.state.search, 'product', 'L', 1);
+        }
+        return;
+      case 1:
+        this.setState({
+          type: 'post'
+        });
+        if(__this.state.search == '' || this.props.search.kwPost !== __this.state.search) {
+          __this.props.actions.search(__this.state.search, 'post', 'L', 1);
+        }
+        return;
+      case 2:
+        this.setState({
+          type: 'routine'
+        });
+        if(__this.state.search == '' || this.props.search.kwRoutine !== __this.state.search) {
+          __this.props.actions.search(__this.state.search, 'routine', 'L', 1);
+        }
+        return;
+      case 3:
+        this.setState({
+          type: 'coach'
+        });
+        if(__this.state.search == '' || this.props.search.kwCoach !== __this.state.search) {
+          __this.props.actions.search(__this.state.search, 'coach', 'L', 1);
+        }
+        return;
+      default:
+        __this.props.actions.search(__this.state.search, 'product', 'L');
+    }
+  }
+
+  
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <NavBar style={{navBar: main.navBarSearch }} statusBar={{barStyle: 'light-content', backgroundColor: 'black'}}>
+          <Image style={styles.icSearch} source={require('../images/icons/ic_search_small.png')} />
+          <TextInput
+            style={styles.input}
+            placeholder="Nhập nội dung tìm kiếm"
+            placeholderTextColor="#7f9ccd"
+            value={this.state.search}
+            underlineColorAndroid="transparent"
+            onChangeText={(search) => this.setState({search: search})}
+            onSubmitEditing={() => this.submitSearch(this.state.search, this.state.type)}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          <TouchableOpacity style={{ padding: 10}} onPress={()=> Actions.pop()}>
+            <Image style={styles.icClose} source={require('../images/icons/ic_close_black2.png')} />
+          </TouchableOpacity>
+        </NavBar>
+        <View style={styles.content}>
+          <ScrollableTabView
+            ref="tabSearch"
+            tabBarTextStyle={{fontSize: 14}}
+            tabBarActiveTextColor='rgb(51, 51, 51)'
+            tabBarInactiveTextColor='rgba(0, 0, 0, 0.7)'
+            tabBarUnderlineStyle={{height: 2, backgroundColor: '#333333'}}
+            onChangeTab = {(page) => this.changePage(page.i)}
+            renderTabBar={() => <DefaultTabBar />}
+            >
+            <View tabLabel="SẢN PHẨM" >
+              {
+                this.props.search.isFetching ?
+                <View style={main.mainSpinTop}>
+                  <Image style={main.imgLoading} source={require('../images/spinner.gif')} />
+                </View>
+                : 
+                this.props.search.product.length == 0 ?
+                  <View style={{alignItems: 'center', paddingTop: 20,}}>
+                    <Text>Không có kết quả tìm kiếm</Text>
+                  </View>
+                  :
+                  <FlatList 
+                    data={this.props.search.product}
+                    ListFooterComponent={() => this._renderFooter()}
+                    onEndReached={() => this.loadMore()}
+                    onEndReachedThreshold={0.2}
+                    refreshControl={
+                      <RefreshControl
+                          refreshing={this.state.isRefreshing}
+                          onRefresh={() => this._onRefresh()}
+                      />
+                    }
+                    renderItem={(data) => <BoxReview data={data.item}/> }
+                  />
+              }
+            </View>
+            <View tabLabel="BÀI VIẾT">
+              <View style={{flexDirection: 'row'}}>
+              <TouchableOpacity style={[styles.filter,]} onPress={ () => this.setState({modalCategoryPost: true}) }>
+                <Text style={{color: '#fff'}}>{this.state.categoryPost}</Text>
+                <Image source={require('../images/icons/ic_caret_down.png')} style={{width: 8, height: 5,marginLeft: 20}}/>
+              </TouchableOpacity>
+              </View>
+              {
+                this.props.search.isFetching ?
+                <View style={main.mainSpinTop}>
+                  <Image style={main.imgLoading} source={require('../images/spinner.gif')} />
+                </View>
+                : 
+                this.props.search.post.length == 0 ?
+                  <View style={{alignItems: 'center', paddingTop: 20,}}>
+                    <Text>Không có kết quả tìm kiếm</Text>
+                  </View>
+                  :
+                  <FlatList 
+                    data={this.props.search.post}
+                    // contentContainerStyle={{flex: 1, backgroundColor: 'red'}}
+                    ListFooterComponent={() => this._renderFooter()}
+                    onEndReached={() => this.loadMore()}
+                    onEndReachedThreshold={0.2}
+                    refreshControl={
+                      <RefreshControl
+                          refreshing={this.state.isRefreshing}
+                          onRefresh={() => this._onRefresh()}
+                      />
+                    }
+                    renderItem={(data) => <ItemPost posts={data.item}/> }
+                  />
+                }
+               
+            </View>
+           
+            {/* <View tabLabel="LIỆU TRÌNH">
+            {
+              this.props.search.isFetching ?
+              <View style={main.mainSpinTop}>
+                <Image style={main.imgLoading} source={require('../images/spinner.gif')} />
+              </View>
+              : 
+              this.props.search.routine.length == 0 ?
+                <View style={{alignItems: 'center', paddingTop: 20}}>
+                  <Text>Không có kết quả tìm kiếm</Text>
+                </View>
+                :
+                <FlatList 
+                  data={this.props.search.routine}
+                  ListFooterComponent={() => this._renderFooter()}
+                  onEndReached={() => this.loadMore()}
+                  onEndReachedThreshold={0.2}
+                  refreshControl={
+                    <RefreshControl
+                        refreshing={this.state.isRefreshing}
+                        onRefresh={() => this._onRefresh()}
+                    />
+                  }
+                  renderItem={(data) => <ReviewRoutine routineSave={((id) => this.props.actions.routineSave(id))} fetchingLoad={this.props.routine.fetchingLoad} routineJoin={(id, image_thumb, title) => this.props.actions.routineJoin(id, image_thumb, title)} data={data.item}/> }
+                />
+              }
+            </View>
+            <View tabLabel="COACH">
+            {
+              this.props.search.isFetching ?
+              <View style={main.mainSpinTop}>
+                <Image style={main.imgLoading} source={require('../images/spinner.gif')} />
+              </View>
+              : 
+              this.props.search.coach.length == 0 ?
+                <View style={{alignItems: 'center', paddingTop: 20}}>
+                  <Text>Không có kết quả tìm kiếm</Text>
+                </View>
+                :
+                <FlatList 
+                  data={this.props.search.coach}
+                  contentContainerStyle={{paddingLeft: 15, paddingRight: 15}}
+                  ListFooterComponent={() => this._renderFooter()}
+                  onEndReached={() => this.loadMore()}
+                  onEndReachedThreshold={0.2}
+                  refreshControl={
+                    <RefreshControl
+                        refreshing={this.state.isRefreshing}
+                        onRefresh={() => this._onRefresh()}
+                    />
+                  }
+                  renderItem={(data) => <BoxCoach data={data.item}/> }
+                />
+              }
+            </View> */}
+          </ScrollableTabView>
+        </View>
+        <Modal style={{flex: 1, marginTop: Platform.OS === 'android' ? DeviceInfo.getSystemVersion().slice(0, 1) != 4 ? margin : 94 : margin }}
+            isOpen={this.state.modalCategoryPost}
+            ref={"top"}
+            swipeToClose={true}
+            position="top"
+            entry="bottom"
+            animationDuration={100}
+            backdropColor="white"
+            onClosed={()=> this.setState({modalCategoryPost: false})}>
+              <ModalSearchPost 
+                active={this.state.categoryPost} 
+                setTitle = {(name) => this.setState({categoryPost: name})} 
+                keyword={this.state.search} 
+                close={() => this.setState({modalCategoryPost: false})}
+              />
+        </Modal>
+
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  filter: {
+    padding: 7,
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderRadius: 20,
+    margin: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#C5ACD3',
+    justifyContent: 'space-between'
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  },
+  content: {
+    flex: 1
+  },
+  icClose: {
+    height: 14,
+    width: 14
+  },
+  icSearch: {
+    height: 20,
+    width: 20
+  },
+  input: {
+    flex: 1
+  },
+});
+
+let main = require('../styles/Main');
+export default connect(mapStateToProps, mapDispatchToProps)(Search);

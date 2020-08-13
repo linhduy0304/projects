@@ -1,0 +1,256 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ * @flow
+ */
+
+import React, { Component } from 'react';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  BackHandler
+} from 'react-native';
+
+import { Actions } from "react-native-router-flux";
+import { TextField } from 'react-native-material-textfield';
+import Button from "react-native-button";
+import dismissKeyboard from 'react-native/Libraries/Utilities/dismissKeyboard'
+import Spinner from "react-native-spinkit";
+import NoInternet from '../components/NoInternet'
+//import RNFirebase from 'react-native-firebase';
+import RNFirebase from 'react-native-firebase';
+
+var {FBLogin, FBLoginManager} = require('react-native-facebook-login');
+let css = require('../Css');
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import {Map} from 'immutable';
+import * as authActions from '../actions/authActions';
+const actions = [
+  authActions
+];
+
+function mapStateToProps(state) {
+  return {
+    auth: state.auth
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class Login extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      email: '',
+      password: '',
+      error: '',
+    }
+  }
+
+  componentWillMount() {
+    var firebase = RNFirebase.initializeApp({ debug: false });
+    firebase.analytics().logEvent('Login_Screen');
+  }
+
+  // componentDidMount() {
+  //   // console.log(BackHandler)
+  //   // BackHandler.addEventListener('hardwareBackPress', function() {
+  //   //   console.log('back')
+  //   //   // BackHandler.exitApp()
+  //   // });
+  // }
+
+  // componentWillUnmount() {
+  //   if (Platform.OS === 'android') {
+  //     BackHandler.removeEventListener("hardwareBackPress", function() {
+  //       console.log('remove')
+  //       return false
+  //     });
+  //   } 
+  // }
+
+  loginWithFacebook() {
+    var _this = this;
+    loginSocial = true;
+    if(Platform.OS == 'android') {
+      FBLoginManager.loginWithPermissions(["email","user_friends"], function(error, data){
+        if(data){
+          var token = data.credentials.token;
+          _this.props.actions.loginFacebook(token);
+        }
+      });
+    }else {
+      FBLoginManager.getCredentials(function(error, data){
+        if (error) {
+          FBLoginManager.loginWithPermissions(["email","user_friends"],function (error, data) {
+            if (!error) {
+              var token = data.credentials.token;
+              _this.props.actions.loginFacebook(token);
+            }
+          })
+        } else {
+          var token = data.credentials.token;
+              _this.props.actions.loginFacebook(token);
+        }
+      });
+    }
+  }
+
+  submitLogin() {
+    this.setState({
+      error: ''
+    });
+    dismissKeyboard();
+    if(this.state.email == '' || this.state.password == '') {
+      this.setState({
+        error: 'Các trường không được để trống!'
+      });
+      return;
+    };
+    this.props.actions.submitLogin(this.state.email, this.state.password)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.auth != this.props.auth) {
+      this.setState({error: nextProps.auth.error})
+    }
+  }
+
+  render() {
+    return (
+      <View style={css.container}>
+            <NoInternet />
+        
+        <ScrollView
+        bounces={false}
+        keyboardShouldPersistTaps={'always'}>
+          <View style={styles.body}>
+          
+            <View style={{alignItems: 'center'}}>
+              <Image source={require('../images/logo.png')} />
+            </View>
+            <Text style={styles.txtTip}>Để dùng toàn bộ tính năng của IPICK, bạn cần đăng nhập tài khoản.</Text>
+            <TextField
+              label='Tên đăng nhâp / Email'
+              autoCorrect={false}
+              onChangeText={(email) => this.setState({email: email})}
+              onSubmitEditing={() => this.refs.password.focus()}
+              tintColor="rgb(194, 196, 202)"
+              textColor="rgb(31, 42, 53)"
+              baseColor="rgb(194, 197, 208)"
+              autoCapitalize="none"
+              selectionColor="rgb(41, 162, 104)"
+              value={this.state.email}
+            />
+            <TextField
+              ref="password"
+              label='Mật khẩu'
+              onChangeText={(password) => this.setState({password: password})}
+              onSubmitEditing={ () => this.submitLogin() }
+              tintColor="rgb(194, 196, 202)"
+              textColor="rgb(31, 42, 53)"
+              baseColor="rgb(194, 196, 202)"
+              autoCapitalize="none"
+              selectionColor="rgb(41, 162, 104)"
+              secureTextEntry={true}
+              value={this.state.password}
+            />
+            {
+              this.state.error != '' ?
+                <Text style={{color: 'red', marginTop: 10}}>{this.state.error}</Text>
+                : null
+            }
+            <Button 
+              containerStyle={styles.btnRegister}
+              style={styles.txtRegister}
+              onPress={() => this.submitLogin()}
+              >
+              Đăng nhập
+            </Button>
+            <Text onPress={() => Actions.forgotPass()} style={styles.txtForgot}>Quên mật khẩu ?</Text>
+            <Button 
+              containerStyle={styles.btnFb}
+              style={styles.txtRegister}
+              onPress={() => this.loginWithFacebook()}
+              >
+              <Image style={{marginRight: 24}} source={require('../images/icons/ic_facebook.png')} />
+              Đăng nhập qua Facebook
+            </Button>
+            <Text style={styles.txtAcount}>Bạn chưa có tài khoản? <Text onPress={() => Actions.register()} style={{color: 'rgb(48, 88, 154)'}}>Đăng ký</Text></Text>
+          </View>
+        </ScrollView>
+        {
+          this.props.auth.isFetching ? 
+            <View style={css.mainSpin}>
+              <Spinner isFullScreen={true} isVisible={true} size={50} type={'Circle'} color={'#FFFFFF'}/>
+            </View> : null
+        }
+      </View>
+    )
+  }
+}
+
+const styles= StyleSheet.create({
+  container: {
+    flex: 1,
+		backgroundColor: '#fff',
+  },
+  txtAcount: {
+    fontSize: 16,
+    color: 'rgb(31, 42, 53)'
+  },
+  txtForgot: {
+    color: 'rgb(48, 88, 154)',
+    fontSize: 16,
+    marginTop: 16,
+  },
+  txtTip: {
+    color: 'rgb(102, 111, 128)',
+    fontSize: 13,
+    marginTop: 25
+  },
+ 
+  btnFb: {
+    marginTop: 50,
+    marginBottom: 16,
+    height: 48,
+    backgroundColor:"rgb(38, 114, 203)", 
+    borderRadius: 4, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+  },
+  txtRegister: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  btnRegister: {
+    marginTop: 40,
+    height: 48,
+    backgroundColor:"rgb(48, 88, 154)", 
+    borderRadius: 4, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+  },
+  body: {
+    padding: 15,
+    paddingBottom: 30
+  }
+});
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
+
+

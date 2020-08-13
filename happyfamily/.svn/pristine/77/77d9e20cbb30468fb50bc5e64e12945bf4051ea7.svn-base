@@ -1,0 +1,101 @@
+
+'use strict'
+import { Alert } from 'react-native';
+import {Actions} from 'react-native-router-flux'
+import SimpleToast from 'react-native-simple-toast';
+const {
+  HOME_REQUEST,
+  HOME_SUCCESS,
+  HOME_FAIL,
+  POST_STATUS_REQUEST,
+  POST_STATUS_SUCCESS,
+  POST_STATUS_FAIL,
+} = require('../config/actionTypes');
+const Home = require('../services/Home');
+
+export function postStatusRequest() {
+  return {
+    type: POST_STATUS_REQUEST,
+  }
+}
+
+export function postStatusSuccess(data) {
+  return {
+    type: POST_STATUS_SUCCESS,
+    data
+  }
+}
+
+export function postStatusFail() {
+  return {
+    type: POST_STATUS_FAIL,
+  }
+}
+
+export function postStatus(body) {
+  return dispatch => {
+    dispatch(postStatusRequest());
+    return Home.postStatus(body).then(res => {
+      switch(res.status) {
+        case 200:
+          dispatch(postStatusSuccess(res.message));
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(postStatusFail())
+          return;
+        default:
+          dispatch(postStatusFail());
+          return;
+      }
+    })
+  }
+}
+
+//home
+export function homeRequest() {
+  return {
+    type: HOME_REQUEST,
+  }
+}
+
+export function homeSuccess(data) {
+  return {
+    type: HOME_SUCCESS,
+    data
+  }
+}
+
+export function homeFail() {
+  return {
+    type: HOME_FAIL,
+  }
+}
+
+export function loadHome() {
+  return dispatch => {
+    dispatch(homeRequest());
+    return Home.home().then(res => {
+      switch(res.status) {
+        case 200:
+          dispatch(homeSuccess(res.data));
+          return;
+        case 500: 
+          Alert.alert(
+            'Thông báo!',
+            'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+            {text: 'Ok', style: 'cancel'},
+          );
+          dispatch(homeFail())
+          return;
+        default:
+          dispatch(homeFail());
+          return;
+      }
+    })
+  }
+}

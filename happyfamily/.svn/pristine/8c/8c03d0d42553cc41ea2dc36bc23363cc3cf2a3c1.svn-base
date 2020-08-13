@@ -1,0 +1,152 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  FlatList,
+  Dimensions,
+  Platform
+} from 'react-native';
+
+const window = Dimensions.get('window');
+
+import {Actions} from 'react-native-router-flux';
+import NavBar, { NavButton, NavGroup, NavTitle } from 'react-native-nav';
+import css from '../../Css'
+import Loading from '../../components/Loading';
+import NoData from '../../components/NoData';
+
+import {postCategory} from '../../actions/post'
+import { connect } from 'react-redux'
+
+class PostCategory extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      
+    }
+  }
+
+  componentWillMount() {
+    this.props.postCategory(this.props.slug)
+  }  
+
+  renderItem(data) {
+    return (
+      <TouchableOpacity onPress={() => Actions.postDetail({slug: data.slug})} style={{ marginBottom: 1}}>
+        <Image style={{width: window.width, height: (window.width)/2}} source={{uri: data.image_thumb + '.png'}} />
+        <View style={styles.ctBlur}/>
+        <View style={styles.ctContent}>
+          <Text numberOfLines={2} style={styles.txtTitle}>{data.title}</Text>
+          <Text style={styles.txtCount}>{data.count_view} views  ·  {data.count_comment} comments</Text>
+        </View>
+      </TouchableOpacity>
+    )
+  }
+
+  renderHeader() {
+    if(this.props.post.postCategory.length === 0) {
+      return (
+        <NoData />
+      )
+    }else return null;
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={{height: Platform.OS === 'ios' ? 20 : 0, backgroundColor: '#C6247D'}}></View>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'light-content', backgroundColor: '#C6247D'}} >
+          <NavButton/>
+          <NavTitle style={css.navTitle}>
+            <Text style={css.txtTitle}>{this.props.title}</Text>
+          </NavTitle>
+          <NavButton/>
+          <TouchableOpacity onPress={() => Actions.pop()} style={{position: 'absolute', left: 0, padding: 15}}>
+            <Image source={require('../../images/icons/ic_back.png')} />
+          </TouchableOpacity>
+        </NavBar>
+
+        <View style={{flex: 1}}>
+        {
+          this.props.post.loading ?
+            <Loading />
+          :
+            this.props.post.postCategory ?
+              <FlatList
+                    ref="listRef"
+                    contentContainerStyle={styles.list}
+                    data={this.props.post.postCategory}
+                    ListHeaderComponent={() => this.renderHeader()}
+                    // refreshControl={
+                    //   <RefreshControl
+                    //       refreshing={this.state.isRefreshing}
+                    //       onRefresh={() => this._onRefresh()}
+                    //   />
+                    // }
+                    onEndReachedThreshold={0.2}
+                    renderItem={(data) => this.renderItem(data.item)}
+                    keyExtractor={(item, index) => index.toString()}
+                  />
+            : null
+          }
+        </View>
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  txtCount: {
+    color: '#fff',
+    fontSize: 12
+  },
+  txtTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+    // bottom: 50,
+  },
+  ctBlur: {
+    width: window.width,
+    height:  window.width/2,
+    position: 'absolute',
+    top: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)'
+  },
+
+  ctContent: {
+    position: 'absolute',
+    bottom: 15,
+    left: 15, 
+    right: 15,
+    marginTop: 7,
+  },
+  list: {
+    // paddingBottom: 20
+    // flexDirection: 'row',
+    // flexWrap: 'wrap',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  }
+})
+
+const mapStateToProps = (state) => {
+  return {
+    post: state.post,
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    postCategory: (slug) => dispatch(postCategory(slug)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PostCategory);

@@ -1,0 +1,72 @@
+import React from 'react';
+// import {
+//   View, Text, 
+// } from "react-native";
+let HTTP = require('./HTTP');
+let URL = require('./URL');
+
+export function review(content, product_id, raty_score, name){
+  var body = {
+    content: content,
+    product_id: product_id,
+    raty_score: raty_score,
+    product_name: name
+  };
+  return HTTP.postWithAuth(URL.review, body);
+}
+
+//review update
+export function reviewUpdate(id, rating, content) {
+  var body = {
+    id: id,
+    raty_score: rating,
+    content: content,
+  };
+  return HTTP.postWithAuth(URL.review+'/'+id+'/update', body);
+}
+
+//review delete
+export function reviewDelete(id) {
+  return HTTP.postWithAuth(URL.review+'/'+id+'/destroy');
+}
+//update 
+export function productUpdate(id) {
+  var body = {
+    product_id: id
+  }
+  return HTTP.postWithAuth(URL.register+'/update_product_using', body)
+}
+//load detail
+export function loadDetail(id) {
+  return HTTP.get(URL.cosmeticDetail+id)
+}
+//delete product
+export function productDelete(id) {
+  var body = {
+    product_id: id
+  }
+  return HTTP.postWithAuth(URL.register+'/destroy_product_using', body)
+}
+export function productSuggest(typeSkin, page) {
+  return HTTP.get(URL.skintest+'/product/'+typeSkin+'?page='+ page);
+}
+
+//producting and producted
+export function product(direct, page, typeSkin){
+  switch(direct) {
+    case 'producted':
+      return HTTP.get(URL.register+'/products_used?page='+ page);
+    case 'producting':
+      return HTTP.get(URL.register+'/products_using?page='+ page);
+  }
+}
+
+//add product
+export function addProduct(product) {
+  return HTTP.postWithAuth(URL.register+'/store_product_using', product);
+}
+
+//search product
+export function search(keyword, page){
+  return HTTP.get(URL.searchProducts+'?keyword='+keyword+'&page='+page);
+}

@@ -1,0 +1,56 @@
+
+'use strict'
+import { Alert } from 'react-native';
+import {Actions} from 'react-native-router-flux'
+import SimpleToast from 'react-native-simple-toast';
+const {
+    ADD_INDIVIDUAL_REQUEST,
+    ADD_INDIVIDUAL_SUCCESS,
+    ADD_INDIVIDUAL_FAIL,
+} = require('../config/actionTypes');
+const Individual = require('../services/Individual');
+
+//post detail
+export function addIndividualRequest() {
+  return {
+    type: ADD_INDIVIDUAL_REQUEST,
+  }
+}
+
+export function addIndividualSuccess(data) {
+  return {
+    type: ADD_INDIVIDUAL_SUCCESS,
+    data: data
+  }
+}
+
+export function addIndividualFail() {
+  return {
+    type: ADD_INDIVIDUAL_FAIL,
+  }
+}
+
+export function addIndividual(body) {
+  return dispatch => {
+    dispatch(addIndividualRequest());
+    return Individual.addIndividual(body).then(res => {
+        console.log(res);
+        switch(res.status) {
+            case 200:
+                dispatch(addIndividualSuccess(res.data))
+                return;
+            case 500: 
+                Alert.alert(
+                    'Thông báo!',
+                    'Đã có lỗi xảy ra! Vui lòng kiểm tra lại',
+                    {text: 'Ok', style: 'cancel'},
+                );
+                dispatch(addIndividualFail())
+                return;
+            default:
+                dispatch(addIndividualFail());
+                return;
+        }
+    })
+  }
+}

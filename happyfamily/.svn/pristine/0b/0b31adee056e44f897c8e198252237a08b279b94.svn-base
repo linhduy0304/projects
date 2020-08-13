@@ -1,0 +1,157 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  RefreshControl,
+  Platform
+} from 'react-native';
+import {Actions} from 'react-native-router-flux'
+import ListChat from '../../components/chat/ListChat';
+import NavBar, { NavButton, NavGroup, NavTitle } from 'react-native-nav';
+import css from '../../Css'
+import {chats} from '../../actions/chat'
+import { connect } from 'react-redux'
+import Loading from '../../components/Loading';
+import NoData from '../../components/NoData';
+
+class Chat extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      refresh: null,
+      data: [
+        {
+          avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+          full_name: 'User One',
+          content: 'Far far away, behind the word mountains',
+          time: '17:56'
+        },
+      ]
+    }
+  }
+
+  componentWillMount() {
+    this.props.chats()
+  }
+
+  detailChat(data) {
+    if(data.type === 'multiple') {
+      Actions.chatGroup({title: data.name, id: data.id, socket: this.props.socket})
+      // this.props.navigation.navigate('chat_group', {title: data.full_name})
+    }else {
+      Actions.chatOne({title: data.user.full_name, id: data.id, socket: this.props.socket})
+      // this.props.navigation.navigate('chat_one', {title: data.full_name})
+    }
+  }
+
+  onRefresh() {
+    this.setState({
+      refresh: true
+    })
+  }
+
+  renderHeader() {
+    if(this.props.chat.chats.length === 0) {
+      return (
+        <NoData />
+      )
+    }else return null;
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={{height: Platform.OS === 'ios' ? 20 : 0, backgroundColor: '#C6247D'}}></View>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'light-content', backgroundColor: '#297FCA'}} >
+          <NavButton/>
+          <NavTitle style={css.navTitle}>
+            <Text style={css.txtTitle}>Chats</Text>
+          </NavTitle>
+          <NavButton/>
+          <TouchableOpacity onPress={() => Actions.createGroup()} style={{position: 'absolute', right: 0, padding: 15}}>
+            <Image source={require('../../images/icons/ic_edit.png')} />
+          </TouchableOpacity>
+        </NavBar>
+
+        {/* <View style={styles.ctHeader}>
+          <View style={styles.ctSearch}>
+            <Image source={require('../../images/icons/ic_search.png')} />
+            <Text style={styles.txtSearch}>Search</Text>
+          </View>
+        </View> */}
+        {
+          this.props.chat.loading ?
+           <Loading />
+           :
+          this.props.chat.chats ? 
+            <FlatList
+              ref="list"
+              onScroll= {this.props.onScroll}
+              // onEndReached={() => this.loadMore()}
+              ListHeaderComponent={() => this.renderHeader()}
+              data={this.props.chat.chats}
+              // refreshControl={
+              //   <RefreshControl
+              //       refreshing={this.state.refresh}
+              //       onRefresh={() => this.onRefresh()}
+              //   />
+              // }
+              removeClippedSubviews 
+              keyExtractor={(item, index) => index.toString()}
+              onEndReachedThreshold={0.2}
+              renderItem={(data) => <ListChat onPress={() => this.detailChat(data.item)} data={data.item}/>} 
+            />
+          : null
+        }
+        
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  txtSearch: {
+    color: '#287FC9',
+    fontSize: 13,
+    marginLeft: 7
+  },
+  ctSearch: {
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    padding: 7
+  },
+  ctHeader: {
+    backgroundColor: '#E3F1FD',
+    padding: 7,
+  },
+  container: {
+    flex: 1,
+    // backgroundColor: '#E3F1FD'
+    backgroundColor: '#fff'
+  }
+})
+
+const mapStateToProps = (state) => {
+  return {
+    chat: state.chat,
+    profile: state.profile,
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    chats: () => dispatch(chats()),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Chat);

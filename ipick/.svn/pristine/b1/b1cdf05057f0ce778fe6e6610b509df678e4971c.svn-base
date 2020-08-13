@@ -1,0 +1,26 @@
+'use strict';
+
+const {Record} = require('immutable');
+const {
+  PROFILE
+} = require('../../libs/actionTypes');
+
+var InitialState = Record({
+  state: PROFILE,
+  loading: null,
+  loadOther: null,
+  loadingSearch: null,
+  loadFollow: null,
+  loadMore: null,
+  currentUser: null,
+  myPost: null,
+  myPick: null,
+  otherPost: null,
+  otherPick: null,
+  following: null,
+  follower: null,
+  otherProfile: null
+});
+
+export default InitialState;
+

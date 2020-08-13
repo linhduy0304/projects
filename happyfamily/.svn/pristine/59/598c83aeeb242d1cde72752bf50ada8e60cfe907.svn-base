@@ -1,0 +1,129 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+
+import {Actions} from 'react-native-router-flux'
+import Calendar1 from '../../libs/react-native-lunar-calendar';
+import NavBar, { NavButton, NavTitle } from 'react-native-nav';
+import css from '../../Css'
+import ItemEvent from '../../components/calendar/ItemEvent';
+
+import {loadEvent} from '../../actions/calendar';
+import { connect } from 'react-redux';
+
+class Calendar extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      date: this.getDateNow(new Date()),
+      data: [
+        {
+          title: 'Sinh nhat'
+        }
+      ],
+    }
+  }
+
+  getDateNow(today) {
+    var getDate = today.getDate() < 10 ? "0"+today.getDate() : today.getDate();
+    var getMonth =today.getMonth() < 10 ? "0"+(1+today.getMonth()) : (1+today.getMonth());
+    return getDate+'-'+getMonth+'-'+today.getFullYear();
+  }
+
+  componentWillMount() {
+    // this.props.loadEvent()
+  }
+  
+  selectDate(date, lunar) {
+    var newDate = this.getDateNow(date);
+    this.setState({date: newDate})
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={{height: Platform.OS === 'ios' ? 20 : 0, backgroundColor: '#C6247D'}}></View>
+        <NavBar style={{navBar: css.navBar2, statusBar: css.statusBar}} statusBar={{barStyle: 'light-content', backgroundColor: '#C6247D'}} >
+          <NavButton/>
+          <NavTitle style={css.navTitle}>
+            <Text style={css.txtTitle}>Calendar</Text>
+          </NavTitle>
+          <NavButton/>
+        </NavBar>
+        
+        <ScrollView>
+          <Calendar1
+            headerStyle={{backgroundColor: '#3f4553'}}
+            weekHeadStyle={{backgroundColor: '#3f4553'}}
+            onDateSelect={(date, lunar) => this.selectDate(date, lunar)}
+            onMonthSelect={(mon) => console.log(mon)}
+            // onDateLunarSelect ={(date) => console.log(date)}
+            dateStyle={{backgroundColor: '#f8f9f9'}}
+            // selectDateStyle={{backgroundColor: '#f00'}}
+            // weekendStyle={{backgroundColor: '#f00'}}
+            style={{backgroundColor: '#fff'}} 
+          />
+
+          <View style={styles.ctEvent}>
+            <Text style={styles.txtEvent}>Sự kiện</Text>
+            <TouchableOpacity onPress={() => Actions.addEvent({date: this.state.date})} style={styles.ctAdd}>
+              <Image source={require('../../images/icons/ic_add_white.png')} />
+            </TouchableOpacity>
+          </View>
+          {/* {
+            this.state.data.map((item, index) => {
+              return <ItemEvent key={index} data={item} />
+            })
+          } */}
+          
+        </ScrollView>
+       
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  ctAdd: {
+    padding: 20
+  },
+  txtEvent: {
+    color: '#fff',
+    fontSize: 15,
+  },
+  ctEvent: {
+    backgroundColor: '#e87151',
+    paddingLeft: 15,
+    height: 40,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  }
+})
+
+const mapStateToProps = (state) => {
+  return {
+    calendar: state.calendar,
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    loadEvent: () => dispatch(loadEvent()),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Calendar);

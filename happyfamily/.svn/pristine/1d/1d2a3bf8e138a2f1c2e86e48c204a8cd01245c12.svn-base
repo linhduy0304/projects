@@ -1,0 +1,52 @@
+
+import React from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Dimensions
+} from 'react-native';
+var Modal = require('react-native-modalbox');
+
+const window1 = Dimensions.get('window');
+
+const ModalTypeEvent = ({
+  isOpen,
+  close,
+  onPress = type
+}) => (
+    <Modal
+      style={[css.ctModal]}
+      isOpen={isOpen}
+      position="bottom"
+      swipeToClose={true}
+      backdropColor="#292c34"
+      onClosed={close}
+      >
+        <View style={[css.ctModal]}>
+          <TouchableOpacity onPress={() => onPress({type: 0, title: 'Sinh nhật'})} style={css.ctItem}>
+            <Text>Sinh nhật</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => onPress({type: 1, title: 'Ngày giỗ'})} style={css.ctItem}>
+            <Text>Ngày giỗ</Text>
+          </TouchableOpacity>
+        </View>
+    </Modal>
+)
+
+const css = StyleSheet.create({
+  ctItem: {
+    flexDirection: 'row',
+    padding: 15
+  },
+  ctModal: {
+    height: window.height,
+    backgroundColor: '#fff',
+    width: window1.width,
+  },
+})
+
+export default ModalTypeEvent;
+  

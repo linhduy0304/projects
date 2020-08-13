@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/24x24_drink_o</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M19,5 C20.657,5 22,6.343 22,8 L22,10 C22,11.657 20.657,13 19,13 L18,13 C18,14.657 16.657,16 15,16 L7,16 C5.343,16 4,14.657 4,13 L4,5 L19,5 Z M20,10 L20,8 C20,7.45 19.55,7 19,7 L18,7 L18,11 L19,11 C19.55,11 20,10.55 20,10 Z M16,13 L16,7 L15,7 L14,7 L8,7 L6,7 L6,13 C6,13.552 6.447,14 7,14 L15,14 C15.553,14 16,13.552 16,13 Z M21,17 C21.553,17 22,17.448 22,18 C22,18.552 21.553,19 21,19 L3,19 C2.447,19 2,18.552 2,18 C2,17.448 2.447,17 3,17 L21,17 Z" id="path-1"></path>
+    </defs>
+    <g id="icon/24x24_drink_o" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="24x24_drink_o" fill-rule="nonzero"></g>
+        <g id="COLOR/JJ_4.black" mask="url(#mask-2)" fill="#0F0A0A">
+            <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        </g>
+    </g>
+</svg>

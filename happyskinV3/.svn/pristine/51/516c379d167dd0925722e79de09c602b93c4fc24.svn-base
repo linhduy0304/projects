@@ -1,0 +1,384 @@
+'use strict';
+const {
+    ROUTINE_REQUEST,
+    ROUTINE_SUCCESS,
+    ROUTINE_FAIL,
+    RT_DETAIL_REQUEST,
+    RT_DETAIL_SUCCESS,
+    RT_DETAIL_FAIL,
+    RT_JOIN_REQUEST,
+    RT_JOIN_SUCCESS,
+    RT_JOIN_FAIL,
+    RT_PRODUCT_REQUEST,
+    RT_PRODUCT_SUCCESS,
+    RT_PRODUCT_FAIL,
+    RT_UPDATE_REQUEST,
+    RT_UPDATE_SUCCESS,
+    RT_UPDATE_FAIL,
+    RT_REVIEW_REQUEST,
+    RT_REVIEW_SUCCESS,
+    RT_REVIEW_FAIL,
+    RT_SAVE_REQUEST,
+    RT_SAVE_SUCCESS,
+    RT_SAVE_FAIL,
+    PRODUCT_UPDATE_REQUEST,
+    PRODUCT_UPDATE_SUCCESS,
+    PRODUCT_UPDATE_FAIL,
+    UPDATE_ROUTINE_PROFILE,
+    SAVE_ROUTINE_HOME,
+    JOIN_ROUTINE_HOME,
+  } = require('../libs/actionTypes');
+
+import Constant from '../services/Constant';
+const StoreService = require('../services/StoreService').default;
+
+const Routine = require('../services/Routine');
+import Toast from 'react-native-simple-toast';
+import {Actions} from 'react-native-router-flux';
+
+//load product update
+export function productUpdateRequest() {
+  return {
+    type: PRODUCT_UPDATE_REQUEST
+  };
+}
+
+export function productUpdateSuccess(data) {
+  return {
+    type: PRODUCT_UPDATE_SUCCESS,
+    data: data,
+  };
+}
+export function productUpdateFail() {
+  return {
+    type: PRODUCT_UPDATE_FAIL,
+  };
+}
+
+export function productUpdate(id, time=null) {
+  return dispatch => {
+    return Routine.productUpdate(id, time).then((res) => {
+      switch(res.status) {
+        case 200:
+          dispatch(productUpdateSuccess(res.data))  
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          dispatch(productUpdateFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(productUpdateFail())
+    })
+  }
+}
+
+//routine save
+//routine user join
+export function rtSaveRequest() {
+  return {
+    type: RT_SAVE_REQUEST
+  };
+}
+
+export function rtSaveSuccess(id, routine) {
+  return {
+    type: RT_SAVE_SUCCESS,
+    id: id,
+    routine: routine
+  };
+}
+export function rtSaveFail() {
+  return {
+    type: RT_SAVE_FAIL,
+  };
+}
+
+export function saveRoutineHome(id, routine) {
+  return {
+    type: SAVE_ROUTINE_HOME,
+    id: id,
+    routine: routine
+  };
+}
+
+export function routineSave(id) {
+  return dispatch => {
+    dispatch(rtSaveRequest())
+    return Routine.routineSave(id).then((res) => {
+      switch(res.status) {
+        case 200:
+          dispatch(saveRoutineHome(id, res.data))
+          dispatch(rtSaveSuccess(id, res.data))
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          Toast.show(res.message)
+          dispatch(rtSaveFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(rtSaveFail())
+    })
+  }
+}
+
+//routine review
+export function routineReviewRequest() {
+  return {
+    type: RT_REVIEW_REQUEST,
+  }
+}
+
+export function routineReviewSuccess(data) {
+  return {
+    type: RT_REVIEW_SUCCESS,
+    data: data
+  }
+}
+
+export function routineReviewFail() {
+  return {
+    type: RT_REVIEW_FAIL
+  }
+}
+
+export function routineReview(id, rating, content) {
+  return dispath => {
+    dispath(routineReviewRequest())
+    Routine.routineReview(id, rating, content).then(res => {
+      switch(res.status) {
+        case 200:
+          Toast.show('Review liệu trình thành công')
+          dispath(routineReviewSuccess(res.data))
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          dispath(routineReviewFail());
+          return;
+      }
+    }).catch(errors => {
+      return dispath(routineReviewFail());
+    })
+  }
+}
+//update process
+export function routineUpdateRequest() {
+  return {
+    type: RT_UPDATE_REQUEST,
+  };
+}
+
+export function routineUpdateSuccess(time, data) {
+  return {
+    type: RT_UPDATE_SUCCESS,
+    time: time, 
+    data: data
+  };
+}
+export function routineUpdateFail() {
+  return {
+    type: RT_UPDATE_FAIL,
+  };
+}
+
+export function routineUpdate(id, array_id, time) {
+  return dispatch => {
+    dispatch(routineUpdateRequest())
+    return Routine.routineUpdate(id, array_id, time).then((res) => {
+      switch(res.status) {
+        case 200:
+          Toast.show('Cập nhật thành công');
+          Actions.pop();
+          dispatch(routineUpdateSuccess(time, res.data))
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          dispatch(routineUpdateFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(routineUpdateFail())
+    })
+  }
+}
+
+//routine product
+export function routineProductRequest() {
+  return {
+    type: RT_PRODUCT_REQUEST
+  };
+}
+
+export function routineProductSuccess(data, direct) {
+  return {
+    type: RT_PRODUCT_SUCCESS,
+    data: data,
+    direct: direct
+  };
+}
+export function routineProductFail() {
+  return {
+    type: RT_PRODUCT_FAIL,
+  };
+}
+
+export function routineProduct(id, direct, time=null) {
+  return dispatch => {
+    return Routine.routineProduct(id, direct, time).then((res) => {
+      switch(res.status) {
+        case 200:
+          dispatch(routineProductSuccess(res.data, direct))
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          dispatch(routineProductFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(routineProductFail())
+    })
+  }
+}
+
+//routine user join
+export function rtJoinRequest() {
+  return {
+    type: RT_JOIN_REQUEST
+  };
+}
+
+export function rtJoinSuccess(id, routine) {
+  return {
+    type: RT_JOIN_SUCCESS,
+    id: id,
+    routine: routine
+  };
+}
+export function rtJoinFail() {
+  return {
+    type: RT_JOIN_FAIL,
+  };
+}
+export function updateRoutineProfile() {
+  return {
+    type: UPDATE_ROUTINE_PROFILE,
+  };
+}
+
+export function routineJoin(id, image_thumb, title) {
+  return dispatch => {
+    dispatch(rtJoinRequest())
+    return Routine.routineJoin(id).then((res) => {
+      switch(res.status) {
+        case 200:
+          Actions.routineDone({data: res.data});
+          dispatch(updateRoutineProfile())
+          dispatch(saveRoutineHome(id, res.data))
+          dispatch(rtJoinSuccess(id, res.data));
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          Toast.show(res.message)
+          dispatch(rtJoinFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(rtJoinFail())
+    })
+  }
+}
+
+//doutine Detail
+export function rtDetailRequest() {
+  return {
+    type: RT_DETAIL_REQUEST
+  };
+}
+
+export function rtDetailSuccess(data) {
+  return {
+    type: RT_DETAIL_SUCCESS,
+    data: data,
+  };
+}
+export function rtDetailFail() {
+  return {
+    type: RT_DETAIL_FAIL,
+  };
+}
+
+export function routineDetail(id) {
+  return dispatch => {
+    return Routine.routineDetail(id).then((res) => {
+      switch(res.status) {
+        case 200:
+          dispatch(rtDetailSuccess(res.data))
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          dispatch(rtDetailFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(rtDetailFail())
+    })
+  }
+}
+
+//routine
+export function routineRequest() {
+  return {
+    type: ROUTINE_REQUEST
+  };
+}
+
+export function routineSuccess(data, action, redirect) {
+  return {
+    type: ROUTINE_SUCCESS,
+    data: data,
+    action: action,
+    redirect: redirect
+  };
+}
+export function routineFail() {
+  return {
+    type: ROUTINE_FAIL,
+  };
+}
+
+export function routine(redirect, action, page= 1) {
+  return dispatch => {
+    return Routine.routine(redirect, page).then((res) => {
+      switch(res.status) {
+        case 200:
+          dispatch(routineSuccess(res.data, action, redirect))
+          return;
+        case 500: 
+          Actions.login({type: 'reset'});
+          return;
+        default:
+          dispatch(routineFail());
+          return;
+      }
+    }).catch((err) => {
+      return dispatch(routineFail())
+    })
+  }
+}
+
+

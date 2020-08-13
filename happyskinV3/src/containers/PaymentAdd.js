@@ -1,0 +1,99 @@
+import React from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+  StatusBar,
+  Platform,
+  Alert
+} from "react-native";
+import Button from "react-native-button";
+import {Actions} from "react-native-router-flux";
+import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav'; 
+
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+
+class PaymentAdd extends React.Component {
+  constructor(props) {
+    super()
+    this.state = {
+    }
+  }
+
+  render(){
+    return (
+      <View style={styles.container}>
+        <NavBar style={{navBar: main.navBarWhite, statusBar: main.statusBar}} statusBar={{barStyle: 'dark-content', backgroundColor: '#000' }} >
+          <NavButton onPress={() => Actions.pop()} style={main.navButton}>
+            <Image style={{height: (42*8)/24, width: 8, marginRight: 10}} source={require('../images/icons/ic_arrow_back_blue.png')} />
+            <Text style={{color: 'rgb(68, 110, 182)'}}>Payment</Text>
+          </NavButton>
+        </NavBar>
+        
+        <View style={{flex: 1}}>
+          <Text style={styles.txtAdd}>Add payment methods</Text>
+          <Text style={styles.txtChoose}>Chọn phương thức thanh toán bạn muốn thêm</Text>
+          <TouchableOpacity onPress={() => Actions.paymentAddCard()} style={styles.ctItem}>
+            <Image style={{height: 18, width: 24}} source={require('../images/icons/ic_internet_banking.png')} />
+            <Text style={styles.txtAcount}>Tài khoản Internet Banking</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => Actions.paymentAddCard()} style={styles.ctItem}>
+            <Image style={{height: 16, width: 22}} source={require('../images/icons/ic_atm.png')} />
+            <Text style={styles.txtAcount}>Thẻ ATM</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => Actions.paymentAddCard()} style={[styles.ctItem, styles.border]}>
+            <Image style={{height: 16, width: 22}} source={require('../images/icons/ic_credit.png')} />
+            <Text style={styles.txtAcount}>Thẻ Credit/Debit</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  },
+  txtAdd: {
+    color: 'rgb(215, 53, 84)',
+    fontSize: 32,
+    marginLeft: 15,
+  },
+  txtChoose: {
+    color: 'rgb(51, 51, 51)',
+    marginLeft: 15,
+    marginTop: 8,
+    marginBottom: 16
+  },
+  ctItem: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingTop: 18,
+    paddingBottom: 18,
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: 'rgb(236, 238, 240)',
+    alignItems: 'center'
+  },
+  txtAcount: {
+    fontSize: 17,
+    color: 'rgb(51, 51, 51)',
+    marginLeft: 13
+  },
+  border: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgb(236, 238, 240)'
+  },
+  
+});
+let main = require('../styles/Main');
+module.exports = PaymentAdd;

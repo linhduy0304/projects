@@ -1,0 +1,246 @@
+import React, { Component, PureComponent } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  FlatList,
+  Image,
+  Dimensions,
+  TouchableOpacity,
+  InteractionManager,
+  RefreshControl
+} from 'react-native';
+
+import { Actions } from "react-native-router-flux";
+import PostItem from '../../components/PostItem';
+import Carousel from 'react-native-snap-carousel';
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+let css = require('../../Css');
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { Map } from 'immutable';
+import * as homeActions from '../../actions/homeActions';
+
+const actions = [
+  homeActions,
+];
+function mapStateToProps(state) {
+  return {
+    home: state.home,
+    tab: state.tab
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class Popular extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      is_like: 1,
+      isRefreshing: false,
+      page: 1,
+    }
+  }
+
+  componentWillMount() {
+    this.props.actions.popularRequest();
+  }
+
+  componentDidMount() {
+    // timeout = setTimeout( () => {
+    // }, 1000);
+    // InteractionManager.runAfterInteractions(()=> {
+      this.props.actions.popular();
+    // })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.tab.home && nextProps.home.popular && nextProps.home.popular.length !== 0) {
+      // setTimeout( () => {
+        this.refs.list.scrollToOffset({x: 0, y: 0, animated: true})
+      // }, 10);
+    }
+  }
+
+  _onRefresh() {
+    this.setState({
+      isRefreshing: true,
+      page: 1
+    });
+    this.props.actions.popular('RF');
+    this.setState({
+      isRefreshing: false,
+    })
+  }
+
+  loadMore() {
+    if (!this.props.home.loadMore) {
+        return;
+    }
+    this.props.actions.popular('LM', this.state.page + 1);
+    this.setState({
+        page: this.state.page + 1,
+    });
+  }
+
+
+  _renderFooter() {
+    if(this.props.home.loadMore) {
+      return (
+        <View style={{width: deviceWidth, marginTop:20,marginBottom: 10,alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
+          <Image style={{height: 30, width: 30}} source={require('../../images/load_more.gif')} />
+          <Text style={{color: 'rgb(0, 139, 125)', fontSize: 12, marginLeft: 8}}>Đang tải</Text>
+        </View>)
+    }else return null;
+  }
+
+
+  render() {
+    return (
+      <View style={css.container}>
+        {
+          this.props.home.isFetching ?
+            <View style={css.mainSpinTop}>
+              <Image style={{width: 50, height: 50}} source={require('../../images/loading.gif')} />
+            </View>
+          :
+          <FlatList
+            ref="list"
+            contentContainerStyle={{backgroundColor: 'rgb(237, 239, 241)'}}
+            // ListHeaderComponent={() => this._renderHeader()}
+            onScroll= {this.props.onScroll}
+            // onScrollBeginDrag={() => this.props.scrollBegin()}
+            onScrollEndDrag={(e) => this.props.scrollEnd(e)}
+            onEndReached={() => this.loadMore()}
+            ListFooterComponent={() => this._renderFooter()}
+            data={this.props.home.popular}
+            refreshControl={
+              <RefreshControl
+                  refreshing={this.state.isRefreshing}
+                  onRefresh={() => this._onRefresh()}
+              />
+            }
+            removeClippedSubviews 
+            keyExtractor={(item, index) => index.toString()}
+            onEndReachedThreshold={0.2}
+            renderItem={(data) => <PostItem data={data.item}/>} 
+          />
+        }
+      </View>
+    )
+  }
+}
+
+const styles= StyleSheet.create({
+  ctAction: {
+    flexDirection: 'row',
+    paddingTop: 16,
+    paddingBottom: 16
+  },
+  img: {
+    width: deviceWidth - 30,
+    height: 190,
+    borderRadius: 2,
+    resizeMode: 'cover',
+    marginTop: 10
+  },
+  txtTitle: {
+    color: 'rgb(53, 69, 164)',
+    fontSize: 20,
+    marginTop: 12
+  },
+  txtTime: {
+    fontSize: 13,
+    color: 'rgb(176, 184, 198)'
+  },
+  txtName: {
+    color: '#000'
+  },
+  ctName: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  ctAvatar: {
+    height: 32,
+    width: 32,
+    borderRadius: 4
+  },
+  ctItem: {
+    paddingLeft: 15,
+    // paddingTop: 20,
+    paddingRight: 15,
+    marginBottom: 8,
+    backgroundColor: '#fff'
+  },
+  ctHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomColor: 'rgb(237, 239, 241)',
+    borderBottomWidth: 1,
+    paddingTop: 10,
+    paddingBottom: 10
+  },
+  ctCount1: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 13,
+    paddingBottom: 13,
+    borderBottomColor: 'rgb(237, 239, 241)',
+    borderBottomWidth: 1
+  },
+
+
+  ctSuggest: {
+    paddingLeft: 15,
+    paddingBottom: 30,
+    paddingTop: 20,
+  },
+  txtCount: {
+    fontSize: 16, 
+    color: '#000',
+  },
+  txtPost: {
+    color: 'rgb(176, 184, 198)'
+  },
+  ctFollow: {
+    borderWidth: 1,
+    borderColor: 'rgb(176, 184, 198)',
+    borderRadius: 12,
+    flexDirection: 'row',
+    height: 24,
+    width: 64,
+    justifyContent: 'center', 
+    alignItems: 'center',
+    marginTop: 15
+  },
+  txtSuggest: {
+    color: 'rgb(27, 48, 70)',
+
+  },
+  ctCount: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 13,
+    paddingBottom: 13,
+    marginLeft: 10
+  },
+  txtCountDaily: {
+    fontSize: 12,
+    color: 'rgb(176, 184, 198)',
+    marginRight: 24,
+    marginLeft: 5
+  },
+});
+export default connect(mapStateToProps, mapDispatchToProps)(Popular);

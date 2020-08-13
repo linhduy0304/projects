@@ -1,0 +1,20 @@
+
+
+import React from 'react';
+
+let HTTP = require('./HTTP');
+let URL = require('./URL');
+
+//delete
+export function deleteEvent(slug) {
+  return HTTP.postWithAuth(`${URL.url}event/${slug}/destroy`, {});
+}
+//load
+export function event(date) {
+  return HTTP.get(`${URL.url}events?time_event=${date}`);
+}
+
+//add event
+export function addEvent(body) {
+  return HTTP.postWithAuth(`${URL.url}events`, body);
+}

@@ -1,0 +1,7 @@
+import { AppRegistry } from 'react-native';
+
+console.disableYellowBox = true;
+
+import Main from './Main';
+
+AppRegistry.registerComponent('happyskin', () => Main);

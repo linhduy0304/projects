@@ -1,0 +1,78 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity
+} from 'react-native';
+
+class Setting extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+
+    }
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <ScrollView>
+          <View style={styles.ctTitle}>
+            <Text style={styles.txtTitle}>TÀI KHOẢN</Text>
+          </View>
+          <TouchableOpacity style={styles.ctItem}>
+            <Text style={styles.txtItem}>Mời bạn bè</Text>
+          </TouchableOpacity>
+          <TouchableOpacity  style={styles.ctItem}>
+            <Text style={styles.txtItem}>Đổi mật khẩu</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.ctItem}>
+            <Text style={styles.txtItem}>Đăng xuất</Text>
+          </TouchableOpacity>
+
+          <View style={styles.ctTitle}>
+            <Text style={styles.txtTitle}>HỖ TRỢ</Text>
+          </View>
+          <TouchableOpacity  style={styles.ctItem}>
+            <Text style={styles.txtItem}>Thông tin ứng dụng</Text>
+          </TouchableOpacity>
+          <TouchableOpacity  style={styles.ctItem}>
+            <Text style={styles.txtItem}>Góp ý & Báo lỗi </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  },
+  ctItem: {
+    padding: 15,
+    paddingTop: 19,
+    paddingBottom: 19
+  },
+  txtItem: {
+    color: 'rgb(31, 42, 53)',
+    fontSize: 15,
+  },
+  ctTitle: {
+    height: 40,
+    justifyContent: 'center',
+    paddingLeft: 15,
+    backgroundColor: 'rgb(237, 239, 241)'
+  },
+  txtTitle: {
+    color: 'rgb(138, 144, 150)',
+    fontSize: 13,
+  },
+})
+
+export default (Setting)

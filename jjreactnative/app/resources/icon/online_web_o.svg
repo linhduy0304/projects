@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/24x24_online_web_o</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M19,17 L5,17 C3.35,17 2,15.65 2,14 L2,6 C2,4.35 3.35,3 5,3 L19,3 C20.65,3 22,4.35 22,6 L22,14 C22,15.65 20.65,17 19,17 Z M4,6 L4,14 C4,14.542 4.458,15 5,15 L19,15 C19.542,15 20,14.542 20,14 L20,6 C20,5.458 19.542,5 19,5 L5,5 C4.458,5 4,5.458 4,6 Z M12,12.487 C12.419,12.805 12.935,13 13.5,13 C14.878,13 16,11.878 16,10.5 L16,8 C16,7.448 15.552,7 15,7 C14.448,7 14,7.448 14,8 L14,10.5 C14,10.771 13.771,11 13.5,11 C13.229,11 13,10.771 13,10.5 L13,8 C13,7.448 12.552,7 12,7 C11.448,7 11,7.448 11,8 L11,10.5 C11,10.771 10.771,11 10.5,11 C10.229,11 10,10.771 10,10.5 L10,8 C10,7.448 9.552,7 9,7 C8.448,7 8,7.448 8,8 L8,10.5 C8,11.878 9.122,13 10.5,13 C11.065,13 11.581,12.805 12,12.487 Z M23,19 C23.55,19 24,19.45 24,20 C24,20.55 23.55,21 23,21 L1,21 C0.45,21 0,20.55 0,20 C0,19.45 0.45,19 1,19 L23,19 Z" id="path-1"></path>
+    </defs>
+    <g id="icon/24x24_online_web_o" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="24x24_online_web_o" fill-rule="nonzero"></g>
+        <g id="COLOR/JJ_4.black" mask="url(#mask-2)" fill="#0F0A0A">
+            <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        </g>
+    </g>
+</svg>

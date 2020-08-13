@@ -1,0 +1,69 @@
+{
+  "name": "react-native-star-rating",
+  "version": "1.0.6",
+  "description": "A React Native component for generating and displaying interactive star ratings",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react",
+    "native",
+    "react native",
+    "star",
+    "stars",
+    "rating",
+    "ratings",
+    "review",
+    "reviews",
+    "react-component",
+    "react-native",
+    "ios",
+    "android"
+  ],
+  "author": {
+    "name": "Derrick Chie",
+    "email": "djchie.dev@gmail.com",
+    "url": "https://github.com/djchie"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "react-native-button": "^1.6.0",
+    "react-native-vector-icons": "^2.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/djchie/react-native-star-rating.git"
+  },
+  "bugs": {
+    "url": "https://github.com/djchie/react-native-star-rating/issues"
+  },
+  "homepage": "https://github.com/djchie/react-native-star-rating",
+  "gitHead": "b30635dd4c496b30d36120b19248698c1d576fd5",
+  "_id": "react-native-star-rating@1.0.6",
+  "_shasum": "731252c494f5841fbe4ad90279976f1ffd8a7a02",
+  "_from": "react-native-star-rating@>=1.0.6 <2.0.0",
+  "_npmVersion": "3.8.6",
+  "_nodeVersion": "5.11.1",
+  "_npmUser": {
+    "name": "djchie",
+    "email": "djchie.dev@gmail.com"
+  },
+  "dist": {
+    "shasum": "731252c494f5841fbe4ad90279976f1ffd8a7a02",
+    "tarball": "https://registry.npmjs.org/react-native-star-rating/-/react-native-star-rating-1.0.6.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "djchie",
+      "email": "djchie.dev@gmail.com"
+    }
+  ],
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/react-native-star-rating-1.0.6.tgz_1468202313694_0.28657456673681736"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/react-native-star-rating/-/react-native-star-rating-1.0.6.tgz",
+  "readme": "ERROR: No README data found!"
+}

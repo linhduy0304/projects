@@ -1,0 +1,187 @@
+import React, { Component } from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  Text,
+  View,
+  Image
+} from 'react-native';
+
+import Home from './Home';
+import Routine from './Routine';
+import Explore from './Explore';
+import More from './More';
+import ChatList from './ChatList';
+import ChatEmpty from './ChatEmpty';
+
+import TabNavigator from 'react-native-tab-navigator';
+import { Actions } from "react-native-router-flux";
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import {Map} from 'immutable';
+import * as scrollActions from '../actions/scrollToTopActions';
+const actions = [
+  scrollActions
+];
+function mapStateToProps(state) {
+  return {
+    ...state
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class Tab extends React.Component {
+  constructor(props, context) {
+    super(props, context);
+    this.toggle = false;
+    this.state = {
+      selectedTab: (this.props.page) ? this.props.page : 'home',
+      count_magazine: 0,
+      count_event: 0,
+    };
+  }
+
+  changeTab(tabName) {
+    // if(this.state.selectedTab == tabName){
+    //   this.props.actions.scrollToTop(tabName);
+    // }
+    this.setState({ selectedTab: tabName });
+  }
+
+ 
+
+  render() {
+    return (
+      <TabNavigator tabBarStyle={styles.tabNavigator}>
+        <TabNavigator.Item
+          titleStyle={styles.tabTitle}
+          selectedTitleStyle={styles.tabTitleSelected}
+          selected={this.state.selectedTab === 'home'}
+          title="Trang chủ"
+          renderIcon={() => <Image style={styles.ic_home} source={require('../images/icons/ic_home.png')} />}
+          renderSelectedIcon={() => <Image style={styles.ic_home} source={require('../images/icons/ic_home_active.png')} />}
+          //badgeText="1"
+          //badgeStyle={styles.badgeStyle}
+          onPress={() => this.changeTab('home')}>
+          <Home />
+        </TabNavigator.Item>
+        <TabNavigator.Item
+          titleStyle={styles.tabTitle}
+          selectedTitleStyle={styles.tabTitleSelected}
+          selected={this.state.selectedTab === 'routine'}
+          title="Liệu trình"
+          renderIcon={() => <Image style={styles.ic_routine} source={require('../images/icons/ic_routine.png')} />}
+          renderSelectedIcon={() => <Image style={styles.ic_routine} source={require('../images/icons/ic_routine_active.png')} />}
+          onPress={() => this.changeTab('routine')}>
+          <Routine />
+        </TabNavigator.Item>
+        {
+          this.props.profile.currentUser.dashboard.count_coach == 0 && this.props.profile.currentUser.dashboard.count_routine == 0 ?
+          <TabNavigator.Item
+            titleStyle={styles.tabTitle}
+            selectedTitleStyle={styles.tabTitleSelected}
+            selected={this.state.selectedTab === 'message'}
+            title="Chat"
+            renderIcon={() => <Image style={styles.ic_message} source={require('../images/icons/ic_message.png')} />}
+            renderSelectedIcon={() => <Image style={styles.ic_message} source={require('../images/icons/ic_message_active.png')} />}
+            onPress={() => this.changeTab('message')}>
+            <ChatEmpty  />
+          </TabNavigator.Item>
+          :
+          <TabNavigator.Item
+            titleStyle={styles.tabTitle}
+            selectedTitleStyle={styles.tabTitleSelected}
+            selected={this.state.selectedTab === 'message'}
+            title="Chat"
+            renderIcon={() => <Image style={styles.ic_message} source={require('../images/icons/ic_message.png')} />}
+            renderSelectedIcon={() => <Image style={styles.ic_message} source={require('../images/icons/ic_message_active.png')} />}
+            onPress={() => this.changeTab('message')}>
+            <ChatList  />
+          </TabNavigator.Item>
+        }
+        
+        <TabNavigator.Item
+          titleStyle={styles.tabTitle}
+          selectedTitleStyle={styles.tabTitleSelected}
+          selected={this.state.selectedTab === 'explore'}
+          title="Khám phá"
+          renderIcon={() => <Image style={styles.ic_explor} source={require('../images/icons/ic_explore.png')} />}
+          renderSelectedIcon={() => <Image style={styles.ic_explor} source={require('../images/icons/ic_explore_active.png')} />}
+          onPress={() => this.changeTab('explore')}>
+          <Explore  scrollTop = {this.props.scrollToTop.explore}/>
+        </TabNavigator.Item>
+        <TabNavigator.Item
+          titleStyle={styles.tabTitle}
+          selectedTitleStyle={styles.tabTitleSelected}
+          selected={this.state.selectedTab === 'profile'}
+          title="Thêm"
+          renderIcon={() => <Image style={styles.ic_profile} source={require('../images/icons/ic_more.png')} />}
+          renderSelectedIcon={() => <Image style={styles.ic_profile} source={require('../images/icons/ic_more_active.png')} />}
+          onPress={() => this.changeTab('profile')}>
+          <More />
+        </TabNavigator.Item>
+      </TabNavigator>
+      );
+    }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "black",
+  },
+  tabNavigator: {
+    backgroundColor: "#FFFFFF",
+    flex: 1,
+    borderTopColor: '#CCCCCC',
+    borderTopWidth: 1,
+  },
+  newStyle: {
+    paddingBottom: 0
+  },
+  tabTitle: {
+    color: '#8A8A8F',
+    fontSize: 10,
+    marginTop: 6
+  },
+  tabTitleSelected: {
+    color: '#D73554',
+    fontSize: 10,
+  },
+  ic_home: {
+    width: 22,
+    height: 22,
+  },
+  ic_routine: {
+    width: 20,
+    height: 22,
+  },
+  ic_message: {
+    width: 22,
+    height: 20,
+  },
+  ic_explor: {
+    width: 22,
+    height: 22
+  },
+  ic_profile: {
+    width: 16,
+    height: 14,
+    marginBottom: 2
+  },
+});
+
+// export default Tab;
+export default connect(mapStateToProps, mapDispatchToProps)(Tab);

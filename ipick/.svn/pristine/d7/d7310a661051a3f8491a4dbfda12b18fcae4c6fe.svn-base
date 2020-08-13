@@ -1,0 +1,206 @@
+import React, { Component } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  FlatList,
+  Animated
+} from 'react-native';
+
+import NavBar, { NavButton, NavGroup, NavTitle } from 'react-native-nav';
+import { Actions } from "react-native-router-flux";
+import ScrollableTabView from 'react-native-scrollable-tab-view';
+import ScrollableTabBar from '../../components/ScrollableTabBar';
+import MyPost from './MyPost';
+import MyPick from './MyPick';
+import NoInternet from '../../components/NoInternet'
+//import RNFirebase from 'react-native-firebase';
+import RNFirebase from 'react-native-firebase';
+
+let css = require('../../Css');
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { Map } from 'immutable';
+import * as profileActions from '../../actions/profileActions';
+const actions = [
+  profileActions
+];
+function mapStateToProps(state) {
+  return {
+    profile: state.profile,
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class Profile extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollY: new Animated.Value(0),
+    }
+    // const height = Animated.timing(
+    //   this.state.scrollY, 
+    //   {
+    //     toValue: 1,
+    //     duration: 3000,
+    //   }
+    // )
+  }
+
+  componentWillMount() {
+    var firebase = RNFirebase.initializeApp({ debug: false });
+    firebase.analytics().logEvent("Profile_Screen");
+  }
+
+
+  render() {
+    // const top = Animated.diffClamp(this.state.scrollY, 0, 100).interpolate({
+    //   inputRange: [0, 100],
+    //   outputRange: [0, -100],
+    //   extrapolate: 'clamp',
+    // })
+    // const opacity = Animated.diffClamp(this.state.scrollY, 0, 100).interpolate({
+    //   inputRange: [0, 100],
+    //   outputRange: [1, 0],
+    //   extrapolate: 'clamp',
+    // });
+    // const height = Animated.diffClamp(this.state.scrollY, 0, 100).interpolate({
+    //   inputRange: [0, 100],
+    //   outputRange: [1, 0],
+    //   extrapolate: 'clamp',
+    // });
+    return (
+      <View style={css.container}>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'dark-content', backgroundColor: '#fff'}} >
+          <NavGroup>
+            <View style={{marginLeft: 15, flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={[css.txtTitle, {color: 'rgb(0, 139, 125)'}]}>{this.props.profile.currentUser ? this.props.profile.currentUser.full_name : ''}</Text>
+              {/* <Image style={{marginLeft: 5}} source={require('../../images/icons/ic_ticked_blue.png')} /> */}
+            </View>
+          </NavGroup>
+          <NavButton onPress={() => Actions.setting()} style={css.navSearch}>
+            <Image source={require('../../images/icons/ic_seting_black.png')} />
+          </NavButton>
+        </NavBar>
+
+        <NoInternet />
+        
+        <View style={{flex: 1}}>
+          {
+            this.props.profile.currentUser ? 
+            <View>
+              <View style={[styles.ctHeader]}>
+                <Image style={styles.avatar} source={this.props.profile.currentUser.avatar ? {uri: this.props.profile.currentUser.avatar +'.png'} : require('../../images/avatar_default.png')} />
+                <View style={{flex: 1, paddingLeft: 15}}>
+                  <View style={styles.ctCount}>
+                    <View  style={{flex: 1}}>
+                      <Text style={styles.txtCount}>{this.props.profile.currentUser.count_post}</Text>
+                      <Text style={styles.txtPost}>Bài viết</Text>
+                    </View>
+                    <TouchableOpacity onPress={() =>this.props.profile.currentUser.count_followers == 0 ? null : Actions.follower({id: this.props.profile.currentUser.id})} style={{flex: 1}}>
+                      <Text style={styles.txtCount}>{this.props.profile.currentUser.count_followers}</Text>
+                      <Text style={styles.txtPost}>Follower</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => this.props.profile.currentUser.count_followings == 0 ? null : Actions.following({id: this.props.profile.currentUser.id})} style={{flex: 1}}>
+                      <Text style={styles.txtCount}>{this.props.profile.currentUser.count_followings}</Text>
+                      <Text style={styles.txtPost}>Following</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <TouchableOpacity onPress={() => Actions.editProfile()} style={styles.ctEdit}>
+                    <Image source={require('../../images/icons/ic_edit.png')} />
+                    <Text style={styles.txtEdit}>Edit Profile</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {/* <Text style={styles.txtDescrip}>{this.props.profile.currentUser.description}</Text> */}
+            </View>   
+           : null
+          }       
+            <ScrollableTabView  renderTabBar={() => <ScrollableTabBar />}
+              initialPage={0}
+              tabBarBackgroundColor='white'
+              tabBarInactiveTextColor='rgba(0, 0, 0, 0.7)'
+              // tabBarActiveTextColor='rgb(51, 51, 51)'
+              tabBarActiveTextColor='rgb(0, 139, 125)'
+              prerenderingSiblingsNumber={0}
+              tabBarTextStyle={{fontSize: 14}}
+              scrollWithoutAnimation={true}
+              >
+              <MyPick 
+                onScroll={Animated.event(
+                  [{nativeEvent: {contentOffset: {y: this.state.scrollY}}}]
+                )}
+                tabLabel="ALL PICKS" 
+              />
+              <MyPost
+                onScroll={Animated.event(
+                  [{nativeEvent: {contentOffset: {y: this.state.scrollY}}}]
+                )}
+                tabLabel="MY PICKS"
+              />
+            </ScrollableTabView>
+        </View>
+      </View>
+    )
+  }
+}
+
+const styles= StyleSheet.create({
+  txtDescrip:{
+    fontSize: 15,
+    color: 'rgb(51, 51, 51)',
+    marginTop: 12,
+    margin: 15
+  },
+
+  txtEdit: {
+    color: 'rgb(0, 139, 125)',
+    fontSize: 12,
+    marginLeft: 10,
+    fontWeight: 'bold'
+  },
+  ctEdit: {
+    flexDirection: 'row',
+    borderColor: 'rgb(217, 227, 237)',
+    borderWidth: 1,
+    width: 115,
+    alignItems: 'center',
+    height: 24,
+    justifyContent: 'center',
+    borderRadius: 12,
+  },
+  txtCount: {
+    fontSize: 20,
+    color: '#000'
+  },
+  txtPost: {
+    color: 'rgb(176, 184, 198)'
+  },
+  ctCount: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  ctHeader: {
+    flexDirection: 'row',
+    padding: 15
+  },
+  avatar: {
+    height: 80,
+    width: 80,
+    borderRadius: 4,
+  },
+});
+export default connect(mapStateToProps, mapDispatchToProps)(Profile);

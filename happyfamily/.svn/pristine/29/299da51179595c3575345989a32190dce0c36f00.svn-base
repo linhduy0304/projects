@@ -1,0 +1,156 @@
+import React, { Component, PureComponent } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  FlatList,
+  Image,
+  Dimensions,
+  TouchableOpacity,
+  InteractionManager,
+  RefreshControl
+} from 'react-native';
+
+import { Actions } from "react-native-router-flux";
+import {loadSearch} from '../../actions/search'
+import { connect } from 'react-redux'
+import Loading from '../../components/Loading';
+import NoData from '../../components/NoData';
+import LoadMore from '../../components/LoadMore';
+let css = require('../../Css');
+
+class Post extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isRefreshing: false,
+      page: 1,
+    }
+  }
+
+  componentWillMount() {
+    this.props.loadSearch('posts', this.props.keyword, 'L');
+  }
+
+  componentDidMount() {
+    
+    // this.props.actions.search('post', this.props.keyword, 'L');
+    // timeout = setTimeout( () => {
+    // }, 1000);
+    // InteractionManager.runAfterInteractions(()=> {
+    //   this.props.actions.home();
+    // })
+  }
+
+  _onRefresh() {
+    this.setState({
+      isRefreshing: true,
+      page: 1
+    });
+    this.props.loadSearch('posts', this.props.keyword, 'RF');
+    this.setState({
+      isRefreshing: false,
+    })
+  }
+
+  loadMore() {
+    if (!this.props.search.loadMore) {
+        return;
+    }
+    this.props.loadSearch('posts', this.props.keyword, 'LM', this.state.page + 1);
+    this.setState({
+        page: this.state.page + 1,
+    });
+  }
+
+  _renderFooter() {
+    if(this.props.search.loadMore) {
+      return <LoadMore />
+    }else return null;
+  }
+
+  profile(id) {
+    if(this.props.profile.currentUser.id == id) {
+      return null
+    }else{
+      Actions.otherProfile({id: id})
+    }
+  }
+
+  render() {
+    console.log(this.props.search)
+    return (
+      <View style={[css.container, {backgroundColor: 'rgb(237, 239, 241)'}]}>
+        {
+          this.props.search.loading ?
+          <Loading title='Đang tìm kiếm'/>
+          :
+          this.props.search.searchPost ?
+            this.props.search.searchPost.length == 0 ?
+              <NoData />
+            : 
+            <FlatList
+              ref="listRef"
+              onEndReached={() => this.loadMore()}
+              contentContainerStyle={{paddingTop: 10}}
+              ListFooterComponent={() => this._renderFooter()}
+              data={this.props.search.searchPost}
+              refreshControl={
+                <RefreshControl
+                    refreshing={this.state.isRefreshing}
+                    onRefresh={() => this._onRefresh()}
+                />
+              }
+              removeClippedSubviews 
+              keyExtractor={(item, index) => index.toString()}
+              onEndReachedThreshold={0.2}
+              renderItem={(data) => (
+                <View style={styles.ctItem}>
+                  <TouchableOpacity onPress={() => Actions.postDetail({slug: data.item.slug})}>
+                    <Image style={{height: 80*400/600, width: 80}} source={{uri: data.item.image_thumb+'_600x400.png'}} />
+                  </TouchableOpacity>
+                  <View style={{marginLeft: 10, flex: 1}}>
+                    <Text numberOfLines={2} onPress={() => Actions.postDetail({slug: data.item.slug})} style={styles.txtTitle}>{data.item.title}</Text>
+                    {/* <Text style={styles.txtBy}>Đăng bởi: <Text onPress={() => this.profile(data.item.user.id)} style={{color: 'rgb(0, 139, 125)'}}>{data.item.user.full_name}</Text></Text> */}
+                  </View>
+                </View>
+              )} 
+            />
+          : null
+        }
+      </View>
+    )
+  }
+}
+
+const styles= StyleSheet.create({
+  ctItem: {
+    marginBottom: 7,
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    padding: 10,
+    marginLeft: 10,
+    marginRight: 10,
+    borderRadius: 5,
+  },
+  txtTitle: {
+    flex: 1,
+    color: 'rgb(53, 69, 164)',
+    fontSize: 16,
+  },
+});
+
+const mapStateToProps = (state) => {
+  return {
+    search: state.search,
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    loadSearch: (type, keyword,action, page) => dispatch(loadSearch(type, keyword,action, page)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Post);

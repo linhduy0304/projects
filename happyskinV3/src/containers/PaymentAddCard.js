@@ -1,0 +1,92 @@
+import React from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+  StatusBar,
+  Platform,
+  Alert
+} from "react-native";
+import Button from "react-native-button";
+import {Actions} from "react-native-router-flux";
+import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav'; 
+import { TextField } from 'react-native-material-textfield';
+
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+
+class PaymentAddCard extends React.Component {
+  constructor(props) {
+    super()
+    this.state = {
+      numberCard: ''
+    }
+  }
+
+  render(){
+    return (
+      <View style={styles.container}>
+        <NavBar style={{navBar: main.navBarWhite, statusBar: main.statusBar}} statusBar={{barStyle: 'dark-content', backgroundColor: '#000' }} >
+          <NavButton onPress={() => Actions.pop()} style={main.navButton}>
+            <Image style={{height: (42*8)/24, width: 8, marginRight: 10}} source={require('../images/icons/ic_arrow_back_blue.png')} />
+            <Text style={{color: 'rgb(68, 110, 182)'}}>Back</Text>
+          </NavButton>
+        </NavBar>
+        
+        <View style={{flex: 1, paddingLeft: 15, paddingRight: 15}}>
+          <Text style={styles.txtPayment}>Add Credit Card</Text>
+          <Text style={styles.txtChoose}>{this.state.info}</Text>
+          <View style={{backgroundColor: 'red',}}>
+          <Image stye={{position: 'absolute', height:20, width: 20, right: 0, bottom: 0}} source={require('../images/icons/ic_comment_purple.png')} />
+          
+          <TextField
+            label='Card number'
+            autoCorrect={false}
+            containerStyle={{ padding: 0}}
+            underlineColorAndroid="transparent"
+            onChangeText={(numberCard) => this.setState({numberCard: numberCard})}
+            tintColor="#5a5e6f"
+            textColor="#0e0e11"
+            baseColor="#c2c5d0"
+          >
+          </TextField>
+          
+          </View>
+        </View>
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  },
+  txtPayment: {
+    color: 'rgb(215, 53, 84)',
+    fontSize: 32,
+  },
+  txtChoose: {
+    color: 'rgb(51, 51, 51)',
+    marginTop: 8,
+    marginBottom: 16
+  },
+  ctPayment: {
+    borderColor: 'rgb(189, 210, 233)',
+    borderWidth: 1
+  },
+  txtAdd: {
+    fontSize: 16,
+    color: '#fff'
+  },
+  
+});
+let main = require('../styles/Main');
+module.exports = PaymentAddCard;

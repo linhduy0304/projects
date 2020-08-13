@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/24x24_hamburger_o</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M1.2,13.2142857 C0.5372583,13.2142857 0,12.6706314 0,12 C0,11.3293686 0.5372583,10.7857143 1.2,10.7857143 L22.8,10.7857143 C23.4627416,10.7857143 24,11.3293686 24,12 C24,12.6706314 23.4627416,13.2142857 22.8,13.2142857 L1.2,13.2142857 Z M1.2,5.92857143 C0.5372583,5.92857143 0,5.3849172 0,4.71428571 C0,4.04365423 0.5372583,3.5 1.2,3.5 L22.8,3.5 C23.4627416,3.5 24,4.04365423 24,4.71428571 C24,5.3849172 23.4627416,5.92857143 22.8,5.92857143 L1.2,5.92857143 Z M1.2,20.5 C0.5372583,20.5 0,19.9563457 0,19.2857143 C0,18.6150829 0.5372583,18.0714286 1.2,18.0714286 L22.8,18.0714286 C23.4627416,18.0714286 24,18.6150829 24,19.2857143 C24,19.9563457 23.4627416,20.5 22.8,20.5 L1.2,20.5 Z" id="path-1"></path>
+    </defs>
+    <g id="icon/24x24_hamburger_o" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="24x24_hamburger_o" fill-rule="nonzero"></g>
+        <g id="COLOR/JJ_4.black" mask="url(#mask-2)" fill="#0F0A0A">
+            <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        </g>
+    </g>
+</svg>

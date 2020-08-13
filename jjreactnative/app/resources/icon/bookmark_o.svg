@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/24x24_bookmark_o</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M19.125,19.4934979 L19.125,3.42857143 C19.125,2.79738886 18.5933381,2.28571429 17.9375,2.28571429 L6.0625,2.28571429 C5.40666186,2.28571429 4.875,2.79738886 4.875,3.42857143 L4.875,19.4934979 L11.3097796,15.0700189 C11.7226704,14.7861842 12.2773296,14.7861842 12.6902204,15.0700189 L19.125,19.4934979 Z M12,17.4044613 L4.37772035,22.6442669 C3.59175154,23.1845677 2.5,22.6438544 2.5,21.7142857 L2.5,3.42857143 C2.5,1.53502371 4.09498558,0 6.0625,0 L17.9375,0 C19.9050144,0 21.5,1.53502371 21.5,3.42857143 L21.5,21.7142857 C21.5,22.6438544 20.4082485,23.1845677 19.6222796,22.6442669 L12,17.4044613 Z" id="path-1"></path>
+    </defs>
+    <g id="icon/24x24_bookmark_o" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="24x24_bookmark_o" fill-rule="nonzero"></g>
+        <g id="COLOR/JJ_4.black" mask="url(#mask-2)" fill="#0F0A0A">
+            <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,16 @@
+
+
+import React from 'react';
+
+let HTTP = require('./HTTP');
+let URL = require('./URL');
+
+//send
+export function event(date) {
+  return HTTP.get(`${URL.url}events?time_event=${date}`);
+}
+
+//add event
+export function addEvent(body) {
+  return HTTP.postWithAuth(`${URL.url}events`, body);
+}

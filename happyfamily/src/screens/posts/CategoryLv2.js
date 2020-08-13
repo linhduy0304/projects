@@ -1,0 +1,156 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  FlatList,
+  Dimensions,
+  Platform
+} from 'react-native';
+
+const window = Dimensions.get('window');
+
+import {Actions} from 'react-native-router-flux';
+import NavBar, { NavButton, NavGroup, NavTitle } from 'react-native-nav';
+import css from '../../Css'
+import Loading from '../../components/Loading';
+import NoData from '../../components/NoData';
+
+import {categoryLv2} from '../../actions/post'
+import { connect } from 'react-redux'
+
+class CategoryLv2 extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      
+    }
+  }
+
+  componentWillMount() {
+    this.props.categoryLv2(this.props.id)
+  }
+
+  direct(data) {
+    Actions.postCategory({slug: data.slug, title: data.title})
+    // if(data.is_child === 0) {
+    //   Actions.postCategory({slug: data.slug, title: data.title})
+    // }else {
+    //   Actions.categoryLv2({id: data.id, title: data.title})
+    // }
+  }
+
+  renderItem(data) {
+    return (
+      <TouchableOpacity onPress={() => this.direct(data)} style={{marginLeft: 15, marginTop: 15}}>
+        <Image style={{width: (window.width-45)/2, height:  (window.width-45)/2 + 50}} source={{uri: data.image_thumb + '.png'}} />
+        <View style={styles.ctBlur}/>
+        <Text numberOfLines={2} style={styles.txtTitle}>{data.title}</Text>
+      </TouchableOpacity>
+    )
+  }
+
+  renderHeader() {
+    if(this.props.post.categoryLv2.length === 0) {
+      return (
+        <NoData />
+      )
+    }else return null;
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={{height: Platform.OS === 'ios' ? 20 : 0, backgroundColor: '#C6247D'}}></View>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'light-content', backgroundColor: '#C6247D'}} >
+          <NavButton/>
+          <NavTitle style={css.navTitle}>
+            <Text style={css.txtTitle}>{this.props.title}</Text>
+          </NavTitle>
+          <NavButton/>
+          <TouchableOpacity onPress={() => Actions.pop()} style={{position: 'absolute', left: 0, padding: 15}}>
+            <Image source={require('../../images/icons/ic_back.png')} />
+          </TouchableOpacity>
+        </NavBar>
+
+        <View style={styles.ctContent}>
+        {
+          this.props.post.loading ?
+            <Loading />
+          :
+            this.props.post.categoryLv2 ?
+              <FlatList
+                ref="listRef"
+                contentContainerStyle={styles.list}
+                data={this.props.post.categoryLv2}
+                ListHeaderComponent={() => this.renderHeader()}
+                numColumns={2}
+                // refreshControl={
+                //   <RefreshControl
+                //       refreshing={this.state.isRefreshing}
+                //       onRefresh={() => this._onRefresh()}
+                //   />
+                // }
+                onEndReachedThreshold={0.2}
+                renderItem={(data) => this.renderItem(data.item)}
+              />
+            : null
+        }
+        
+        </View>
+     
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  txtTitle: {
+    position: 'absolute',
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+    // bottom: 50,
+    top: (window.width-45)/2,
+    left: 10,
+    right: 10
+  },
+  ctBlur: {
+    width: (window.width-45)/2,
+    height:  (window.width-45)/2 + 50,
+    position: 'absolute',
+    top: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)'
+  },
+
+  ctContent: {
+    flex: 1
+  },
+  list: {
+    paddingBottom: 20
+    // flexDirection: 'row',
+    // flexWrap: 'wrap',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  }
+})
+
+const mapStateToProps = (state) => {
+  return {
+    post: state.post,
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    categoryLv2: (id) => dispatch(categoryLv2(id)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CategoryLv2);

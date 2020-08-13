@@ -1,0 +1,44 @@
+
+
+import React from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Dimensions
+} from 'react-native';
+const window = Dimensions.get('window')
+
+const OtherMessage = ({
+  data
+}) => (
+  <View style={styles.container}>
+    <View style={styles.ctMessage}>
+      <Text style={styles.txtContent}>{data.content}</Text>
+    </View>
+  </View>
+)
+
+const styles = StyleSheet.create({
+  txtContent: {
+    fontSize: 15,
+    color: '#287FC9'
+  },
+  container: {
+    marginTop: 20,
+    paddingRight: window.width/4,
+    flexDirection: 'row'
+  },
+  ctMessage: {
+    padding: 5,
+    paddingLeft: 10,
+    paddingRight: 10,
+    borderRadius: 15,
+    backgroundColor: '#E3F1FD',
+  },
+})
+
+export default OtherMessage;
+  

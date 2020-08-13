@@ -1,0 +1,152 @@
+import React from 'react';
+import {AppRegistry, Navigator, StyleSheet, Text, View} from 'react-native';
+import {Scene, Stack, Reducer, Router, ActionConst} from 'react-native-router-flux';
+
+import App from './src/containers/App';
+import Welcome from './src/containers/Welcome';
+import Login from './src/containers/Login';
+import HomeNew from './src/containers/HomeNew';
+import Tab from './src/containers/Tab';
+import More from './src/containers/More';
+import Register from './src/containers/Register';
+import ForgetPassword from './src/containers/ForgetPassword';
+import Setting from './src/containers/Setting';
+import PostDetail from './src/containers/PostDetail';
+import Profile from './src/containers/Profile';
+import OtherProfile from './src/containers/OtherProfile';
+import CoachProfile from './src/containers/CoachProfile';
+import EditProfile from './src/containers/EditProfile';
+import SkinIntroduct from './src/containers/SkinIntroduct';
+import SkinTest from './src/containers/SkinTest';
+import SkinResult from './src/containers/SkinResult';
+import ChatDetail from './src/containers/ChatDetail';
+import Explore from './src/containers/Explore';
+import ChatList from './src/containers/ChatList';
+import ExploreDetail from './src/components/explore/ExploreDetail';
+import SkinDiary from './src/containers/SkinDiary';
+import SkinDiaryDetail from './src/containers/SkinDiaryDetail';
+import SkinDiaryDone from './src/containers/SkinDiaryDone';
+import RoutineDetail from './src/containers/RoutineDetail';
+import RoutineDone from './src/containers/RoutineDone';
+import RoutineSubscribed from './src/containers/RoutineSubscribed';
+import RoutineList from './src/containers/RoutineList';
+import Payment from './src/containers/Payment';
+import PaymentAdd from './src/containers/PaymentAdd';
+import PaymentAddCard from './src/containers/PaymentAddCard';
+import CosmeticsBag from './src/containers/CosmeticsBag';
+import CosmeticsBagAdd from './src/components/cosmeticsBag/CosmeticsBagAdd';
+import CosmeticsDetail from './src/components/cosmeticsBag/CosmeticsDetail';
+import ChatBox from './src/containers/ChatBox';
+import ChatBox2 from './src/containers/ChatBox2';
+import ChatNotification from './src/containers/ChatNotification';
+import ChatStatics from './src/containers/ChatStatics';
+import ChatImage from './src/containers/ChatImage';
+import ChatQAStep1 from './src/containers/ChatQAStep1';
+import ChatQAStep2 from './src/containers/ChatQAStep2';
+import ChatQAStep3 from './src/containers/ChatQAStep3';
+import ChatQAStep31 from './src/containers/ChatQAStep31';
+import Magazine from './src/containers/Magazine';
+import Notification from './src/containers/Notification';
+import PostLiked from './src/containers/PostLiked';
+import ChatEmpty from './src/containers/ChatEmpty';
+import ExploreReview from './src/components/explore/ExploreReview';
+import VideoDetail from './src/containers/VideoDetail';
+import Search from './src/containers/Search';
+import InviteFriend from './src/containers/InviteFriend';
+import NewsDetail from './src/containers/NewsDetail';
+import SPoint from './src/containers/SPoint';
+import Event from './src/containers/Event';
+import EventDetail from './src/containers/EventDetail';
+import PageSkinDetail from './src/containers/PageSkinDetail';
+import HotDebateDetail from './src/components/explore/HotDebateDetail';
+import UpdateRoutine from './src/components/routine/UpdateRoutine';
+import ImageView from './src/components/ImageView';
+import SpaBooking from './src/containers/SpaBooking';
+import RoutineHistory from './src/containers/RoutineHistory';
+import Community from './src/containers/Community';
+
+import {Provider} from 'react-redux';
+import configureStore from './src/libs/configureStore';
+
+function getInitialState() {
+  const _initState = {
+    //login: new loginInitialState,
+  };
+  return _initState;
+}
+
+export default class Main extends React.Component {
+    render() {
+        const store = configureStore(getInitialState());
+        return (
+            <Provider store={store}>
+                <Router>
+                    <Stack key="root">
+                        <Scene key="app" initial={true} component={App} title="App" hideNavBar={true}/>
+                        <Scene key="welcome"  component={Welcome} title="Welcome" hideNavBar={true}/>
+                        <Scene key="login" component={Login} title="Login" hideNavBar={true} direction="fade"/>
+                        <Scene key="homeNew" component={HomeNew} hideNavBar={true}/>
+                        <Scene key="tab"  component={Tab} title="Tab" hideNavBar={true}/>
+                        <Scene key="register" component={Register} title="Register" hideNavBar={true}/>
+                        <Scene key="forgetPassword" component={ForgetPassword} title="ForgetPassword" hideNavBar={true}/>
+                        <Scene key="setting" component={Setting} title="Setting" hideNavBar={true}/>
+                        <Scene key="postDetail" component={PostDetail} title="PostDetail" hideNavBar={true} />
+                        <Scene key="more"  component={More}  hideNavBar={true}/>
+                        <Scene key="profile"  component={Profile}  hideNavBar={true}/>
+                        <Scene key="otherProfile"  component={OtherProfile}  hideNavBar={true}/>
+                        <Scene key="coachProfile"  component={CoachProfile}  hideNavBar={true}/>
+                        <Scene key="editProfile" component={EditProfile}  hideNavBar={true}/>
+                        <Scene key="skinIntroduct" component={SkinIntroduct} hideNavBar={true}/>
+                        <Scene key="skinTest" panHandlers={null} component={SkinTest} hideNavBar={true}/>
+                        <Scene key="skinResult" panHandlers={null} component={SkinResult} hideNavBar={true}/>
+                        <Scene key="chatDetail" panHandlers={null} component={ChatDetail} hideNavBar={true} />
+                        <Scene key="chatList" panHandlers={null} component={ChatList} hideNavBar={true}/> 
+                        <Scene key="explore" component={Explore}  hideNavBar={true}/>
+                        <Scene key="exploreDetail" component={ExploreDetail}  hideNavBar={true}/>
+                        <Scene key="skinDiary"  component={SkinDiary}  hideNavBar={true}/>
+                        <Scene key="skinDiaryDetail" component={SkinDiaryDetail} panHandlers={null} hideNavBar={true}/>
+                        <Scene key="skinDiaryDone"  component={SkinDiaryDone} panHandlers={null} hideNavBar={true}/>
+                        <Scene key="routineDetail" component={RoutineDetail} title="RoutineDetail" hideNavBar={true}/>
+                        <Scene key="routineDone" component={RoutineDone} title="RoutineDone" hideNavBar={true}/>
+                        <Scene key="routineSubscribed" component={RoutineSubscribed} title="RoutineSubscribed" hideNavBar={true}/>
+                        <Scene key="routineList" component={RoutineList} title="RoutineList" hideNavBar={true}/>
+                        <Scene key="payment" component={Payment}  hideNavBar={true}/>
+                        <Scene key="paymentAdd"  component={PaymentAdd}  hideNavBar={true}/>
+                        <Scene key="paymentAddCard"  component={PaymentAddCard}  hideNavBar={true}/>
+                        <Scene key="cosmeticsBag" component={CosmeticsBag}  hideNavBar={true}/>
+                        <Scene key="cosmeticsBagAdd" component={CosmeticsBagAdd}  hideNavBar={true}/>
+                        <Scene key="chatBox" panHandlers={null} component={ChatBox} hideNavBar={true} />
+                        <Scene key="chatBox2" panHandlers={null} component={ChatBox2} hideNavBar={true} />
+                        <Scene key="chatNotification" panHandlers={null} component={ChatNotification} hideNavBar={true} />
+                        <Scene key="chatStatics" panHandlers={null} component={ChatStatics} hideNavBar={true} />
+                        <Scene key="chatImage" panHandlers={null} component={ChatImage} hideNavBar={true} />
+                        <Scene key="chatQAStep1" panHandlers={null} component={ChatQAStep1} hideNavBar={true} />
+                        <Scene key="chatQAStep2" panHandlers={null} component={ChatQAStep2} hideNavBar={true} />
+                        <Scene key="chatQAStep3" panHandlers={null} component={ChatQAStep3} hideNavBar={true} />
+                        <Scene key="chatQAStep31" panHandlers={null} component={ChatQAStep31} hideNavBar={true} />
+                        <Scene key="magazine" panHandlers={null} component={Magazine} hideNavBar={true} />
+                        <Scene key="notification" panHandlers={null} component={Notification} hideNavBar={true} />
+                        <Scene key="postLiked" panHandlers={null} component={PostLiked} hideNavBar={true} />
+                        <Scene key="chatEmpty" panHandlers={null} component={ChatEmpty} hideNavBar={true} />
+                        <Scene key="exploreReview" panHandlers={null} component={ExploreReview} hideNavBar={true} />
+                        <Scene key="videoDetail" panHandlers={null} component={VideoDetail} hideNavBar={true} />
+                        <Scene key="search" panHandlers={null} component={Search} hideNavBar={true} />
+                        <Scene key="inviteFriend" panHandlers={null} component={InviteFriend} hideNavBar={true} />
+                        <Scene key="newsDetail" panHandlers={null} component={NewsDetail} hideNavBar={true} />
+                        <Scene key="spoint" panHandlers={null} component={SPoint} hideNavBar={true} />
+                        <Scene key="event" panHandlers={null} component={Event} hideNavBar={true} />
+                        <Scene key="eventDetail" panHandlers={null} component={EventDetail} hideNavBar={true} />
+                        <Scene key="pageSkinDetail" panHandlers={null} component={PageSkinDetail} hideNavBar={true} />
+                        <Scene key="hotDebateDetail" panHandlers={null} component={HotDebateDetail} hideNavBar={true} />
+                        <Scene key="cosmeticsDetail" component={CosmeticsDetail}  hideNavBar={true}/>
+                        <Scene key="updateRoutine" component={UpdateRoutine}  hideNavBar={true}/>
+                        <Scene key="spaBooking"  component={SpaBooking}  hideNavBar={true}/>
+                        <Scene key="imageView" component={ImageView} direction="fade" duration={0} hideNavBar={true}/>
+                        <Scene key="routineHistory" component={RoutineHistory} hideNavBar={true}/>
+                        <Scene key="community" component={Community} hideNavBar={true}/>
+                    </Stack>
+                </Router>
+            </Provider>
+        );
+    }
+}

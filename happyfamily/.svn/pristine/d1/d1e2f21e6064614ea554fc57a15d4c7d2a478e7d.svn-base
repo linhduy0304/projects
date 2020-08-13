@@ -1,0 +1,132 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  FlatList,
+  Image
+} from 'react-native';
+import ListChat from '../../components/chat/ListChat';
+
+class Chat extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: [
+        {
+          avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+          full_name: 'User One',
+          content: 'Far far away, behind the word mountains',
+          time: '17:56'
+        },
+        {
+          avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+          full_name: 'User Two',
+          content: 'Far far away, behind the word mountains',
+          time: '17:56'
+        },
+        {
+          avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+          full_name: 'Group One',
+          content: 'Far far away, behind the word mountains',
+          time: '17:56',
+          type: 'group'
+        },
+        {
+          avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+          full_name: 'User Three',
+          content: 'Far far away, behind the word mountains',
+          time: '17:56'
+        },
+        {
+          avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+          full_name: 'User Four',
+          content: 'Far far away, behind the word mountains',
+          time: '17:56'
+        },
+        {
+          avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+          full_name: 'User Five',
+          content: 'Far far away, behind the word mountains',
+          time: '17:56'
+        },
+        {
+          avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+          full_name: 'Group Two',
+          content: 'Far far away, behind the word mountains',
+          time: '17:56',
+          type: 'group'
+        },
+
+      ]
+    }
+  }
+
+  detailChat(data) {
+    if(data.type === 'group') {
+      this.props.navigation.navigate('chat_group', {title: data.full_name})
+    }else {
+      this.props.navigation.navigate('chat_one', {title: data.full_name})
+    }
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={styles.ctHeader}>
+          <View style={styles.ctSearch}>
+            <Image source={require('../../images/icons/ic_search.png')} />
+            <Text style={styles.txtSearch}>Search</Text>
+          </View>
+        </View>
+        <FlatList
+          ref="list"
+          onScroll= {this.props.onScroll}
+          // onEndReached={() => this.loadMore()}
+          // ListFooterComponent={() => this._renderFooter()}
+          data={this.state.data}
+          // refreshControl={
+          //   <RefreshControl
+          //       refreshing={this.state.isRefreshing}
+          //       onRefresh={() => this._onRefresh()}
+          //   />
+          // }
+          removeClippedSubviews 
+          keyExtractor={(item, index) => index.toString()}
+          onEndReachedThreshold={0.2}
+          renderItem={(data) => <ListChat onPress={() => this.detailChat(data.item)} type='group' data={data.item}/>} 
+        />
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  txtSearch: {
+    color: '#287FC9',
+    fontSize: 13,
+    marginLeft: 7
+  },
+  ctSearch: {
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    padding: 7
+  },
+  ctHeader: {
+    backgroundColor: '#E3F1FD',
+    padding: 7,
+  },
+  container: {
+    flex: 1,
+    // backgroundColor: '#E3F1FD'
+    backgroundColor: '#fff'
+  }
+})
+
+export default (Chat);

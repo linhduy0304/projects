@@ -1,0 +1,24 @@
+
+'use strict';
+
+const InitialState = require('./state').default;
+  
+const {
+  PROFILE_SUCCESS
+  } = require('../../config/actionTypes');
+
+const initialState = new InitialState;
+
+export default function reducer(state = initialState, action) {
+
+  switch (action.type) {
+
+      //creategorup
+      case PROFILE_SUCCESS: 
+        return state.setIn(['currentUser'], action.data);
+
+
+  }
+ 
+  return state;
+}

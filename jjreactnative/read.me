@@ -1,0 +1,39 @@
+read******************************************************************************************************************
+************************************************** BUILD GUIDE ****************************************************
+*******************************************************************************************************************
+
+***ANDROID:
+Note:
+    -variant dev-debug build: devDebug
+    -variant dev-release build: devRelease
+    -variant beta-debug build: betaDebug
+    -variant beta-release build: betaRelease
+    -variant publish-debug build: publishDebug
+    -variant publish-release build: publishRelease
+
+*Step1: In `gradle.properties` file, change information to this build:
+    -AppVersionCode
+    -AppVersionName
+
+*Step2:
+    -Run the our dev version in debug mode: "react-native run-android --variant=devDebug"
+    -Building a beta release: "cd android && ./gradlew assembleBetaRelease" //./gradlew assembleDevRelease
+
+
+***iOS:
+-Change version
+-Change build number
+-Change plist file config in release build to dev if for dev, pro for publish
+
+***CodePush:
+Dev:
+-appcenter codepush release-react -a pnsinh.hg92/JAMJA-Android-Dev -d Dev -m --description "Update: 08:05, 19/04/2019, Phúc Long Update Analytics" --target-binary-version "3.1.22"
+-appcenter codepush release-react -a pnsinh.hg92/JAMJA-iOS -d Dev -m --description "Update: 18:50, 12/04/2019, Phúc Long Update Analytics" --target-binary-version "3.0.23"
+
+-appcenter codepush release-react -a pnsinh.hg92/JAMJA-Android-Dev -d Alpha -m --description "Update 09:35, 09/05/19: Update Delivery" --target-binary-version "3.1.24"
+-appcenter codepush release-react -a pnsinh.hg92/JAMJA-iOS -d Alpha -m --description "Update 09:40, 09/05/19: Update Delivery" --target-binary-version "3.0.27"
+
+Production:
+-appcenter codepush release-react -a pnsinh.hg92/JAMJA-Android-Dev -d Production -m --target-binary-version "3.1.23"
+-appcenter codepush release-react -a pnsinh.hg92/JAMJA-iOS -d Production -m --target-binary-version "3.0.25"
+

@@ -1,0 +1,69 @@
+
+
+import React from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image
+} from 'react-native';
+
+const ListUserGroup = ({
+  onPress,
+  user,
+  arrUser
+}) => (
+  <View style={styles.ctUser}>
+    <TouchableOpacity onPress={onPress} style={[styles.ctCheck, arrUser.indexOf(user) === -1 ? {backgroundColor: '#fff'} : {backgroundColor:'#c6247d'}]}>
+      <Image source={require('../../images/icons/ic_check.png')} />
+    </TouchableOpacity>
+    <Image style={styles.ctAvatar} source={user.avatar ? {uri: user.avatar} : require('../../images/icons/ic_user.png')} />
+    <View style={styles.ctName}>
+      <Text style={styles.txtFullName}>{user.full_name}</Text>
+      <Text style={styles.txtUserName}>@{user.username}</Text>
+    </View>
+  </View>
+)
+
+const styles = StyleSheet.create({
+  ctName: {
+    marginLeft: 15,
+    flex: 1
+  },
+  txtUserName: {
+    color: '#e59dc5',
+    fontSize: 12
+  },
+  txtFullName: {
+    color: '#c6247d',
+    fontSize: 15
+  },
+  ctUser: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderBottomColor: '#F7FCFE',
+    borderBottomWidth: 1,
+    padding: 8,
+    paddingLeft: 15
+  },
+  ctAvatar: {
+    height: 40,
+    width: 40,
+    borderRadius: 20,
+    marginLeft: 15,
+  },
+  ctCheck: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderColor: '#c6247d',
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+})
+
+export default ListUserGroup;
+  

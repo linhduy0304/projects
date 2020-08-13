@@ -1,0 +1,20 @@
+//
+//  Development.xcconfig
+//  JamJaReactNative
+//
+//  Created by Sinh Phan on 10/2/18.
+//  Copyright © 2018 Facebook. All rights reserved.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+ENV_CONFIG_FB_ID          = 1628889640660321
+ENV_CONFIG_BUILD_TYPE     = dev
+GA_ID                     = UA-64551878-15
+GG_MAP_KEY                = AIzaSyBbWBHXAN4jmYhoZBuKFonHXMMOJJEDyog
+ONESIGNAL_KEY             = 79d889ff-f51c-447b-8d9c-ad61e21ad2bf
+INSIDER_PARTNER           = jamjatest
+FCM_SENDER_ID             = 1095577327775
+CODEPUSH_KEY              = _X4DfmEM5g9fvNcuQPFlw3k7Pa4jHymKk2n_V
+

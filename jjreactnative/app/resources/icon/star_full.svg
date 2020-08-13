@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/24x24_star_full</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M7.90484731,7.2454373 L11.0218706,0.636327906 C11.422015,-0.212109301 12.577985,-0.212109301 12.9781294,0.636327906 L16.0951527,7.2454373 L23.0657723,8.31179217 C23.9601362,8.4486106 24.3165919,9.59921168 23.6690994,10.2592676 L18.6260954,15.4001221 L19.8162542,22.6628267 C19.9690957,23.595511 19.0336804,24.3067161 18.2334364,23.8662583 L12,20.4353472 L5.76656358,23.8662583 C4.96631959,24.3067161 4.0309043,23.595511 4.18374574,22.6628267 L5.37390453,15.4001221 L0.330900567,10.2592676 C-0.316591942,9.59921168 0.0398638147,8.4486106 0.934227697,8.31179217 L7.90484731,7.2454373 Z" id="path-1"></path>
+    </defs>
+    <g id="icon/24x24_star_full" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="24x24_star_full" fill-rule="nonzero"></g>
+        <g id="COLOR/JJ_4.black" mask="url(#mask-2)" fill="#0F0A0A">
+            <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        </g>
+    </g>
+</svg>

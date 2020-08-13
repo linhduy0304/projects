@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/24x24_lipstick_o</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M6,11.0004 L6,9.0004 L7.992,9.0004 L7.976,11.0234 L6,11.0004 Z M5,13 L9,13 L9,19 C9,20.103 8.103,21 7,21 C5.897,21 5,20.103 5,19 L5,13 Z M10,8.0024 C10,7.4514 9.549,7.0004 8.997,7.0004 L5.004,7.0004 C4.452,7.0004 4,7.4514 4,8.0034 L4,11.0004 C3.45,11.0234 3,11.4734 3,12.0234 L3,19.0234 C3,21.2234 4.8,23.0234 7,23.0234 C9.2,23.0234 11,21.2234 11,19.0234 L11,12.0234 C11,11.4734 10.55,11.0234 10.001,11.0234 C9.999,11.0180667 9.99866667,10.0110667 10,8.0024 Z M17,11 C19.2,11 21,12.8 21,15 L21,22.001 C21,22.551 20.55,23 20.001,23 L13.999,23 C13.45,23 13,22.551 13,22.001 L13,15 C13,12.8 14.8,11 17,11 Z M15,21 L19,21 L19,19 L15,19 L15,21 Z M19,17 L19,15 C19,13.897 18.103,13 17,13 C15.897,13 15,13.897 15,15 L15,17 L19,17 Z M9,1 L9,7 L5,7 L5,5 C5,2.791 6.791,1 9,1 Z" id="path-1"></path>
+    </defs>
+    <g id="icon/24x24_lipstick_o" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="24x24_lipstick_o" fill-rule="nonzero"></g>
+        <g id="COLOR/JJ_4.black" mask="url(#mask-2)" fill="#0F0A0A">
+            <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        </g>
+    </g>
+</svg>

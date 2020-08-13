@@ -1,0 +1,13 @@
+
+
+import React from 'react';
+
+let HTTP = require('./HTTP');
+let URL = require('./URL');
+
+//load home
+export function home() {
+  return HTTP.get(`${URL.url}feeds`);
+}
+
+

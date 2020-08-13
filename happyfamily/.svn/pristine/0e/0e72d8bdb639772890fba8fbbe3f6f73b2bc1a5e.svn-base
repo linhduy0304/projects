@@ -1,0 +1,18 @@
+
+
+import React from 'react';
+
+let HTTP = require('./HTTP');
+let URL = require('./URL');
+
+//post status
+export function postStatus(body) {
+  return HTTP.postWithAuth(`${URL.url}feeds`, body);
+}
+
+//load home
+export function home() {
+  return HTTP.get(`${URL.url}feeds`);
+}
+
+

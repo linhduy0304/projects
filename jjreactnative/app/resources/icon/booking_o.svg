@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/24x24_booking_o</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M5,20 C5.553,20 6,20.448 6,21 C6,21.552 5.553,22 5,22 L3,22 C1.343,22 0,20.657 0,19 L0,5 C0,3.343 1.343,2 3,2 L5,2 L5,1 C5,0.448 5.447,0 6,0 C6.553,0 7,0.448 7,1 L7,2 L13,2 L13,1 C13,0.448 13.447,0 14,0 C14.553,0 15,0.448 15,1 L15,2 L17,2 C18.657,2 20,3.343 20,5 L20,11 C20,11.552 19.553,12 19,12 C18.447,12 18,11.552 18,11 L18,10 L2,10 L2,19 C2,19.552 2.447,20 3,20 L5,20 Z M2,5 L2,8 L18,8 L18,5 C18,4.448 17.553,4 17,4 L15,4 L15,5 C15,5.552 14.553,6 14,6 C13.447,6 13,5.552 13,5 L13,4 L7,4 L7,5 C7,5.552 6.553,6 6,6 C5.447,6 5,5.552 5,5 L5,4 L3,4 C2.447,4 2,4.448 2,5 Z M23.707,12.293 C24.098,12.684 24.098,13.316 23.707,13.707 L13.707,23.707 C13.316,24.098 12.684,24.098 12.293,23.707 L8.293,19.707 C7.902,19.316 7.902,18.684 8.293,18.293 C8.684,17.902 9.316,17.902 9.707,18.293 L13,21.586 L22.293,12.293 C22.684,11.902 23.316,11.902 23.707,12.293 Z" id="path-1"></path>
+    </defs>
+    <g id="icon/24x24_booking_o" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="24x24_booking_o" fill-rule="nonzero"></g>
+        <g id="COLOR/JJ_4.black" mask="url(#mask-2)" fill="#0F0A0A">
+            <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        </g>
+    </g>
+</svg>

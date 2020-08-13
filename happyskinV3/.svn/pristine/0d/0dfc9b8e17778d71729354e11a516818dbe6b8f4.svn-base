@@ -1,0 +1,126 @@
+import React from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions
+} from "react-native";
+import Button from "react-native-button";
+import {Actions} from "react-native-router-flux";
+import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav';
+
+let deviceWidth = Dimensions.get('window').width;
+let main = require('../styles/Main');
+
+class InviteFriend extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state={
+    };
+  }
+ 
+  render(){
+    return (
+      <View style={styles.container}>
+        <NavBar style={{navBar: main.navBarWhite}} statusBar={{barStyle: 'dark-content', backgroundColor: '#fff' }} >
+          <NavButton onPress={() => Actions.pop()} style={main.navBack}>
+            <Image style={{height: 12, width:13}} source={require('../images/icons/ic_back_blue2.png')}/>
+            <Text style={{fontSize: 14, color: 'rgb(68, 110, 182)', marginLeft: 7}}>Quay lại</Text>
+          </NavButton>
+        </NavBar>
+        <View style={styles.content}>
+          <ScrollView>
+            <Text style={{fontSize: 32, color: 'rgb(215, 53, 84)', marginLeft: 15}}>Mời bạn bè tham gia</Text>
+            <Text style={styles.txtDes}>Khi mời bạn bè tham gia liệu trình thành công, bạn và người bạn được mời sẽ được <Text style={{fontWeight: 'bold'}}>giảm giá 10%</Text> một liệu trình bất kì.</Text>
+            <View style={styles.ctCode}>
+              <Text style={styles.txtCopy}>SAO CHÉP MÃ DƯỚI ĐÂY VÀ GỬI CHO BẠN BÈ</Text>
+              <View style={{flexDirection: 'row',paddingBottom: 8, marginTop: 20, alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: 'rgb(228, 232, 242)'}}>
+                <View>
+                  <Text style={{fontSize: 12, color: 'rgb(194, 197, 208)'}}>Mã giới thiệu</Text>
+                  <Text style={{fontSize: 16,marginTop: 5, color: 'rgb(41, 42, 57)'}}>2MIK7</Text>
+                </View>
+                <Button 
+                  containerStyle={{backgroundColor:"rgb(227, 0, 82)", borderRadius: 4, justifyContent: 'center', height: 32, paddingLeft: 10, paddingRight: 10 }}
+                  style={{color: '#fff', fontSize: 14}}
+                  onPress={() => null}
+                  >
+                  Sao chép
+                </Button>
+              </View>
+            </View>
+
+            <View style={styles.ctTitle}>
+              <Text style={{color: 'rgb(135, 80, 161)'}}>HOẶC CHIA SẺ TRỰC TIẾP</Text>
+            </View>
+            <View style={styles.ctItem}>
+              <Image style={styles.icFb} source={require('../images/icons/ic_share_fb.png')} />
+              <Text style={styles.txtFb}>Chia sẻ trên Facebook</Text>
+            </View>
+            <View style={styles.ctItem}>
+              <Image style={styles.icFb} source={require('../images/icons/ic_share_instagram.png')} />
+              <Text style={styles.txtFb}>Chia sẻ trên Instagram</Text>
+            </View>
+            <View style={styles.ctItem}>
+              <Image style={styles.icFb} source={require('../images/icons/ic_share_message.png')} />
+              <Text style={styles.txtFb}>Chia sẻ qua Messenger</Text>
+            </View>
+          </ScrollView>
+        </View>
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  txtFb: {
+    fontSize: 16,
+    color: 'rgb(41, 42, 57)'
+  },
+  icFb: {
+    height: 40,
+    width: 40,
+    marginRight: 13
+  },
+  ctItem: {
+    padding: 8,
+    paddingLeft: 15,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  ctTitle: {
+    backgroundColor: 'rgb(249, 249, 249)',
+    padding: 12,
+    paddingLeft: 15,
+    marginTop: 50,
+  },
+  txtCopy: {
+    color: 'rgb(135, 80, 161)'
+  },
+  ctCode: {
+    backgroundColor: 'rgba(197, 172, 211, 0.1)',
+    padding: 15,
+    paddingTop: 36,
+    paddingBottom: 50,
+    marginTop: 43
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  },
+  content: {
+    flex: 1
+  },
+  txtDes: {
+    fontSize: 16,
+    color: 'rgb(41, 42, 57)',
+    marginLeft: 15,
+    marginRight: 15
+  },
+});
+
+module.exports = InviteFriend;

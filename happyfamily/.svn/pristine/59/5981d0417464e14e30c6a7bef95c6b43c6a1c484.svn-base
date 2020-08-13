@@ -1,0 +1,149 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  FlatList,
+  Image,
+  TouchableOpacity
+} from 'react-native';
+import {Actions} from 'react-native-router-flux'
+import ListChat from '../../components/chat/ListChat';
+import NavBar, { NavButton, NavGroup, NavTitle } from 'react-native-nav';
+import css from '../../Css'
+
+class Chat extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: [
+        {
+          avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+          full_name: 'User One',
+          content: 'Far far away, behind the word mountains',
+          time: '17:56'
+        },
+        {
+          avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+          full_name: 'User Two',
+          content: 'Far far away, behind the word mountains',
+          time: '17:56'
+        },
+        {
+          avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+          full_name: 'Group One',
+          content: 'Far far away, behind the word mountains',
+          time: '17:56',
+          type: 'group'
+        },
+        {
+          avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+          full_name: 'User Three',
+          content: 'Far far away, behind the word mountains',
+          time: '17:56'
+        },
+        {
+          avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+          full_name: 'User Four',
+          content: 'Far far away, behind the word mountains',
+          time: '17:56'
+        },
+        {
+          avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+          full_name: 'User Five',
+          content: 'Far far away, behind the word mountains',
+          time: '17:56'
+        },
+        {
+          avatar: 'https://statics.happyskin.vn/images/avatars/db5e82bf1bbd6e4cb45dae8e27f799a4/conheonho_9x_R8AS6S_100x100.png',
+          full_name: 'Group Two',
+          content: 'Far far away, behind the word mountains',
+          time: '17:56',
+          type: 'group'
+        },
+
+      ]
+    }
+  }
+
+  detailChat(data) {
+    if(data.type === 'group') {
+      Actions.chatGroup({title: data.full_name})
+      // this.props.navigation.navigate('chat_group', {title: data.full_name})
+    }else {
+      Actions.chatOne({title: data.full_name})
+      // this.props.navigation.navigate('chat_one', {title: data.full_name})
+    }
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'light-content', backgroundColor: '#297FCA'}} >
+          <NavButton/>
+          <NavTitle style={css.navTitle}>
+            <Text style={css.txtTitle}>Chats</Text>
+          </NavTitle>
+          <NavButton/>
+          <TouchableOpacity onPress={() => Actions.createGroup()} style={{position: 'absolute', right: 0, padding: 15}}>
+            <Image source={require('../../images/icons/ic_edit.png')} />
+          </TouchableOpacity>
+        </NavBar>
+
+        <View style={styles.ctHeader}>
+          <View style={styles.ctSearch}>
+            <Image source={require('../../images/icons/ic_search.png')} />
+            <Text style={styles.txtSearch}>Search</Text>
+          </View>
+        </View>
+        <FlatList
+          ref="list"
+          onScroll= {this.props.onScroll}
+          // onEndReached={() => this.loadMore()}
+          // ListFooterComponent={() => this._renderFooter()}
+          data={this.state.data}
+          // refreshControl={
+          //   <RefreshControl
+          //       refreshing={this.state.isRefreshing}
+          //       onRefresh={() => this._onRefresh()}
+          //   />
+          // }
+          removeClippedSubviews 
+          keyExtractor={(item, index) => index.toString()}
+          onEndReachedThreshold={0.2}
+          renderItem={(data) => <ListChat onPress={() => this.detailChat(data.item)} type='group' data={data.item}/>} 
+        />
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  txtSearch: {
+    color: '#287FC9',
+    fontSize: 13,
+    marginLeft: 7
+  },
+  ctSearch: {
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    padding: 7
+  },
+  ctHeader: {
+    backgroundColor: '#E3F1FD',
+    padding: 7,
+  },
+  container: {
+    flex: 1,
+    // backgroundColor: '#E3F1FD'
+    backgroundColor: '#fff'
+  }
+})
+
+export default (Chat);

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/24x24_map_o</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M15.5347928,22.8854304 L8.03146931,19.1337686 L1.49613894,22.8682431 C0.829482172,23.2491899 0,22.7678227 0,22 L0,6 C0,5.64114315 0.192286064,5.30979971 0.503861062,5.13175686 L7.48861308,1.14046999 C7.63824364,1.05125373 7.81313635,1 8,1 C8.16795727,1 8.32624342,1.04140696 8.46520716,1.11456959 L15.9685307,4.86623136 L22.5038611,1.13175686 C23.1705178,0.750810134 24,1.23217733 24,2 L24,18 C24,18.3588568 23.8077139,18.6902003 23.4961389,18.8682431 L16.5113869,22.85953 C16.3617564,22.9487463 16.1868637,23 16,23 C15.8320427,23 15.6737566,22.958593 15.5347928,22.8854304 Z M15,6.61803399 L9,3.61803399 L9,17.381966 L15,20.381966 L15,6.61803399 Z M17,6.58032254 L17,20.2768203 L22,17.4196775 L22,3.72317968 L17,6.58032254 Z M7,3.72317968 L2,6.58032254 L2,20.2768203 L7,17.4196775 L7,3.72317968 Z" id="path-1"></path>
+    </defs>
+    <g id="icon/24x24_map_o" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="24x24_map_o" fill-rule="nonzero"></g>
+        <g id="COLOR/JJ_4.black" mask="url(#mask-2)" fill="#0F0A0A">
+            <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        </g>
+    </g>
+</svg>

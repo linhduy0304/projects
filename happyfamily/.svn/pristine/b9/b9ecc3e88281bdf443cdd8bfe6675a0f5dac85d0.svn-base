@@ -1,0 +1,56 @@
+
+var keyMirror = function(obj) {
+  var ret = {};
+  var key;
+  if (!(obj instanceof Object && !Array.isArray(obj))) {
+    throw new Error('keyMirror(...): Argument must be an object.');
+  }
+  for (key in obj) {
+    if (!obj.hasOwnProperty(key)) {
+      continue;
+    }
+    ret[key] = key;
+  }
+  return ret;
+};
+
+module.exports = keyMirror({
+  SET_SESSION_TOKEN: null,
+  SET_STORE: null,
+  SET_STATE: null,
+  GET_STATE: null,
+
+  AUTH: null,
+  LOGIN_REQUEST: null,
+  LOGIN_SUCCESS:  null,
+  LOGIN_FAIL: null,
+  REGISTER_REQUEST: null,
+  REGISTER_SUCCESS: null,
+  REGISTER_FAIL: null,
+  CHECK_LOGIN_SUCCESS: null,
+  PROFILE_SUCCESS: null,
+  FORGOT_PASS_REQUEST: null,
+  FORGOT_PASS_SUCCESS: null,
+  FORGOT_PASS_FAIL: null,
+
+  //chat
+  CHAT: null,
+  CHATS_REQUEST: null,
+  CHATS_SUCCESS: null,
+  CHATS_FAIL: null,
+  CHAT_DETAIL_REQUEST: null,
+  CHAT_DETAIL_SUCCESS: null,
+  CHAT_DETAIL_FAIL: null,
+  FRIEND_LIST_REQUEST: null,
+  FRIEND_LIST_SUCCESS: null,
+  FRIEND_LIST_FAIL: null,
+  CREATE_GROUP_REQUEST: null,
+  CREATE_GROUP_SUCCESS: null,
+  CREATE_GROUP_FAIL: null,
+  SEND_SUCCESS: null,
+  SEND_FAIL: null,
+
+  
+})
+
+

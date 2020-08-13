@@ -1,0 +1,84 @@
+{
+  "name": "JamJaReactNative",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "android": "react-native run-android --variant=devDebug"
+  },
+  "xcodeSchemes": {
+    "Debug": [
+      "Debug"
+    ],
+    "Release": [
+      "Release"
+    ],
+    "projectDirectory": "iOS"
+  },
+  "projectDirectory": "iOS",
+  "dependencies": {
+    "@mauron85/react-native-background-geolocation": "^0.5.3",
+    "immutable": "^4.0.0-rc.12",
+    "intl": "^1.2.5",
+    "link": "^0.1.5",
+    "lottie-react-native": "^2.6.1",
+    "moment": "^2.24.0",
+    "native-base": "^2.12.1",
+    "prop-types": "^15.7.2",
+    "query-string": "^6.4.2",
+    "react": "^16.8.6",
+    "react-native": "^0.55.4",
+    "react-native-code-push": "^5.6.0",
+    "react-native-communications": "^2.2.1",
+    "react-native-fast-image": "5.2.0",
+    "react-native-fbsdk": "^0.8.0",
+    "react-native-firebase": "^5.2.2",
+    "react-native-gesture-handler": "1.0.9",
+    "react-native-google-autocomplete": "^0.1.5",
+    "react-native-i18n": "^2.0.15",
+    "react-native-image-zoom-viewer": "^2.2.25",
+    "react-native-insider": "^2.2.0",
+    "react-native-interactable": "^0.1.10",
+    "react-native-keyboard-aware-scroll-view": "^0.8.0",
+    "react-native-linear-gradient": "^2.5.4",
+    "react-native-maps": "git+https://github.com/sinhpn92/react-native-maps#v0.23.1",
+    "react-native-modal": "^9.0.0",
+    "react-native-modalbox": "^1.7.1",
+    "react-native-onesignal": "^3.2.12",
+    "react-native-popover-view": "1.0.18",
+    "react-native-progress": "^3.6.0",
+    "react-native-render-html": "^4.1.2",
+    "react-native-scrollable-tab-view": "^0.10.0",
+    "react-native-snap-carousel": "^3.7.5",
+    "react-native-star-rating": "^1.1.0",
+    "react-native-svg": "^6.5.2",
+    "react-native-swiper": "^1.5.14",
+    "react-native-vector-icons": "^5.0.0",
+    "react-native-version-number": "^0.3.5",
+    "react-navigation": "3.8.1",
+    "react-redux": "^5.0.7",
+    "realm": "2.26.1",
+    "redux": "^4.0.0",
+    "redux-saga": "^0.16.0",
+    "rxjs": "^6.5.1",
+    "save": "^2.3.3",
+    "why-did-you-update": "^0.1.1"
+  },
+  "devDependencies": {
+    "babel-jest": "^22.0.4",
+    "babel-preset-react-native": "^4.0.1",
+    "jest": "^22.0.4",
+    "lodash": "^4.17.11",
+    "react-native-schemes-manager": "^1.0.4",
+    "react-test-renderer": "16.0.0"
+  },
+  "jest": {
+    "preset": "react-native",
+    "setupFiles": []
+  },
+  "rnpm": {
+    "assets": [
+      "./assets/fonts"
+    ]
+  }
+}

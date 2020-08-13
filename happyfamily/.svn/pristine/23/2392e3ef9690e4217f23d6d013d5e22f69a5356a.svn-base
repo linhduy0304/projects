@@ -1,0 +1,36 @@
+
+import React from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image
+} from 'react-native';
+
+const ButtonImageLeft = ({
+  onPress,
+  title, 
+  backgroundColor, 
+  fontWeight, 
+  color, 
+  fontSize,
+  source
+  }) => (
+  <TouchableOpacity onPress={onPress}
+    style={{
+      backgroundColor,
+      marginTop: 40,
+      height: 45,
+      borderRadius: 4,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center'
+    }}
+  >
+    <Image source={source} />
+    <Text style={{color, fontSize, fontWeight, marginLeft: 20}}>{title}</Text>
+  </TouchableOpacity>
+)
+
+export default ButtonImageLeft;
+  

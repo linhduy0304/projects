@@ -1,0 +1,105 @@
+
+
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image
+} from 'react-native';
+import Toast from 'react-native-simple-toast';
+import MyMessage from '../../components/chat/MyMessage';
+import OtherMessage from '../../components/chat/OtherMessage';
+import ButtonInput from '../../components/chat/ButtonInput';
+
+class ChatGroup extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: [
+        {
+          id: 1,
+          content: 'hello'
+        },
+        {
+          id: 2,
+          content: 'there live the bind'
+        },
+        {
+          id: 1,
+          content: 'far from the countries Vokalia and Consonantia, there live the blind'
+        },
+        {
+          id: 2,
+          content: 'there live the bind'
+        },
+      ]
+    }
+  }
+
+  renderChat(data) {
+    switch(data.id) {
+      case 1:
+        return <MyMessage data={data}/>
+      default:
+        return <OtherMessage data={data}/>
+    }
+  }
+
+  send() {
+    if(this.state.message === '') {
+      Toast.show('You must enter characters');
+      return;
+    }
+    var arr = this.state.data;
+    var message = {
+      id: 1,
+      content: this.state.message
+    };
+    arr.push(message)
+    this.setState({
+      data: arr,
+      message: ''
+    })
+    setTimeout(() => {
+      this.refs.scroll.scrollToEnd({animated: true});
+    }, 100)
+  }
+
+  render() {
+    return (
+      <View style={{flex: 1}}>
+        <ScrollView ref='scroll' style={styles.container}>
+          {
+            this.state.data.length === 0 ?
+            <View style={css.ctNoti}>
+              <Image source={require('../../images/icons/ic_message.png')} />
+              <Text style={css.txtNoti}>No message here yet</Text>
+            </View>
+            :
+            this.state.data.map((data, index) => {
+              return this.renderChat(data, index)
+            })
+          }
+        </ScrollView>
+        <ButtonInput
+          value = {this.state.message}
+          onChange={(message) => this.setState({message: message})}
+          send = {() => this.send()}
+        />
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  
+  container: {
+    flex: 1,
+    // backgroundColor: '#E3F1FD'
+    backgroundColor: '#F7FCFE'
+  }
+})
+
+export default (ChatGroup);

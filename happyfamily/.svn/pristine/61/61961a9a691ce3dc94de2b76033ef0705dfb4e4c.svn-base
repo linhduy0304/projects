@@ -1,0 +1,86 @@
+
+'use strict';
+
+const InitialState = require('./state').default;
+  
+const {
+    INDIVIDUAL_REQUEST,
+    INDIVIDUAL_SUCCESS,
+    INDIVIDUAL_FAIL,
+    ADD_INDIVIDUAL_REQUEST,
+    ADD_INDIVIDUAL_SUCCESS,
+    ADD_INDIVIDUAL_FAIL,
+    RELATIONSHIP_REQUEST,
+    RELATIONSHIP_SUCCESS,
+    RELATIONSHIP_FAIL,
+    EDIT_INDIVIDUAL_REQUEST,
+    EDIT_INDIVIDUAL_SUCCESS,
+    EDIT_INDIVIDUAL_FAIL,
+    UPDATE_INDIVIDUAL_REQUEST,
+    UPDATE_INDIVIDUAL_SUCCESS,
+    UPDATE_INDIVIDUAL_FAIL,
+    DELETE_INDIVIDUAL_REQUEST,
+    DELETE_INDIVIDUAL_SUCCESS,
+    DELETE_INDIVIDUAL_FAIL
+} = require('../../config/actionTypes');
+
+const initialState = new InitialState;
+var findIndex = (individuals, id) => {
+  var result = -1;
+  individuals.forEach((individual, index) => {
+      if (individual.individual.id === id) {
+          result = index;
+          return result;
+      }
+  });
+  return result;
+}
+export default function reducer(state = initialState, action) {
+  var index = -1;
+  switch (action.type) {
+    //individual
+    case INDIVIDUAL_REQUEST:
+    case DELETE_INDIVIDUAL_REQUEST:
+      return state.setIn(['loading'], true);
+    case INDIVIDUAL_SUCCESS:
+      return state.setIn(['loading'], null).setIn(['individual'], action.data);
+    case INDIVIDUAL_FAIL:
+    case DELETE_INDIVIDUAL_FAIL:
+      return state.setIn(['loading'], null)
+    case DELETE_INDIVIDUAL_SUCCESS:
+      index = findIndex(state.getIn(['individual']), action.id);
+      var old_individual = state.getIn(['individual']);
+      old_individual.splice(index, 1);
+      if(old_individual.length == 0) {
+        old_individual = null;
+      }
+      return state.setIn(['loading'], null).setIn(['individual'], old_individual);
+
+      //add
+    case ADD_INDIVIDUAL_REQUEST:
+    case UPDATE_INDIVIDUAL_REQUEST:
+      return state.setIn(['loading'], true);
+    case ADD_INDIVIDUAL_SUCCESS:
+    case UPDATE_INDIVIDUAL_SUCCESS:
+      return state.setIn(['loading'], null);
+    case ADD_INDIVIDUAL_FAIL:
+    case UPDATE_INDIVIDUAL_FAIL:
+      return state.setIn(['loading'], null);
+
+    case RELATIONSHIP_REQUEST:
+      return state.setIn(['loadingRelationship'], true);
+    case RELATIONSHIP_SUCCESS:
+      return state.setIn(['loadingRelationship'], null).setIn(['relationships'], action.data);
+    case RELATIONSHIP_FAIL:
+      return state.setIn(['loadingRelationship'], null);
+
+    case EDIT_INDIVIDUAL_REQUEST:
+      return state.setIn(['loadingItemEditing'], true);
+    case EDIT_INDIVIDUAL_SUCCESS:
+      return state.setIn(['loadingItemEditing'], null).setIn(['itemEditing'], action.data);
+    case EDIT_INDIVIDUAL_FAIL:
+      return state.setIn(['loadingItemEditing'], null)
+  }
+ 
+  return state;
+}

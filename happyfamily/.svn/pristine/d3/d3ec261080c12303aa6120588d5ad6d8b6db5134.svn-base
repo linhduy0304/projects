@@ -1,0 +1,30 @@
+
+import React from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity
+} from 'react-native';
+import { TextField } from 'react-native-material-textfield';
+
+const Input = ({
+  value,
+  title, 
+  onChange = value
+}) => (
+  <TextField
+    label={title}
+    autoCorrect={false}
+    onChangeText={(value) => onChange(value)}
+    // onSubmitEditing={() => this.refs.password.focus()}
+    tintColor="rgb(194, 196, 202)"
+    textColor="rgb(31, 42, 53)"
+    baseColor="rgb(194, 197, 208)"
+    autoCapitalize="none"
+    selectionColor="rgb(41, 162, 104)"
+    value={value}
+  />
+)
+
+export default Input;
+  

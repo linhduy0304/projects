@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "497602058839",
+    "firebase_url": "https://ipickvn-mobile.firebaseio.com",
+    "project_id": "ipickvn-mobile",
+    "storage_bucket": "ipickvn-mobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:497602058839:android:410bb01ca82e3237",
+        "android_client_info": {
+          "package_name": "vn.ipick"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "497602058839-n7si7hpq9a6tj4vbd4r315hm9pti5jln.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPym8l3PZMAzc_LCwZlKQWOjiMatC7ytQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

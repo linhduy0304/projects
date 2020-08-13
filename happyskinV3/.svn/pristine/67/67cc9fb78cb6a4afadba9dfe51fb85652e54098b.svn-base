@@ -1,0 +1,475 @@
+import React from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+  StatusBar,
+  Platform,
+  Alert,
+  FlatList,
+  Animated,
+  RefreshControl,
+  InteractionManager
+} from "react-native";
+
+var Modal = require('react-native-modalbox');
+
+import BoxFeed from '../components/BoxFeed'
+import ModalSearch from '../components/ModalSearch'
+import Button from "react-native-button";
+import {Actions} from "react-native-router-flux";
+import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav'; 
+import Carousel from 'react-native-snap-carousel';
+import ExploreList from '../components/explore/ExploreList'
+
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { Map } from 'immutable';
+import * as exploreActions from '../actions/exploreActions';
+
+const actions = [
+  exploreActions
+];
+function mapStateToProps(state) {
+  return {
+    explore: state.explore,
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class Explore extends React.Component {
+  constructor(props) {
+    super()
+    this.state = {
+      openModal: false,
+      scrollY: new Animated.Value(0),
+      page: 1,
+      isRefreshing: false,
+      hotDebate: {
+        title: 'Phương pháp nào trị mụn hiệu quả nhất vào mùa hè',
+        thumbnail: 'https://staticpro.happyskin.vn/images/content/2016/10/nhung-san-pham-cham-soc-da-ban-can-co-truoc-tuoi-30-8-630x420.jpg',
+        content: 'Lời giới thiệu ngắn về chương trình. Nếu bạn nghĩ rằng dầu để dưỡng da hay ngăn ngừa lão hóa, có lẽ bạn chưa khám phá hết những công dụng thú vị mà dầu dướng da có thể mang lại',
+        pro: [
+          {
+            avatar: 'https://staticpro.happyskin.vn/images/content/2016/10/nhung-san-pham-cham-soc-da-ban-can-co-truoc-tuoi-30-8-630x420.jpg',
+            userName: 'Tammy Ng'
+          },
+          {
+            avatar: 'https://staticpro.happyskin.vn/images/content/2016/10/nhung-san-pham-cham-soc-da-ban-can-co-truoc-tuoi-30-8-630x420.jpg',
+            userName: 'July2019'
+          },
+        ],
+        member: {
+          avatar: [
+            'https://staticpro.happyskin.vn/images/content/2016/10/nhung-san-pham-cham-soc-da-ban-can-co-truoc-tuoi-30-8-630x420.jpg',
+            'https://staticpro.happyskin.vn/images/content/2016/10/nhung-san-pham-cham-soc-da-ban-can-co-truoc-tuoi-30-8-630x420.jpg',
+            'https://staticpro.happyskin.vn/images/content/2016/10/nhung-san-pham-cham-soc-da-ban-can-co-truoc-tuoi-30-8-630x420.jpg'
+          ],
+          countMember: 172
+        }
+      },
+    }
+  }
+
+  componentWillMount() {
+    this.props.actions.exploreRequest();
+  }
+  componentDidMount() {
+    timeout = setTimeout( () => {
+    }, 12000);
+    InteractionManager.runAfterInteractions(()=> {
+      this.props.actions.explore();
+    })
+  }
+
+  refresh() {
+    this.setState({
+      isRefreshing: true,
+      page: 1
+    });
+    this.props.actions.explore();
+    this.setState({
+      isRefreshing: false,
+    })
+  }
+
+  loadMore() {
+    if (!this.props.explore.loadMore) {
+        return;
+    }
+    this.props.actions.explore('LM', this.state.page + 1);
+    this.setState({
+        page: this.state.page + 1,
+    });
+  }
+
+  _renderFooter() {
+    if(this.props.explore.loadMore) {
+      return (
+        <View style={{width: deviceWidth, marginTop:20,marginBottom: 10,alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
+          <Image style={{height: 10, width: 10}} source={require('../images/load_more.gif')} />
+          <Text style={{color: 'rgb(197, 172, 211)', fontSize: 12, marginLeft: 8}}>Đang tải</Text>
+        </View>)
+    }
+    if (this.props.explore.explore.length == 0 ) {
+      return (
+        <View style = {main.footer}>
+          <Text>Không có dữ liệu. Vui lòng thử lại!</Text>
+        </View>
+      )
+    }else return null;
+  }
+
+  detailTrending(data) {
+    switch(data.type_content) {
+      case 'posts':
+        Actions.newsDetail({id: data.target_id, typePost: 'post'})
+        return 
+    }
+  }
+
+  _renderItem ({item, index}) {
+    return (
+        <TouchableOpacity onPress={() => this.detailTrending(item)} style={styles.slide}>
+          <Image style={{width: deviceWidth - 115, height: 133, borderRadius: 2}} source={{uri: item.thumbnail+'.png'}} />
+          <Text style={styles.title}>{ item.title }</Text>
+        </TouchableOpacity>
+    );
+  }
+
+  _renderHeader() {
+    return (
+      <View >
+        <Text style={[styles.txtTrending, styles.margin]}>ĐANG HOT</Text>
+        <View style={[styles.containerSilde, styles.margin]}>
+          <Carousel
+            data={this.props.explore.exTrending}
+            renderItem={this._renderItem.bind(this)}
+            sliderWidth={deviceWidth-15}
+            itemWidth={deviceWidth - 100}
+            inactiveSlideScale={1}
+            activeSlideAlignment={'start'}
+          />
+        </View>
+        {
+          this.props.explore.exHotDebate !== '' ?
+          <View style={styles.containerHotDebate}>
+            <View style={{flexDirection: 'row'}}>
+              <View style={[styles.containerLive, styles.margin]}>
+                <Image source={require('../images/icons/ic_point.png')}/>
+                <Text style={styles.txtLive}>ĐANG DIỄN RA <Text style={{fontWeight: 'bold'}}>HOT DEBATE</Text></Text>
+              </View>
+              <View style={{flex: 1}}/>
+            </View>
+            <Image style={[styles.thumbHotDebate, styles.margin]} source={{uri: this.state.hotDebate.thumbnail}}/>
+            <Text style={[styles.txtHotDebate, styles.margin]}>{this.state.hotDebate.title}</Text>
+            <Text style={[styles.contentHotDebate, styles.margin]}>{this.state.hotDebate.content}</Text>
+            <Text style={{color: 'rgb(41,42, 57)', marginTop: 5, marginLeft: 15}}>Khách mời</Text>
+            <View style={{flexDirection: 'row', paddingTop: 13, paddingBottom: 20, paddingLeft: 15, paddingRight: 15}}>
+              {
+                this.state.hotDebate.pro.map((item, index) => {
+                  return (
+                    <View style={styles.containerItemPro}>
+                      <Image style={styles.avatarPro} source={{uri: item.avatar}}/>
+                      <Text style={styles.namePro}>{item.userName}</Text>
+                    </View>
+                  )
+                })
+              }
+            </View>
+            <View style={{alignItems: 'center'}}>
+              <View style={{height: 1,width: deviceWidth/3, borderTopWidth: 1, borderTopColor: 'rgb(236, 238, 240)'}}/>
+            </View>
+            <View style={styles.containerJoin}>
+              <Image style={styles.avatarMem} source={{uri: this.state.hotDebate.member.avatar[0]}} />
+              <Image style={[styles.avatarMem,{marginLeft: -6}]} source={{uri: this.state.hotDebate.member.avatar[1]}} />
+              <Image style={[styles.avatarMem,{marginLeft: -6}]} source={{uri: this.state.hotDebate.member.avatar[2]}} />
+              <View style={{backgroundColor: 'rgb(68, 110, 182)', paddingLeft: 17, paddingRight: 17,  height: 28, alignItems: 'center', justifyContent: 'center', marginLeft: -13, opacity: 0.5, borderRadius: 14,}}>
+                <Text style={{color: '#fff'}}>+{this.state.hotDebate.member.countMember}</Text>
+              </View>
+              <Text style={{color: 'rgb(135, 155, 206)', marginLeft: 8}}> thành viên đang tham gia</Text>
+            </View>
+          </View>
+          : null
+        }
+
+        <View style={[styles.containerMagazine, styles.padding]}>
+          <Text style={{color: 'rgb(135, 80, 161)', marginBottom: 13}}>MAGAZINE</Text>
+					<View style={styles.containerItemMagazine}>
+						<TouchableOpacity onPress={() => Actions.magazine({typePost: 'post', id: '559be1aa7f8b9a377681f448', title: 'Chăm sóc da'})} style={styles.careSkin}>
+							<Image style={styles.iconCareSkin} source={require('../images/icons/ic_cham_soc_da.png')} />
+							<Text style={styles.txtCareSkin}>Chăm sóc da</Text>
+						</TouchableOpacity>
+						<TouchableOpacity onPress={() => Actions.magazine({typePost: 'post', id: '559be1aa7f8b9a377681f44d', title: 'Trang điểm'})} style={styles.careSkin}>
+							<Image style={styles.iconCareSkin} source={require('../images/icons/ic_trang_diem.png')} />
+							<Text style={styles.txtCareSkin}>Trang điểm</Text>
+						</TouchableOpacity>
+						<TouchableOpacity onPress={() => Actions.magazine({typePost: 'post', id: '56273b007f8b9abe701c15bb', title: 'Khỏe đẹp'})} style={styles.careSkin}>
+							<Image style={{width: 48*144/96, height: 48}} source={require('../images/icons/ic_khoe_dep.png')} />
+							<Text style={styles.txtCareSkin}>Khỏe đẹp</Text>
+						</TouchableOpacity>
+						<TouchableOpacity onPress={() => Actions.magazine({typePost: 'review', title: 'Review'})} style={styles.careSkin}>
+							<Image style={{width: 38, height: 48}} source={require('../images/icons/ic_review.png')} />
+							<Text style={styles.txtCareSkin}>Review</Text>
+						</TouchableOpacity>
+						<TouchableOpacity onPress={() => Actions.event({typePost: 'event', title: 'Sự kiện'})} style={styles.careSkin}>
+							<Image style={styles.iconCareSkin} source={require('../images/icons/ic_su_kien.png')} />
+							<Text style={styles.txtCareSkin}>Sự kiện</Text>
+						</TouchableOpacity>
+						<TouchableOpacity onPress={() => Actions.magazine({typePost: 'video', title: 'Video'})} style={styles.careSkin}>
+							<Image style={styles.iconCareSkin} source={require('../images/icons/ic_video.png')} />
+							<Text style={styles.txtCareSkin}>Video</Text>
+						</TouchableOpacity>
+						{/* <TouchableOpacity onPress={() => Actions.magazine({typePost: 'hotdebate'})} style={styles.careSkin}>
+							<Image style={styles.iconCareSkin} source={require('../images/icons/ic_hot_debate.png')} />
+							<Text style={styles.txtCareSkin}>Hot Debate</Text>
+						</TouchableOpacity> */}
+            <TouchableOpacity onPress={() => Actions.community()} style={styles.careSkin}>
+							<Image style={styles.iconCareSkin} source={require('../images/icons/ic_hot_debate.png')} />
+							<Text style={styles.txtCareSkin}>Hội nhóm</Text>
+						</TouchableOpacity>
+            {/* <View style={styles.careSkin}/> */}
+						
+					</View>
+        </View>
+				<Text style={{marginTop: 24, marginLeft: 15, color: 'rgb(135, 80, 161)'}}>BÀI VIẾT MỚI NHẤT</Text>
+      </View>
+    )
+  }
+
+  openModal(action) {
+    this.setState({
+      openModal: action
+    })
+  }
+
+  render(){
+    const headerHeight = Animated.diffClamp(this.state.scrollY, 0, 75).interpolate({
+      inputRange: [0, 75],
+      outputRange: [150, 75],
+      extrapolate: 'clamp',
+    });
+    const navTranslate = Animated.diffClamp(this.state.scrollY, 0, 75).interpolate({
+      inputRange: [0, 75],
+      outputRange: [0, -75],
+      extrapolate: 'clamp',
+    });
+    const navOpacity = Animated.diffClamp(this.state.scrollY, 0, 75).interpolate({
+      inputRange: [0, 25],
+      outputRange: [1, 0],
+      extrapolate: 'clamp',
+    });
+    return (
+      <View style={styles.content}>
+        <View style={main.container}>
+          <View style={{flex: 1}}>
+            <FlatList
+              bounces={false}
+              ListFooterComponent={() => this._renderFooter()}
+              contentContainerStyle={styles.list}
+              ListHeaderComponent={() => this._renderHeader()}
+              data={this.props.explore.explore}
+              refreshControl={
+                <RefreshControl
+                    refreshing={this.state.isRefreshing}
+                    onRefresh={() => this.refresh()}
+                />
+              }
+              onEndReached={() => this.loadMore()}
+              onEndReachedThreshold={0.2}
+              onScroll={Animated.event(
+                [{nativeEvent: {contentOffset: {y: this.state.scrollY}}}]
+              )}
+              renderItem={(data) => <BoxFeed key={data.index} data = {data.item}/>}
+              /> 
+          </View>
+          {
+            this.props.explore.isFetching ?
+            <View style={main.mainSpin1}>
+              <Image style={main.imgLoading} source={require('../images/rolling.gif')} />
+            </View>
+            : null
+          }
+          <Animated.View style={[main.navScroll,{opacity: navOpacity, transform: [{translateY: navTranslate}]}]}>
+            <NavBar style={{navBar: main.navBarWhite, statusBar: main.statusBar}} statusBar={{barStyle: 'dark-content', backgroundColor: '#fff' }} >
+              <NavButton onPress={() => Actions.pop()} style={main.navBack}>
+                <Image style={{height: 12, width:13}} source={require('../images/icons/ic_back_blue2.png')}/>
+                <Text style={{fontSize: 14, color: 'rgb(68, 110, 182)', marginLeft: 7}}>Home</Text>
+              </NavButton>
+              {/* <NavTitle style={main.navExplore}>
+                {'Khám phá'}
+              </NavTitle> */}
+              <NavButton onPress={() => this.openModal(true)} style={main.navSave}  >
+                <Image style={{height: 16, width: 16}} source={require('../images/icons/ic_search_black.png')} />
+              </NavButton>
+            </NavBar>
+          </Animated.View>
+        </View>
+        <Modal 
+          style={main.modal}
+          isOpen={this.state.openModal}
+          swipeToClose={true}
+          position="top"
+          entry="bottom"
+          animationDuration={200}
+          backdropColor="#000"
+          onClosed={()=> this.openModal(false) }>
+          <ModalSearch closeModal={() => this.openModal(false)}/>
+        </Modal>
+      </View>
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+  content: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  list: {
+    // paddingRight: 15,
+    paddingBottom: 26,
+    paddingTop: 44,
+	},
+	margin: {
+		marginLeft: 15,
+		marginRight: 15,
+	},
+	padding: {
+		paddingLeft: 15,
+		paddingRight: 15,
+	},
+	containerMagazine: {
+		paddingTop: 20,
+		borderBottomWidth: 1,
+		borderBottomColor: 'rgb(236, 238, 240)'
+	},
+	containerJoin: {
+		flexDirection: 'row',
+		paddingTop: 14, 
+		paddingBottom: 14, 
+		alignItems: 'center', 
+		paddingLeft: 15, 
+		paddingRight: 15
+	},
+	containerItemMagazine: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		justifyContent: 'space-between',
+	},
+	careSkin: {
+		width: (deviceWidth-30) /3,
+		alignItems: 'center',
+		paddingTop: 15,
+		paddingBottom: 15,
+	},
+	txtCareSkin: {
+		marginTop: 16,
+		fontWeight: 'bold',
+		fontSize: 13,
+		color: 'rgb(68, 110, 182)'
+	},
+	iconCareSkin: {
+		height: 48,
+		width: 48
+	},
+  containerItemPro: {
+    width: (deviceWidth- 30)/2,
+    flexDirection: 'row'
+  },
+  avatarPro: {
+    height: 40,
+    width: 40,
+    borderRadius: 20,
+  },
+  namePro: {
+    flex: 1,
+    color: 'rgb(68, 110, 182)',
+    fontWeight: 'bold',
+    marginLeft: 10
+  },
+  avatarMem: {
+    height: 28,
+    width: 28,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: '#fff' 
+  },
+  containerLive: {
+    flexDirection: 'row', 
+    alignItems: 'center',
+    borderTopWidth: 2,
+    borderTopColor: 'rgb(135, 80, 161)',
+    paddingTop: 16,
+    paddingBottom: 13,
+  },
+  txtLive: {
+    fontSize: 14,
+    marginLeft: 5,
+    color: 'rgb(135, 80, 161)'
+  },
+  txtHotDebate: {
+    fontWeight: 'bold',
+    marginTop: 12,
+    fontSize: 18,
+    color: 'rgb(135, 80, 161)'
+  },
+  contentHotDebate: {
+    color: 'rgb(41, 42, 57)',
+    fontSize: 14
+  },
+  thumbHotDebate: {
+    height: 133,
+    borderRadius: 2,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  },
+  txtTrending: {
+    marginTop: 16,
+    marginBottom: 18,
+    color: 'rgb(135, 80, 161)',
+  },
+  title: {
+    fontSize: 16,
+    color: 'rgb(68, 110, 182)',
+    marginTop: 14,
+  },
+  containerSilde: {
+    paddingBottom: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgb(236, 238, 240)',
+  },
+  slide: {
+    width: deviceWidth - 115,
+    marginRight: 40
+  },
+  containerHotDebate: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgb(236, 238, 240)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgb(236, 238, 240)'
+  },
+ 
+});
+let main = require('../styles/Main');
+export default connect(mapStateToProps, mapDispatchToProps)(Explore);

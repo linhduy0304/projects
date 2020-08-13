@@ -1,0 +1,183 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ * @flow
+ */
+
+import React, { Component } from 'react';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  Alert,
+  TouchableOpacity
+} from 'react-native';
+
+import NavBar, { NavButton, NavGroup, NavTitle } from 'react-native-nav';
+import { Actions } from "react-native-router-flux";
+import Button from "react-native-button";
+import NoInternet from '../../components/NoInternet'
+//import RNFirebase from 'react-native-firebase';
+import RNFirebase from 'react-native-firebase';
+
+const StoreService = require('../../services/StoreService').default;
+let Constant = require('../../services/Constant');
+let css = require('../../Css');
+var {FBLogin, FBLoginManager} = require('react-native-facebook-login');
+
+import * as profileActions from '../../actions/profileActions';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import {Map} from 'immutable';
+
+const actions = [
+  profileActions
+];
+
+function mapStateToProps(state) {
+  return {
+    profile: state.profile,
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class Setting extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+     
+    }
+  }
+
+  componentWillMount() {
+    var firebase = RNFirebase.initializeApp({ debug: false });
+    firebase.analytics().logEvent("Setting_Screen");
+  }
+
+  password() {
+    if(this.props.profile.currentUser.is_password === 1) {
+      Actions.createNewPass()
+    }else {
+      Actions.changePass()
+    }
+  }
+
+  logoutAction() {
+    Alert.alert(
+      'Thông báo',
+      'Bạn muốn thoát ứng dụng?',
+      [
+        {text: 'Thoát', onPress: () => this.logout(), style: 'cancel'},
+        {text: 'Huỷ bỏ', onPress: () => null}
+      ]
+    )
+  }
+
+  logout() {
+    var _this = this;
+    // _this.props.actions.logout();
+    new StoreService().getSession(Constant.IP_HEADER_REQUEST)
+    .then((header) => {
+     if (header.Fbtoken != '') {
+        FBLoginManager.logout(function(error, data){
+          _this.props.actions.logout();
+        });
+      } else {
+        _this.props.actions.logout();
+      }
+    })
+    .catch((err) => {
+    });
+  }
+
+  render() {
+    return (
+      <View style={css.container}>
+        <NavBar style={{navBar: css.navBar, statusBar: css.statusBar}} statusBar={{barStyle: 'dark-content', backgroundColor: '#fff'}} >
+          <NavGroup>
+            <NavButton onPress={() => Actions.pop()} style={css.navBack}  >
+              <Image style={{height: 12, width: 13}} source={require('../../images/icons/ic_back.png')} />
+            </NavButton>
+            <View style={{marginLeft: 9,justifyContent: 'center'}}>
+              <Text style={css.txtTitle}>Setting</Text>
+            </View>
+          </NavGroup>
+        </NavBar>
+        
+        <NoInternet />
+        
+        <ScrollView>
+          <View style={styles.ctTitle}>
+            <Text style={styles.txtTitle}>TÀI KHOẢN</Text>
+          </View>
+          <TouchableOpacity onPress={()=> Actions.invite()} style={styles.ctItem}>
+            <Text style={styles.txtItem}>Mời bạn bè</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => this.password()} style={styles.ctItem}>
+            <Text style={styles.txtItem}>Đổi mật khẩu</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => this.logoutAction()} style={styles.ctItem}>
+            <Text style={styles.txtItem}>Đăng xuất</Text>
+          </TouchableOpacity>
+
+          {/* <View style={styles.ctTitle}>
+            <Text style={styles.txtTitle}>THIẾT LẬP</Text>
+          </View>
+          <TouchableOpacity style={styles.ctItem}>
+            <Text style={styles.txtItem}>Kết nối tài khoản</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.ctItem}>
+            <Text style={styles.txtItem}>Thông báo</Text>
+          </TouchableOpacity> */}
+
+          <View style={styles.ctTitle}>
+            <Text style={styles.txtTitle}>HỖ TRỢ</Text>
+          </View>
+          <TouchableOpacity onPress={() => Actions.appInfo()} style={styles.ctItem}>
+            <Text style={styles.txtItem}>Thông tin ứng dụng</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => Actions.feedback()} style={styles.ctItem}>
+            <Text style={styles.txtItem}>Góp ý & Báo lỗi </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+    )
+  }
+}
+
+const styles= StyleSheet.create({
+  ctItem: {
+    padding: 15,
+    paddingTop: 19,
+    paddingBottom: 19
+  },
+  txtItem: {
+    color: 'rgb(31, 42, 53)',
+    fontSize: 15,
+  },
+  ctTitle: {
+    height: 40,
+    justifyContent: 'center',
+    paddingLeft: 15,
+    backgroundColor: 'rgb(237, 239, 241)'
+  },
+  txtTitle: {
+    color: 'rgb(138, 144, 150)',
+    fontSize: 13,
+  },
+});
+export default connect(mapStateToProps, mapDispatchToProps)(Setting);
+
+

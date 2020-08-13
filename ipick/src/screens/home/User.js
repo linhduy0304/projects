@@ -1,0 +1,183 @@
+import React, { Component, PureComponent } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  FlatList,
+  Image,
+  Dimensions,
+  TouchableOpacity,
+  InteractionManager,
+  RefreshControl
+} from 'react-native';
+
+import { Actions } from "react-native-router-flux";
+import PostItem from '../../components/PostItem';
+import Carousel from 'react-native-snap-carousel';
+import UserSuggest from './UserSuggest';
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+let css = require('../../Css');
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { Map } from 'immutable';
+import * as homeActions from '../../actions/homeActions';
+import UserItem from './UserItem';
+
+const actions = [
+  homeActions,
+];
+function mapStateToProps(state) {
+  return {
+    profile: state.profile,
+    home: state.home,
+  };
+}
+function mapDispatchToProps(dispatch) {
+  const creators = Map()
+    .merge(...actions)
+    .filter(value => typeof value === 'function')
+    .toObject();
+  return {
+    actions: bindActionCreators(creators, dispatch),
+    dispatch
+  };
+}
+
+class User extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isRefreshing: false,
+      page: 1,
+    }
+  }
+
+  componentWillMount() {
+    // this.props.actions.searchRequest();
+  }
+
+  componentDidMount() {
+    
+    this.props.actions.search('user', this.props.keyword, 'L');
+    // timeout = setTimeout( () => {
+    // }, 1000);
+    // InteractionManager.runAfterInteractions(()=> {
+    //   this.props.actions.home();
+    // })
+  }
+
+  _onRefresh() {
+    this.setState({
+      isRefreshing: true,
+      page: 1
+    });
+    this.props.actions.search('user', this.props.keyword, 'RF');
+    this.setState({
+      isRefreshing: false,
+    })
+  }
+
+  loadMore() {
+    if (!this.props.home.loadMore) {
+        return;
+    }
+    this.props.actions.search('user', this.props.keyword, 'LM', this.state.page + 1);
+    this.setState({
+        page: this.state.page + 1,
+    });
+  }
+
+  _renderFooter() {
+    if(this.props.home.loadMore) {
+      return (
+        <View style={{width: deviceWidth, marginTop:20,marginBottom: 10,alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
+          <Image style={{height: 30, width: 30}} source={require('../../images/load_more.gif')} />
+          <Text style={{color: 'rgb(0, 139, 125)', fontSize: 12, marginLeft: 8}}>Đang tải</Text>
+        </View>)
+    }else return null;
+  }
+
+  render() {
+    return (
+      <View style={[css.container, {backgroundColor: 'rgb(237, 239, 241)'}]}>
+        {
+          this.props.home.isFetching ?
+          <View style={css.ctLoading}>
+            <Image style={{width: 30, height: 30}} source={require('../../images/sending.gif')} />
+            <Text style={css.txtLoading}>Đang tìm kiếm</Text>
+          </View>
+          :
+          this.props.home.searchUser ?
+            this.props.home.searchUser.length == 0 ?
+              <View style={{alignItems: 'center', paddingTop: 20}}>
+                <Text>Không có người dùng nào</Text>
+              </View>
+            : 
+            <FlatList
+              ref="listRef"
+              onEndReached={() => this.loadMore()}
+              contentContainerStyle={{paddingTop: 10}}
+              ListFooterComponent={() => this._renderFooter()}
+              data={this.props.home.searchUser}
+              refreshControl={
+                <RefreshControl
+                    refreshing={this.state.isRefreshing}
+                    onRefresh={() => this._onRefresh()}
+                />
+              }
+              removeClippedSubviews 
+              keyExtractor={(item, index) => index.toString()}
+              onEndReachedThreshold={0.2}
+              renderItem={(data) => (<UserItem data={data.item}/>)} 
+            />
+          : null
+        }
+      </View>
+    )
+  }
+}
+
+const styles= StyleSheet.create({
+  ctItem: {
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 7, 
+    borderRadius: 2, 
+    padding: 15, 
+    backgroundColor: '#fff', 
+    flexDirection: 'row'
+  },
+  txtCount: {
+    fontSize: 16, 
+    color: '#000',
+  },
+  txtPost: {
+    color: 'rgb(176, 184, 198)'
+  },
+  ctFollow: {
+    borderWidth: 1,
+    borderColor: 'rgb(176, 184, 198)',
+    borderRadius: 12,
+    flexDirection: 'row',
+    height: 24,
+    width: 64,
+    justifyContent: 'center', 
+    alignItems: 'center',
+    marginTop: 15
+  },
+  ctFollow1: {
+    borderWidth: 1,
+    borderColor: 'rgb(176, 184, 198)',
+    borderRadius: 12,
+    flexDirection: 'row',
+    height: 24,
+    width: 70,
+    justifyContent: 'center', 
+    alignItems: 'center',
+    marginTop: 15
+  },
+});
+export default connect(mapStateToProps, mapDispatchToProps)(User);

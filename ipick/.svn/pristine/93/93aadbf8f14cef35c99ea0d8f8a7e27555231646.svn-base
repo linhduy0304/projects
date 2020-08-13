@@ -1,0 +1,131 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ * @flow
+ */
+
+import React, { Component } from 'react';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  TouchableHighlight,
+  Dimensions
+} from 'react-native';
+
+import { Actions } from "react-native-router-flux";
+import Button from "react-native-button";
+
+let deviceWidth = Dimensions.get('window').width;
+let deviceHeight = Dimensions.get('window').height;
+let css = require('../../Css');
+
+class PostBlank extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+    }
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+          {/* <View style={styles.ctHeader}/> */}
+          <TouchableWithoutFeedback onPress={() => this.props.action('image')} >
+            <View style={styles.ctItem}>
+              <Image style={styles.icLink} source={require('../../images/icons/ic_picture.png')} />
+              <Text style={styles.txtLink}>Ảnh</Text>
+              {
+                this.props.active == 'image' ?
+                <Image source={require('../../images/icons/ic_checked.png')} />
+                : null
+              }
+            </View>
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={() => this.props.action('link')} >
+            <View style={styles.ctItem}>
+              <Image style={{width: 13, height: 16}} source={require('../../images/icons/ic_link.png')} />
+              <Text style={styles.txtLink}>Link bài viết hoặc nội dung</Text>
+              {
+                this.props.active == 'link' ?
+                <Image source={require('../../images/icons/ic_checked.png')} />
+                : null
+              }
+            </View>
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={() => this.props.action('article')} >
+            <View style={styles.ctItem}>
+              <Image style={styles.icLink} source={require('../../images/icons/ic_camera.png')} />
+              <Text style={styles.txtLink}>Bài viết</Text>
+              {
+                this.props.active == 'article' ?
+                <Image source={require('../../images/icons/ic_checked.png')} />
+                : null
+              }
+            </View>
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={() => this.props.action('video')} >
+            <View style={styles.ctItem}>
+              <Image style={styles.icLink} source={require('../../images/icons/ic_play.png')} />
+              <Text style={styles.txtLink}>Video</Text>
+              {
+                this.props.active == 'video' ?
+                <Image source={require('../../images/icons/ic_checked.png')} />
+                : null
+              }
+            </View>
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={() => this.props.action('audio')} >
+            <View style={styles.ctItem}>
+              <Image style={styles.icLink} source={require('../../images/icons/ic_comment_send.png')} />
+              <Text style={styles.txtLink}>Audio</Text>
+              {
+                this.props.active == 'audio' ?
+                <Image source={require('../../images/icons/ic_checked.png')} />
+                : null
+              }
+            </View>
+          </TouchableWithoutFeedback>
+      </View>
+    )
+  }
+}
+
+const styles= StyleSheet.create({
+  container: {
+    height: 250,
+  },
+  ctItem: {
+    height: 50,
+    backgroundColor: '#fff',
+    paddingLeft: 15,
+    paddingRight: 17,
+    flexDirection: 'row',
+    borderBottomColor: 'rgb(236, 238, 240)',
+    borderBottomWidth: 1,
+    alignItems: 'center'
+  },
+  txtLink: {
+    fontSize: 16,
+    flex: 1,
+    color: 'rgb(51, 51, 51)',
+    marginLeft: 20
+  },
+  icLink: {
+    width: 16,
+    height: 16
+  },
+  ctHeader: {
+    flex: 1,
+    width: deviceWidth,
+    backgroundColor: 'rgba(0, 138, 139, 0.6)'
+  },
+});
+export default (PostBlank);
+
+

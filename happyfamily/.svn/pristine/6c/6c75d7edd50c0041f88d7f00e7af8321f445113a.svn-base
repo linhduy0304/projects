@@ -1,0 +1,62 @@
+
+import React, {Component} from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image
+} from 'react-native';
+
+class BotAction extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      is_like: this.props.is_like,
+      count_like: this.props.count_like
+    }
+  }
+
+  like() {
+    this.setState({
+      is_like: this.state.is_like === 1 ? 0 : 1,
+      count_like: this.state.is_like === 1 ? this.state.count_like - 1 : this.state.count_like + 1
+    })
+  }
+
+  render() {
+    return(
+      <View style={css.container}>
+        <View style={{flex: 1, flexDirection: 'row'}}>
+          <TouchableOpacity onPress = {() => this.like()}>
+          {
+            this.state.is_like === 1 ? 
+              <Image source={require('../../images/icons/ic_chat_active.png')} />
+            :
+              <Image source={require('../../images/icons/ic_chat.png')} />
+          }
+          </TouchableOpacity>
+          <Text style={css.like}>{this.state.count_like}</Text>
+          <Image source={require('../../images/icons/ic_chat.png')} />
+          <Text style={css.like}>{this.props.count_comment}</Text>
+          <Image source={require('../../images/icons/ic_chat.png')} />
+        </View>
+        <Image source={require('../../images/icons/ic_chat.png')} />
+      </View>
+    )
+  }
+}
+
+const css = StyleSheet.create({
+  like: {
+    marginLeft: 8,
+    marginRight: 15
+  },
+  container:  {
+    flexDirection: 'row',
+    padding: 15
+  },
+})
+
+export default BotAction;
+  

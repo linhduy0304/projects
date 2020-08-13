@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/24x24_book_o</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M19.7777778,16.3636364 L19.7777778,2.18181818 L5.88888889,2.18181818 C4.96841431,2.18181818 4.22222222,2.91444314 4.22222222,3.81818182 L4.22222222,16.7310716 C4.7273641,16.4954678 5.29244594,16.3636364 5.88888889,16.3636364 L19.7777778,16.3636364 Z M19.7777778,18.5454545 L5.88888889,18.5454545 C4.96841431,18.5454545 4.22222222,19.2780795 4.22222222,20.1818182 C4.22222222,21.0855568 4.96841431,21.8181818 5.88888889,21.8181818 L19.7777778,21.8181818 L19.7777778,18.5454545 Z M5.88888889,0 L20.8888889,0 C21.5025386,0 22,0.488416636 22,1.09090909 L22,22.9090909 C22,23.5115833 21.5025386,24 20.8888889,24 L5.88888889,24 C3.74111487,24 2,22.2905417 2,20.1818182 L2,3.81818182 C2,1.70945823 3.74111487,0 5.88888889,0 Z" id="path-1"></path>
+    </defs>
+    <g id="icon/24x24_book_o" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="24x24_book_o" fill-rule="nonzero"></g>
+        <g id="COLOR/JJ_4.black" mask="url(#mask-2)" fill="#0F0A0A">
+            <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+        </g>
+    </g>
+</svg>
